@@ -46,6 +46,7 @@
 #include <util/lock_and_find.h>
 #include <util/log.h>
 #include <util/string_utils.h>
+#include <util/align.h>
 
 #include <util/tracy.h>
 TRACY_MODULE_NAME(SceGxm);
@@ -1000,7 +1001,7 @@ struct SceGxmContext {
     size_t command_next_free_pos;
     // this one is atomic as it is read from one thread and written to by another
     std::atomic<size_t> command_last_free_pos;
-    size_t command_allocator_size = 0;
+    uint32_t command_allocator_size = 0;
 
     bool last_precomputed = false;
 
@@ -1158,7 +1159,7 @@ struct SceGxmContext {
         renderer::Command *new_command = nullptr;
 
         if (state.type == SCE_GXM_CONTEXT_TYPE_IMMEDIATE) {
-            if (command_allocator_size > 0 && command_next_free_pos <= command_last_free_pos) {
+            if (command_allocator_size > 0 && command_next_free_pos <= command_last_free_pos.load(std::memory_order_acquire)) {
                 size_t offset = command_next_free_pos % command_allocator_size;
                 command_next_free_pos++;
                 new_command = alloc_space.cast<renderer::Command>().get(mem) + offset;
@@ -1182,11 +1183,15 @@ struct SceGxmContext {
             if (cmd->flags & renderer::Command::FLAG_FROM_HOST) {
                 delete cmd;
             } else {
-                ++command_last_free_pos;
+                command_last_free_pos.fetch_add(1, std::memory_order_release);
             }
         }
     }
 };
+
+// the size of the context on a PS Vita is 2048 bytes
+// the +4 is for alignment reasons
+static_assert(sizeof(SceGxmContext) + 4 <= 2048);
 
 struct SceGxmRenderTarget {
     std::unique_ptr<renderer::RenderTarget> renderer;
@@ -1388,7 +1393,7 @@ static void gxmContextStateRestore(renderer::State &state, SceGxmContext *contex
     renderer::set_stencil_ref(state, context->renderer.get(), true, context->state.front_stencil.ref);
     renderer::set_stencil_ref(state, context->renderer.get(), false, context->state.back_stencil.ref);
 
-    if (state.features.support_memory_mapping) {
+    if (state.features.enable_memory_mapping) {
         context->state.visibility_enable = false;
         context->state.visibility_index = 0;
         context->state.visibility_is_increment = true;
@@ -1774,9 +1779,10 @@ EXPORT(int, sceGxmCreateContext, const SceGxmContextParams *params, Ptr<SceGxmCo
         return RET_ERROR(SCE_GXM_ERROR_INVALID_VALUE);
     }
 
-    *context = params->hostMem.cast<SceGxmContext>();
+    // This structure needs 8-byte alignment
+    *context = Ptr<SceGxmContext>(align(params->hostMem.address(), 8));
 
-    SceGxmContext *const ctx = context->get(emuenv.mem);
+    SceGxmContext* ctx = context->get(emuenv.mem);
     new (ctx) SceGxmContext(emuenv.gxm.callback_lock);
 
     ctx->state.fragment_ring_buffer = params->fragmentRingBufferMem;
@@ -1822,8 +1828,8 @@ EXPORT(int, sceGxmCreateDeferredContext, SceGxmDeferredContextParams *params, Pt
         return RET_ERROR(SCE_GXM_ERROR_INVALID_VALUE);
     }
 
-    *deferredContext = params->hostMem.cast<SceGxmContext>();
-    SceGxmContext *const ctx = deferredContext->get(emuenv.mem);
+    *deferredContext = Ptr<SceGxmContext>(align(params->hostMem.address(), 8));
+    SceGxmContext* ctx = deferredContext->get(emuenv.mem);
     new (ctx) SceGxmContext(emuenv.gxm.callback_lock);
 
     ctx->state.vertex_memory_callback = params->vertexCallback;
@@ -2198,7 +2204,7 @@ static int gxmDrawElementGeneral(EmuEnvState &emuenv, const char *export_name, c
     // Update vertex data. We should stores a copy of the data to pass it to GPU later, since another scene
     // may start to overwrite stuff when this scene is being processed in our queue (in case of OpenGL).
     size_t max_index = 0;
-    if (!emuenv.renderer->features.support_memory_mapping) {
+    if (!emuenv.renderer->features.enable_memory_mapping) {
         // we don't need to get the vertex buffer size with memory mapping
         if (indexType == SCE_GXM_INDEX_FORMAT_U16) {
             const uint16_t *const data = static_cast<const uint16_t *>(indices_ptr);
@@ -2212,7 +2218,7 @@ static int gxmDrawElementGeneral(EmuEnvState &emuenv, const char *export_name, c
     size_t max_data_length[SCE_GXM_MAX_VERTEX_STREAMS] = {};
     std::uint32_t stream_used = 0;
     for (const SceGxmVertexAttribute &attribute : gxm_vertex_program.attributes) {
-        if (!emuenv.renderer->features.support_memory_mapping) {
+        if (!emuenv.renderer->features.enable_memory_mapping) {
             const size_t attribute_size = gxm::attribute_format_size(attribute.format) * attribute.componentCount;
             const SceGxmVertexStream &stream = gxm_vertex_program.streams[attribute.streamIndex];
             const SceGxmIndexSource index_source = static_cast<SceGxmIndexSource>(stream.indexSource);
@@ -2320,7 +2326,7 @@ EXPORT(int, sceGxmDrawPrecomputed, SceGxmContext *context, SceGxmPrecomputedDraw
     // Update vertex data. We should stores a copy of the data to pass it to GPU later, since another scene
     // may start to overwrite stuff when this scene is being processed in our queue (in case of OpenGL).
     uint32_t max_index = 0;
-    if (!emuenv.renderer->features.support_memory_mapping) {
+    if (!emuenv.renderer->features.enable_memory_mapping) {
         // we don't need to get the vertex buffer size with memory mapping
         if (draw->index_format == SCE_GXM_INDEX_FORMAT_U16) {
             const uint16_t *const data = draw->index_data.cast<const uint16_t>().get(emuenv.mem);
@@ -2351,7 +2357,7 @@ EXPORT(int, sceGxmDrawPrecomputed, SceGxmContext *context, SceGxmPrecomputedDraw
     size_t max_data_length[SCE_GXM_MAX_VERTEX_STREAMS] = {};
     std::uint32_t stream_used = 0;
     for (const SceGxmVertexAttribute &attribute : vertex_program->attributes) {
-        if (!emuenv.renderer->features.support_memory_mapping) {
+        if (!emuenv.renderer->features.enable_memory_mapping) {
             const size_t attribute_size = gxm::attribute_format_size(attribute.format) * attribute.componentCount;
             const SceGxmVertexStream &stream = vertex_program->streams[attribute.streamIndex];
             const SceGxmIndexSource index_source = static_cast<SceGxmIndexSource>(stream.indexSource);
@@ -2719,7 +2725,7 @@ EXPORT(int, sceGxmMapMemory, Ptr<void> base, uint32_t size, uint32_t attribs) {
         if (ite != gxm.memory_mapped_regions.end() && base.address() + size > ite->first) {
             LOG_ERROR("Overlapping mapped memory detected");
 
-            if (emuenv.renderer->features.support_memory_mapping) {
+            if (emuenv.renderer->features.enable_memory_mapping) {
                 // overlapping memory mapping is not supported
                 return RET_ERROR(SCE_GXM_ERROR_INVALID_POINTER);
             }
@@ -2727,7 +2733,7 @@ EXPORT(int, sceGxmMapMemory, Ptr<void> base, uint32_t size, uint32_t attribs) {
         gxm.memory_mapped_regions.emplace(base.address(), MemoryMapInfo{ base.address(), size, attribs });
 
         // little big planet maps regions of size 0
-        if (emuenv.renderer->features.support_memory_mapping && size > 0)
+        if (emuenv.renderer->features.enable_memory_mapping && size > 0)
             renderer::send_single_command(*emuenv.renderer, nullptr, renderer::CommandOpcode::MemoryMap, true, base, size);
 
         return 0;
@@ -3867,7 +3873,7 @@ EXPORT(void, sceGxmSetFrontStencilRef, SceGxmContext *context, uint8_t sref) {
 EXPORT(void, sceGxmSetFrontVisibilityTestEnable, SceGxmContext *context, SceGxmVisibilityTestMode enable) {
     TRACY_FUNC(sceGxmSetFrontVisibilityTestEnable, context, enable);
 
-    if (!emuenv.renderer->features.support_memory_mapping) {
+    if (!emuenv.renderer->features.enable_memory_mapping) {
         UNIMPLEMENTED();
         return;
     }
@@ -3879,7 +3885,7 @@ EXPORT(void, sceGxmSetFrontVisibilityTestEnable, SceGxmContext *context, SceGxmV
 EXPORT(void, sceGxmSetFrontVisibilityTestIndex, SceGxmContext *context, uint32_t index) {
     TRACY_FUNC(sceGxmSetFrontVisibilityTestIndex, context, index);
 
-    if (!emuenv.renderer->features.support_memory_mapping) {
+    if (!emuenv.renderer->features.enable_memory_mapping) {
         UNIMPLEMENTED();
         return;
     }
@@ -3891,7 +3897,7 @@ EXPORT(void, sceGxmSetFrontVisibilityTestIndex, SceGxmContext *context, uint32_t
 EXPORT(void, sceGxmSetFrontVisibilityTestOp, SceGxmContext *context, SceGxmVisibilityTestOp op) {
     TRACY_FUNC(sceGxmSetFrontVisibilityTestOp, context, op);
 
-    if (!emuenv.renderer->features.support_memory_mapping) {
+    if (!emuenv.renderer->features.enable_memory_mapping) {
         UNIMPLEMENTED();
         return;
     }
@@ -4219,7 +4225,7 @@ EXPORT(int, sceGxmSetVisibilityBuffer, SceGxmContext *immediateContext, Ptr<void
     if (bufferBase.address() & (SCE_GXM_VISIBILITY_ALIGNMENT - 1))
         return RET_ERROR(SCE_GXM_ERROR_INVALID_ALIGNMENT);
 
-    if (emuenv.renderer->features.support_memory_mapping) {
+    if (emuenv.renderer->features.enable_memory_mapping) {
         renderer::set_visibility_buffer(*emuenv.renderer, immediateContext->renderer.get(), bufferBase.cast<uint32_t>(), stridePerCore);
     } else {
         STUBBED("Set all visible");
@@ -5465,7 +5471,16 @@ EXPORT(int, sceGxmUnmapMemory, Ptr<void> base) {
         return RET_ERROR(SCE_GXM_ERROR_INVALID_POINTER);
     }
 
-    if (emuenv.renderer->features.support_memory_mapping && ite->second.size > 0)
+    // this memory range may contain trapped region, so untrap everything to make sure
+    // we don't run into issues later
+    // TODO: call a mem function to invalidate the range instead
+    uint8_t* addr_start = base.cast<uint8_t>().get(emuenv.mem);
+    for(volatile uint8_t* addr = addr_start; addr < addr_start + ite->second.size; addr += emuenv.mem.page_size){
+        // this should cause a read and a write
+        *addr = *addr;
+    }
+
+    if (emuenv.renderer->features.enable_memory_mapping && ite->second.size > 0)
         renderer::send_single_command(*emuenv.renderer, nullptr, renderer::CommandOpcode::MemoryUnmap, true, base);
 
     emuenv.gxm.memory_mapped_regions.erase(ite);

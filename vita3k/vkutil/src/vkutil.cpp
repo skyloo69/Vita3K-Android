@@ -51,23 +51,8 @@ void end_single_time_command(vk::Device device, vk::Queue queue, vk::CommandPool
 }
 
 vk::ShaderModule load_shader(vk::Device device, const fs::path &shader_path) {
-    fs::ifstream is(shader_path, fs::ifstream::binary);
-    if (!is) {
-        return {};
-    }
-
-    is.seekg(0, fs::ifstream::end);
-    uint32_t size_read = is.tellg();
-    is.seekg(0);
-
-    if (size_read == 0) {
-        return {};
-    }
-
-    std::vector<uint8_t> shader_code(size_read);
-
-    is.read(reinterpret_cast<char *>(shader_code.data()), size_read);
-    return load_shader(device, shader_code.data(), size_read);
+    const std::vector<uint8_t> shader_code = fs_utils::read_asset_raw(shader_path);
+    return load_shader(device, shader_code.data(), shader_code.size());
 }
 
 vk::ShaderModule load_shader(vk::Device device, const void *data, const uint32_t size) {

@@ -27,7 +27,6 @@
 #include <functional>
 #include <string>
 
-// TODO: remove
 #include <util/fs.h>
 
 struct SfoFile;
