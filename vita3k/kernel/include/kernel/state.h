@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <cpu/functions.h>
 #include <kernel/callback.h>
 #include <kernel/cpu_protocol.h>
 #include <kernel/debugger.h>
@@ -29,15 +28,12 @@
 #include <rtc/rtc.h>
 #include <util/containers.h>
 #include <util/pool.h>
+#include <util/types.h>
 
 #include <atomic>
 #include <kernel/object_store.h>
 #include <map>
 #include <mutex>
-#include <optional>
-#include <queue>
-#include <shared_mutex>
-#include <unordered_map>
 #include <vector>
 
 struct ThreadState;
@@ -52,13 +48,20 @@ struct InitialFiber;
 
 struct CodecEngineBlock;
 
+struct KernelModule {
+    SceKernelModuleInfo info;
+    Ptr<const uint8_t> info_segment_address;
+    uint32_t info_offset;
+};
+typedef std::shared_ptr<KernelModule> SceKernelModulePtr;
+
 typedef std::shared_ptr<ThreadState> ThreadStatePtr;
 typedef std::map<SceUID, CodecEngineBlock> CodecEngineBlocks;
 typedef std::map<SceUID, Ptr<Ptr<void>>> SlotToAddress;
 typedef std::map<SceUID, ThreadStatePtr> ThreadStatePtrs;
 typedef std::shared_ptr<SDL_Thread> ThreadPtr;
 typedef std::map<SceUID, ThreadPtr> ThreadPtrs;
-typedef std::map<SceUID, SceKernelModuleInfoPtr> SceKernelModuleInfoPtrs;
+typedef std::map<SceUID, SceKernelModulePtr> SceKernelModuleInfoPtrs;
 typedef std::map<SceUID, CallbackPtr> CallbackPtrs;
 typedef unordered_map_fast<uint32_t, Address> ExportNids;
 
@@ -70,7 +73,7 @@ struct CodecEngineBlock {
     int32_t vaddr;
 };
 
-using LoadedSysmodules = std::vector<SceSysmoduleModuleId>;
+using LoadedSysmodules = std::map<SceSysmoduleModuleId, std::vector<SceUID>>;
 using LoadedInternalSysmodules = std::vector<SceSysmoduleInternalModuleId>;
 
 struct CorenumAllocator {
@@ -83,13 +86,14 @@ struct CorenumAllocator {
     void free_corenum(const int num);
 };
 
-struct late_binding_info {
+struct VarBindingInfo {
     void *entries;
     uint32_t size;
     uint32_t module_nid;
 };
 
-typedef std::multimap<uint32_t, late_binding_info> VarLateBindingInfos;
+typedef std::multimap<uint32_t, VarBindingInfo> VarBindingInfos;
+typedef std::multimap<uint32_t, Address> FuncBindingInfos;
 
 typedef std::map<uint32_t, uint32_t> ModuleUidByNid;
 
@@ -127,18 +131,19 @@ struct KernelState {
     SceKernelModuleInfoPtrs loaded_modules;
     LoadedSysmodules loaded_sysmodules;
     LoadedInternalSysmodules loaded_internal_sysmodules;
-    ExportNids export_nids;
+
+    // the variables in this block must be accessed by first locking export_nids_mutex
     std::mutex export_nids_mutex;
-    VarLateBindingInfos late_binding_infos;
+    ExportNids export_nids;
+    FuncBindingInfos func_binding_infos;
+    VarBindingInfos var_binding_infos;
     ModuleUidByNid module_uid_by_nid;
 
     bool cpu_opt;
     CPUBackend cpu_backend;
     CorenumAllocator corenum_allocator;
     CPUProtocolPtr cpu_protocol;
-#ifdef USE_DYNARMIC
     ExclusiveMonitorPtr exclusive_monitor;
-#endif
 
     ObjectStore obj_store;
 
@@ -152,7 +157,7 @@ struct KernelState {
         return next_uid++;
     }
 
-    bool init(MemState &mem, CallImportFunc call_import, CPUBackend cpu_backend, bool cpu_opt);
+    bool init(MemState &mem, const CallImportFunc &call_import, CPUBackend cpu_backend, bool cpu_opt);
     void load_process_param(MemState &mem, Ptr<uint32_t> ptr);
     ThreadStatePtr create_thread(MemState &mem, const char *name, Ptr<const void> entry_point = Ptr<const void>(0));
     ThreadStatePtr create_thread(MemState &mem, const char *name, Ptr<const void> entry_point, int init_priority, SceInt32 affinity_mask, int stack_size, const SceKernelThreadOptParam *option);
@@ -161,13 +166,13 @@ struct KernelState {
     Ptr<Ptr<void>> get_thread_tls_addr(MemState &mem, SceUID thread_id, int key);
 
     void exit_delete_all_threads();
-    bool is_threads_paused() { return !paused_threads_status.empty(); };
+    bool is_threads_paused() { return !paused_threads_status.empty(); }
     void pause_threads();
     void resume_threads();
 
     void set_memory_watch(bool enabled);
     void invalidate_jit_cache(Address start, size_t length);
-    std::shared_ptr<SceKernelModuleInfo> find_module_by_addr(Address address);
+    SceKernelModuleInfo *find_module_by_addr(Address address);
 
 private:
     std::atomic<SceUID> next_uid{ 1 };
