@@ -17,22 +17,21 @@
 
 #pragma once
 
-#include <mem/ptr.h>
+#include <cpu/common.h>
 
-#include <map>
+struct KernelState;
+typedef int SceUID;
+typedef std::function<void(CPUState &cpu, uint32_t nid, SceUID thread_id)> CallImportFunc;
 
-struct MemState;
+struct CPUProtocol : public CPUProtocolBase {
+    CPUProtocol(KernelState &kernel, MemState &mem, const CallImportFunc &func);
+    ~CPUProtocol() override = default;
+    void call_svc(CPUState &cpu, uint32_t svc, Address pc, ThreadState &thread) override;
+    Address get_watch_memory_addr(Address addr) override;
+    ExclusiveMonitorPtr get_exlusive_monitor() override;
 
-struct SegmentInfoForReloc {
-    Address addr; // segment address in guest memory
-    Address p_vaddr; // segment virtual address in guest memory
-    uint64_t size; // segment memory size
+private:
+    CallImportFunc call_import;
+    KernelState *kernel;
+    MemState *mem;
 };
-using SegmentInfosForReloc = std::map<uint16_t, SegmentInfoForReloc>;
-
-/**
- * \param is_var_import True when alternate format 1 should be used (it's used for var import relocations)
- * \param explicit_symval Used only if is_var_import is true, specifies the value to be written to the relocation target
- * \return True on success, false on error
- */
-bool relocate(const void *entries, uint32_t size, const SegmentInfosForReloc &segments, const MemState &mem, bool is_var_import = false, uint32_t explicit_symval = 0);
