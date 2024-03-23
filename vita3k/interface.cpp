@@ -26,6 +26,7 @@
 #include <display/state.h>
 #include <gui/functions.h>
 #include <gxm/state.h>
+#include <host/dialog/filesystem.h>
 #include <io/device.h>
 #include <io/functions.h>
 #include <io/vfs.h>
@@ -246,6 +247,9 @@ static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
         std::string m_filename = std::string(file_stat.m_filename);
         if (m_filename.find("sce_module/steroid.suprx") != std::string::npos) {
             LOG_CRITICAL("A Vitamin dump was detected, aborting installation...");
+#ifdef ANDROID
+            SDL_AndroidShowToast("Vitamin dumps are not supported!", 1, -1, 0, 0);
+#endif
             content_path.clear();
             break;
         }
@@ -696,7 +700,11 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
 
             if (ImGui::GetIO().WantTextInput || gui.is_key_locked)
                 continue;
-
+            
+#ifdef ANDROID
+            if(event.key.keysym.sym == SDLK_AC_BACK)
+                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
+#else
             // toggle gui state
             if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
                 emuenv.display.imgui_render = !emuenv.display.imgui_render;
@@ -711,6 +719,12 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
 
             if (sce_ctrl_btn != 0)
                 ui_navigation(sce_ctrl_btn);
+#ifdef ANDROID
+            if(!was_in_livearea && gui.vita_area.live_area_screen){
+                emuenv.display.imgui_render = true;
+                gui::set_controller_overlay_state(0);
+            }
+#endif
 
             break;
         }
