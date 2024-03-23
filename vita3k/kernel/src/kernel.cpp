@@ -26,12 +26,10 @@
 #include <cpu/functions.h>
 #include <mem/ptr.h>
 #include <util/align.h>
-#include <util/arm.h>
 #include <util/find.h>
 #include <util/log.h>
 
 #include <SDL_thread.h>
-
 #include <spdlog/fmt/fmt.h>
 #include <util/lock_and_find.h>
 
@@ -87,13 +85,11 @@ KernelState::KernelState()
     : debugger(*this) {
 }
 
-bool KernelState::init(MemState &mem, CallImportFunc call_import, CPUBackend cpu_backend, bool cpu_opt) {
+bool KernelState::init(MemState &mem, const CallImportFunc &call_import, CPUBackend cpu_backend, bool cpu_opt) {
     constexpr std::size_t MAX_CORE_COUNT = 150;
 
     corenum_allocator.set_max_core_count(MAX_CORE_COUNT);
-#ifdef USE_DYNARMIC
     exclusive_monitor = new_exclusive_monitor(MAX_CORE_COUNT);
-#endif
     start_tick = rtc_get_ticks(rtc_base_ticks());
     base_tick = { rtc_base_ticks() };
     cpu_protocol = std::make_unique<CPUProtocol>(*this, mem, call_import);
@@ -128,8 +124,8 @@ void KernelState::set_memory_watch(bool enabled) {
 
 void KernelState::invalidate_jit_cache(Address start, size_t length) {
     std::lock_guard<std::mutex> lock(mutex);
-    for (auto thread : threads) {
-        ::invalidate_jit_cache(*thread.second->cpu, start, length);
+    for (const auto &[_, thread] : threads) {
+        ::invalidate_jit_cache(*thread->cpu, start, length);
     }
 }
 
@@ -194,14 +190,14 @@ void KernelState::resume_threads() {
     paused_threads_status.clear();
 }
 
-std::shared_ptr<SceKernelModuleInfo> KernelState::find_module_by_addr(Address address) {
+SceKernelModuleInfo *KernelState::find_module_by_addr(Address address) {
     const auto lock = std::lock_guard(mutex);
-    for (auto [_, mod] : loaded_modules) {
-        for (auto seg : mod->segments) {
+    for (auto &[_, mod] : loaded_modules) {
+        for (auto &seg : mod->info.segments) {
             if (!seg.size)
                 continue;
             if (seg.vaddr.address() <= address && address <= seg.vaddr.address() + seg.memsz) {
-                return mod;
+                return &mod->info;
             }
         }
     }
