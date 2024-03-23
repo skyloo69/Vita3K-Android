@@ -17,7 +17,6 @@
 
 #include <kernel/cpu_protocol.h>
 #include <kernel/state.h>
-#include <util/lock_and_find.h>
 
 CPUProtocol::CPUProtocol(KernelState &kernel, MemState &mem, const CallImportFunc &func)
     : call_import(func)
@@ -54,18 +53,14 @@ void CPUProtocol::call_svc(CPUState &cpu, uint32_t svc, Address pc, ThreadState 
     // the only benefit of using thread_id instead--namely less locking-- has been gone for long
     call_import(cpu, nid, thread.id);
 
-#if defined(USE_DYNARMIC)
     // ARM recommends clearing exclusive state inside interrupt handler
     clear_exclusive(kernel->exclusive_monitor, get_processor_id(cpu));
-#endif
 }
 
 Address CPUProtocol::get_watch_memory_addr(Address addr) {
     return kernel->debugger.get_watch_memory_addr(addr);
 }
 
-#ifdef USE_DYNARMIC
 ExclusiveMonitorPtr CPUProtocol::get_exlusive_monitor() {
     return kernel->exclusive_monitor;
 }
-#endif
