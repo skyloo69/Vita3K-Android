@@ -26,11 +26,9 @@
 #include <display/state.h>
 #include <gui/functions.h>
 #include <gxm/state.h>
-#include <host/dialog/filesystem.h>
 #include <io/device.h>
 #include <io/functions.h>
 #include <io/vfs.h>
-#include <kernel/load_self.h>
 #include <kernel/state.h>
 #include <packages/functions.h>
 #include <packages/pkg.h>
@@ -41,8 +39,6 @@
 #include <modules/module_parent.h>
 #include <string>
 #include <touch/functions.h>
-#include <touch/touch.h>
-#include <util/find.h>
 #include <util/log.h>
 #include <util/string_utils.h>
 
@@ -155,19 +151,16 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
             gui::GenericDialogState status = gui::UNK_STATE;
 
             while (handle_events(emuenv, *gui) && (status == gui::UNK_STATE)) {
-                gui::draw_begin(*gui, emuenv);
-                if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
-                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+                ImGui_ImplSdl_NewFrame(gui->imgui_state.get());
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 gui::draw_ui(*gui, emuenv);
                 ImGui::PushFont(gui->vita_font);
                 gui::draw_reinstall_dialog(&status, *gui, emuenv);
                 ImGui::PopFont();
-                if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
-                    glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
+                glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
                 ImGui::Render();
-                gui::draw_end(*gui, emuenv.window.get());
-                emuenv.renderer->swap_window(emuenv.window.get());
+                ImGui_ImplSdl_RenderDrawData(gui->imgui_state.get());
+                SDL_GL_SwapWindow(emuenv.window.get());
             }
             switch (status) {
             case gui::CANCEL_STATE:
@@ -191,8 +184,8 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
             progress_callback({ {}, {}, { file_progress * 0.7f + decrypt_progress * 0.3f } });
     };
 
-    int num_files = mz_zip_reader_get_num_files(zip.get());
-    for (auto i = 0; i < num_files; i++) {
+    mz_uint num_files = mz_zip_reader_get_num_files(zip.get());
+    for (mz_uint i = 0; i < num_files; i++) {
         mz_zip_archive_file_stat file_stat;
         if (!mz_zip_reader_file_stat(zip.get(), i, &file_stat)) {
             continue;
@@ -240,12 +233,12 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
 }
 
 static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
-    int num_files = mz_zip_reader_get_num_files(zip.get());
+    mz_uint num_files = mz_zip_reader_get_num_files(zip.get());
     std::vector<std::string> content_path;
     std::string sfo_path = "sce_sys/param.sfo";
     std::string theme_path = "theme.xml";
 
-    for (int i = 0; i < num_files; i++) {
+    for (mz_uint i = 0; i < num_files; i++) {
         mz_zip_archive_file_stat file_stat;
         if (!mz_zip_reader_file_stat(zip.get(), i, &file_stat))
             continue;
@@ -253,9 +246,6 @@ static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
         std::string m_filename = std::string(file_stat.m_filename);
         if (m_filename.find("sce_module/steroid.suprx") != std::string::npos) {
             LOG_CRITICAL("A Vitamin dump was detected, aborting installation...");
-#ifdef ANDROID
-            SDL_AndroidShowToast("Vitamin dumps are not supported!", 1, -1, 0, 0);
-#endif
             content_path.clear();
             break;
         }
@@ -264,8 +254,7 @@ static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
         if (is_content) {
             const auto content_type = (m_filename.find(sfo_path) != std::string::npos) ? sfo_path : theme_path;
             m_filename.erase(m_filename.find(content_type));
-            if (std::find(content_path.begin(), content_path.end(), m_filename) == content_path.end())
-                content_path.push_back(m_filename);
+            vector_utils::push_if_not_exists(content_path, m_filename);
         }
     }
 
@@ -273,14 +262,14 @@ static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
 }
 
 std::vector<ContentInfo> install_archive(EmuEnvState &emuenv, GuiState *gui, const fs::path &archive_path, const std::function<void(ArchiveContents)> &progress_callback) {
-    FILE *vpk_fp = host::dialog::filesystem::resolve_host_handle(archive_path);
-
-    if (!vpk_fp) {
-        LOG_CRITICAL("Failed to load archive file in path: {}", archive_path.generic_path().string());
+    if (!fs::exists(archive_path)) {
+        LOG_CRITICAL("Failed to load archive file in path: {}", archive_path.generic_path());
         return {};
     }
     const ZipPtr zip(new mz_zip_archive, delete_zip);
     std::memset(zip.get(), 0, sizeof(*zip));
+
+    FILE *vpk_fp = FOPEN(archive_path.generic_path().c_str(), "rb");
 
     if (!mz_zip_reader_init_cfile(zip.get(), vpk_fp, 0, 0)) {
         LOG_CRITICAL("miniz error reading archive: {}", miniz_get_error(zip));
@@ -294,7 +283,7 @@ std::vector<ContentInfo> install_archive(EmuEnvState &emuenv, GuiState *gui, con
         return {};
     }
 
-    const auto count = float(content_path.size());
+    const auto count = static_cast<float>(content_path.size());
     float current = 0.f;
     const auto update_progress = [&]() {
         if (progress_callback)
@@ -321,7 +310,7 @@ static std::vector<fs::path> get_contents_path(const fs::path &path) {
         const auto is_content = (p.path().filename() == "param.sfo") || (p.path().filename() == "theme.xml");
         if (is_content) {
             const auto content_path = (p.path().filename() == "param.sfo") ? p.path().parent_path().parent_path() : p.path().parent_path();
-            if (std::find(content_path.begin(), content_path.end(), p.path().parent_path()) == content_path.end())
+            if (!vector_utils::contains(content_path, p.path().parent_path()))
                 contents_path.push_back(content_path);
         }
     }
@@ -431,11 +420,8 @@ static ExitCode load_app_impl(SceUID &main_module_id, EmuEnvState &emuenv) {
     LOG_INFO("Resolution multiplier: {}", emuenv.cfg.resolution_multiplier);
     if (emuenv.ctrl.controllers_num) {
         LOG_INFO("{} Controllers Connected", emuenv.ctrl.controllers_num);
-        int ctrl_idx = 0;
-        for (auto i = 0; i < 4; i++)
-            if (emuenv.ctrl.controllers_name[i])
-                LOG_INFO("Controller {}: {}", ctrl_idx++, emuenv.ctrl.controllers_name[i]);
-
+        for (auto i = 0; i < emuenv.ctrl.controllers_num; i++)
+            LOG_INFO("Controller {}: {}", i, emuenv.ctrl.controllers_name[i]);
         if (emuenv.ctrl.has_motion_support)
             LOG_INFO("Controller has motion support");
     }
@@ -468,7 +454,7 @@ static ExitCode load_app_impl(SceUID &main_module_id, EmuEnvState &emuenv) {
     main_module_id = load_module(emuenv, "app0:" + emuenv.self_path);
     if (main_module_id >= 0) {
         const auto module = emuenv.kernel.loaded_modules[main_module_id];
-        LOG_INFO("Main executable {} ({}) loaded", module->module_name, emuenv.self_path);
+        LOG_INFO("Main executable {} ({}) loaded", module->info.module_name, emuenv.self_path);
     } else
         return FileNotFound;
     // Set self name from self path, can contain folder, get file name only
@@ -497,7 +483,7 @@ static ExitCode load_app_impl(SceUID &main_module_id, EmuEnvState &emuenv) {
             }
 
             if (module_id != SCE_SYSMODULE_INVALID)
-                emuenv.kernel.loaded_sysmodules.push_back(module_id);
+                emuenv.kernel.loaded_sysmodules[module_id] = {};
         }
     };
     add_preload_module(0x00010000, SCE_SYSMODULE_INVALID, "libc", is_app);
@@ -694,7 +680,7 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             };
 
             // Get Sce Ctrl button from key
-            auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
+            const auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
 
             if (gui.is_capturing_keys && event.key.keysym.scancode) {
                 gui.is_key_capture_dropped = false;
@@ -711,34 +697,20 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             if (ImGui::GetIO().WantTextInput || gui.is_key_locked)
                 continue;
 
-#ifdef ANDROID
-            if(event.key.keysym.sym == SDLK_AC_BACK)
-                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
-#else
             // toggle gui state
+            if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
+                emuenv.display.imgui_render = !emuenv.display.imgui_render;
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_touch && !gui.is_key_capture_dropped)
                 toggle_touchscreen();
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_fullscreen && !gui.is_key_capture_dropped)
                 switch_full_screen(emuenv);
-            if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
-                emuenv.display.imgui_render = !emuenv.display.imgui_render;
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_toggle_texture_replacement && !gui.is_key_capture_dropped)
                 toggle_texture_replacement(emuenv);
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_take_screenshot && !gui.is_key_capture_dropped)
                 take_screenshot(emuenv);
-#endif
-
-            bool was_in_livearea = gui.vita_area.live_area_screen;
 
             if (sce_ctrl_btn != 0)
                 ui_navigation(sce_ctrl_btn);
-
-#ifdef ANDROID
-            if(!was_in_livearea && gui.vita_area.live_area_screen){
-                emuenv.display.imgui_render = true;
-                gui::set_controller_overlay_state(0);
-            }
-#endif
 
             break;
         }
@@ -837,7 +809,7 @@ static std::vector<std::string> split(const std::string &input, const std::strin
 }
 
 ExitCode run_app(EmuEnvState &emuenv, int32_t main_module_id) {
-    auto entry_point = emuenv.kernel.loaded_modules[main_module_id]->start_entry;
+    auto entry_point = emuenv.kernel.loaded_modules[main_module_id]->info.start_entry;
     auto process_param = emuenv.kernel.process_param.get(emuenv.mem);
 
     SceInt32 priority = SCE_KERNEL_DEFAULT_PRIORITY_USER;
@@ -868,8 +840,8 @@ ExitCode run_app(EmuEnvState &emuenv, int32_t main_module_id) {
 
     // Run `module_start` export (entry point) of loaded libraries
     for (auto &[_, module] : emuenv.kernel.loaded_modules) {
-        if (module->modid != main_module_id)
-            start_module(emuenv, module);
+        if (module->info.modid != main_module_id)
+            start_module(emuenv, module->info);
     }
 
     SceKernelThreadOptParam param{ 0, 0 };
@@ -881,7 +853,7 @@ ExitCode run_app(EmuEnvState &emuenv, int32_t main_module_id) {
             buf.insert(buf.end(), arg.c_str(), arg.c_str() + arg.size() + 1);
         auto arr = Ptr<uint8_t>(alloc(emuenv.mem, static_cast<uint32_t>(buf.size()), "arg"));
         memcpy(arr.get(emuenv.mem), buf.data(), buf.size());
-        param.size = SceSize(buf.size());
+        param.size = static_cast<SceSize>(buf.size());
         param.attr = arr.address();
     }
     if (main_thread->start(param.size, Ptr<void>(param.attr), true) < 0) {
