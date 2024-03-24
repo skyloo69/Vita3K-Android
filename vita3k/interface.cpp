@@ -703,7 +703,7 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             
 #ifdef ANDROID
             if(event.key.keysym.sym == SDLK_AC_BACK)
-                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
+                const auto sce_ctrl_btn = SCE_CTRL_PSBUTTON;
 #else
             // toggle gui state
             if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
