@@ -23,19 +23,16 @@
 #include <mem/ptr.h>
 #include <util/log.h>
 #include <util/types.h>
-
 #ifdef USE_DYNARMIC
 #include <cpu/impl/dynarmic_cpu.h>
 #endif
 #ifdef USE_UNICORN
 #include <cpu/impl/unicorn_cpu.h>
 #endif
-
 #include <cassert>
 #include <cpu/state.h>
 #include <cstring>
 
-#include <spdlog/fmt/fmt.h>
 #include <util/string_utils.h>
 
 static void delete_cpu_state(CPUState *state) {
@@ -71,19 +68,17 @@ CPUStatePtr init_cpu(CPUBackend backend, bool cpu_opt, SceUID thread_id, std::si
     switch (backend) {
 #ifdef USE_DYNARMIC
     case CPUBackend::Dynarmic: {
-        Dynarmic::ExclusiveMonitor *monitor = reinterpret_cast<Dynarmic::ExclusiveMonitor *>(protocol->get_exlusive_monitor());
+        Dynarmic::ExclusiveMonitor *monitor = static_cast<Dynarmic::ExclusiveMonitor *>(protocol->get_exlusive_monitor());
         state->cpu = std::make_unique<DynarmicCPU>(state.get(), processor_id, monitor, cpu_opt);
         break;
     }
 #endif
-
 #ifdef USE_UNICORN
     case CPUBackend::Unicorn: {
         state->cpu = std::make_unique<UnicornCPU>(state.get());
         break;
     }
 #endif
-
     default:
         return nullptr;
     }
@@ -219,7 +214,7 @@ CPUContext save_context(CPUState &state) {
     return state.cpu->save_context();
 }
 
-void load_context(CPUState &state, CPUContext ctx) {
+void load_context(CPUState &state, const CPUContext &ctx) {
     state.cpu->load_context(ctx);
 }
 
