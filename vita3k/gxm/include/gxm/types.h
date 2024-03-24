@@ -1099,7 +1099,7 @@ enum SceGxmMemoryAttribFlags {
     SCE_GXM_MEMORY_ATTRIB_RW = (SCE_GXM_MEMORY_ATTRIB_READ | SCE_GXM_MEMORY_ATTRIB_WRITE)
 };
 
-enum SceGxmAttributeFormat {
+enum SceGxmAttributeFormat : uint8_t {
     SCE_GXM_ATTRIBUTE_FORMAT_U8,
     SCE_GXM_ATTRIBUTE_FORMAT_S8,
     SCE_GXM_ATTRIBUTE_FORMAT_U16,
@@ -1358,8 +1358,10 @@ enum SceGxmProgramFlags : uint32_t {
     SCE_GXM_PROGRAM_FLAG_FRAGCOLOR_USED = 1 << 7,
     SCE_GXM_PROGRAM_FLAG_NATIVECOLOR_MSAA2X = 1 << 8,
     SCE_GXM_PROGRAM_FLAG_NATIVECOLOR_MSAA4X = 1 << 9,
+
     // Note, I'm not sure about this one
     SCE_GXM_PROGRAM_FLAG_BUFFER_STORE = 1 << 14,
+
     SCE_GXM_PROGRAM_FLAG_OUTPUT_UNDEFINED = 1 << 16,
     SCE_GXM_PROGRAM_FLAG_INDEX_USED = 1 << 17,
     SCE_GXM_PROGRAM_FLAG_INSTANCE_USED = 1 << 18,
@@ -1473,7 +1475,7 @@ struct SceGxmProgram {
     OFFSET_FUNCTION_CHECKED(SceGxmProgramParameter, program_parameters, parameters_offset)
     OFFSET_FUNCTION_CHECKED(SceGxmProgramVertexVaryings, vertex_varyings, varyings_offset)
     SceGxmParameterType get_fragment_output_type() const {
-        return static_cast<const SceGxmParameterType>(vertex_varyings()->output_param_type);
+        return vertex_varyings()->output_param_type;
     }
     uint8_t get_fragment_output_component_count() const {
         return vertex_varyings()->output_comp_count;
@@ -1505,7 +1507,6 @@ struct SceGxmProgramParameter {
         uint8_t container_index : 4; // applicable for constants, not applicable for samplers (buffer, default, texture)
     };
 
-    // Note, for uniform buffers, it looks like a semantic of 3 means it is being written to
     SceGxmParameterSemantic semantic; // applicable only for for vertex attributes, for everything else it's 0
     uint8_t semantic_index;
     uint32_t array_size;
@@ -1526,7 +1527,7 @@ static_assert(sizeof(SceGxmProgramParameter) == 16, "Incorrect structure layout.
 struct SceGxmVertexAttribute {
     uint16_t streamIndex;
     uint16_t offset;
-    uint8_t format; // SceGxmAttributeFormat.
+    SceGxmAttributeFormat format;
     uint8_t componentCount;
     uint16_t regIndex; // Returned from sceGxmProgramParameterGetResourceIndex().
 };
