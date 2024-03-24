@@ -714,14 +714,23 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
                 toggle_touchscreen();
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_fullscreen && !gui.is_key_capture_dropped)
                 switch_full_screen(emuenv);
+            if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
+                emuenv.display.imgui_render = !emuenv.display.imgui_render;
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_toggle_texture_replacement && !gui.is_key_capture_dropped)
                 toggle_texture_replacement(emuenv);
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_take_screenshot && !gui.is_key_capture_dropped)
                 take_screenshot(emuenv);
-
+#endif
+            bool was_in_livearea = gui.vita_area.live_area_screen;
+            
             if (sce_ctrl_btn != 0)
                 ui_navigation(sce_ctrl_btn);
-
+#ifdef ANDROID
+            if(!was_in_livearea && gui.vita_area.live_area_screen){
+                emuenv.display.imgui_render = true;
+                gui::set_controller_overlay_state(0);
+            }
+#endif
             break;
         }
         case SDL_KEYUP:
