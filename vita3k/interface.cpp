@@ -152,16 +152,18 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
             gui::GenericDialogState status = gui::UNK_STATE;
 
             while (handle_events(emuenv, *gui) && (status == gui::UNK_STATE)) {
-                ImGui_ImplSdl_NewFrame(gui->imgui_state.get());
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                gui::draw_begin(*gui, emuenv);
+                if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
+                    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 gui::draw_ui(*gui, emuenv);
                 ImGui::PushFont(gui->vita_font);
                 gui::draw_reinstall_dialog(&status, *gui, emuenv);
                 ImGui::PopFont();
-                glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
+                if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
+                    glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
                 ImGui::Render();
-                ImGui_ImplSdl_RenderDrawData(gui->imgui_state.get());
-                SDL_GL_SwapWindow(emuenv.window.get());
+                gui::draw_end(*gui, emuenv.window.get());
+                emuenv.renderer->swap_window(emuenv.window.get());
             }
             switch (status) {
             case gui::CANCEL_STATE:
@@ -684,8 +686,7 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             };
 
             // Get Sce Ctrl button from key
-           //  const auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
-            auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
+            const auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
 
             if (gui.is_capturing_keys && event.key.keysym.scancode) {
                 gui.is_key_capture_dropped = false;
@@ -701,11 +702,7 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
 
             if (ImGui::GetIO().WantTextInput || gui.is_key_locked)
                 continue;
-            
-#ifdef ANDROID
-            if(event.key.keysym.sym == SDLK_AC_BACK)
-                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
-#else
+
             // toggle gui state
             if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
                 emuenv.display.imgui_render = !emuenv.display.imgui_render;
@@ -720,12 +717,6 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
 
             if (sce_ctrl_btn != 0)
                 ui_navigation(sce_ctrl_btn);
-#ifdef ANDROID
-            if(!was_in_livearea && gui.vita_area.live_area_screen){
-                emuenv.display.imgui_render = true;
-                gui::set_controller_overlay_state(0);
-            }
-#endif
 
             break;
         }
