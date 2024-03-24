@@ -17,7 +17,7 @@
 
 #include <audio/state.h>
 
-ifdef TRACY_ENABLE
+#ifdef TRACY_ENABLE
 #include <tracy/Tracy.hpp>
 #endif
 
