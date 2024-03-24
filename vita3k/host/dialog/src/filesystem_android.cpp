@@ -89,7 +89,7 @@ std::string format_file_filter_extension_list(std::vector<std::string> &file_ext
 namespace host {
 namespace dialog {
 namespace filesystem {
-Result open_file(fs::path &resulting_path, std::vector<FileFilter> file_filters, fs::path default_path) {
+Result open_file(fs::path &resulting_path, const std::vector<FileFilter> &file_filters, const fs::path &default_path) {
     SDL_AndroidRequestPermission("android.permission.READ_EXTERNAL_STORAGE");
 
     // retrieve the JNI environment.
@@ -126,7 +126,7 @@ Result open_file(fs::path &resulting_path, std::vector<FileFilter> file_filters,
     return Result::SUCCESS;
 };
 
-Result pick_folder(fs::path &resulting_path, fs::path default_path) {
+Result pick_folder(fs::path &resulting_path, const fs::path &default_path) {
     SDL_AndroidRequestPermission("android.permission.MANAGE_EXTERNAL_STORAGE");
     
     // retrieve the JNI environment.
