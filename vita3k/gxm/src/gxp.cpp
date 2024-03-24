@@ -26,10 +26,8 @@
 namespace gxp {
 
 const char *log_parameter_semantic(const SceGxmProgramParameter &parameter) {
-    SceGxmParameterSemantic semantic = static_cast<SceGxmParameterSemantic>(parameter.semantic);
-
     // clang-format off
-    switch (semantic) {
+    switch (parameter.semantic) {
     case SCE_GXM_PARAMETER_SEMANTIC_NONE: return "NONE";
     case SCE_GXM_PARAMETER_SEMANTIC_ATTR: return "ATTR";
     case SCE_GXM_PARAMETER_SEMANTIC_BCOL: return "BCOL";
@@ -102,7 +100,7 @@ int get_parameter_type_size(const SceGxmParameterType type) {
 
 int get_num_32_bit_components(const SceGxmParameterType type, const uint16_t num_comp) {
     const int param_size = get_parameter_type_size(type);
-    return static_cast<int>(num_comp + (4 / param_size - 1)) * param_size / 4;
+    return (num_comp + (4 / param_size - 1)) * param_size / 4;
 }
 
 GenericParameterType parameter_generic_type(const SceGxmProgramParameter &parameter) {
@@ -120,10 +118,11 @@ std::string parameter_name(const SceGxmProgramParameter &parameter) {
     const std::size_t dot_pos = full_name.find_first_of('.');
     const bool is_struct_type = dot_pos != std::string::npos;
     std::replace(full_name.begin(), full_name.end(), '.', '_');
+
     // replace brackets by underscores as on some drivers (Adreno) they cause the shader to crash
     std::replace(full_name.begin(), full_name.end(), '[', '_');
     std::replace(full_name.begin(), full_name.end(), ']', '_');
-
+    
     return full_name;
 }
 
