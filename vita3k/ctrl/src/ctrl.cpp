@@ -119,7 +119,6 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
         }
         if (SDL_IsGameController(joystick_index)) {
             const SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(joystick_index);
-
 #ifdef ANDROID
             // for whatever reasons, fingerprint sensors are detected as controllers, filter them out
             const char *controller_name = SDL_GameControllerNameForIndex(joystick_index);
@@ -128,7 +127,6 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                 || std::string_view(controller_name).starts_with("gf_")))
                 continue;
 #endif
-
             if (!state.controllers.contains(guid)) {
                 Controller new_controller;
                 const GameControllerPtr controller(SDL_GameControllerOpen(joystick_index), SDL_GameControllerClose);
@@ -352,9 +350,9 @@ static void retrieve_ctrl_data(EmuEnvState &emuenv, int port, bool is_v2, bool n
     if (port == 1) {
         apply_keyboard(&buttons, axes.data(), is_v2, emuenv);
     }
-    for (const auto &controller : state.controllers) {
-        if (controller.second.port == port) {
-            apply_controller(emuenv, &buttons, axes.data(), controller.second.controller.get(), is_v2);
+    for (const auto &[_, controller] : state.controllers) {
+        if (controller.port == port) {
+            apply_controller(emuenv, &buttons, axes.data(), controller.controller.get(), is_v2);
         }
     }
 
@@ -378,16 +376,15 @@ int ctrl_get(const SceUID thread_id, EmuEnvState &emuenv, int port, SceCtrlData2
     if (is_peek) {
         nb_returned_data = count;
     } else {
-        uint64_t vblank_count = emuenv.display.vblank_count;
-        if (vblank_count <= state.last_vcount[port]) {
+        if (emuenv.display.vblank_count.load() <= state.last_vcount[port]) {
             // sceCtrlRead is blocking, wait for the next vsync for the buffer to be updated
             auto thread = emuenv.kernel.get_thread(thread_id);
 
             wait_vblank(emuenv.display, emuenv.kernel, thread, state.last_vcount[port] + 1, false);
-            vblank_count = emuenv.display.vblank_count;
         }
-        nb_returned_data = std::min<int>(count, emuenv.display.vblank_count - state.last_vcount[port]);
-        state.last_vcount[port] = emuenv.display.vblank_count;
+        uint64_t vblank_count = emuenv.display.vblank_count.load();
+        nb_returned_data = std::min<int32_t>(count, vblank_count - state.last_vcount[port]);
+        state.last_vcount[port] = vblank_count;
     }
 
     std::chrono::time_point<std::chrono::steady_clock> ts = std::chrono::steady_clock::now();
