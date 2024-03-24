@@ -1779,6 +1779,7 @@ EXPORT(int, sceGxmCreateContext, const SceGxmContextParams *params, Ptr<SceGxmCo
         return RET_ERROR(SCE_GXM_ERROR_INVALID_VALUE);
     }
 
+	// This structure needs 8-byte alignment
     *context = Ptr<SceGxmContext>(align(params->hostMem.address(), 8));
 
     SceGxmContext* ctx = context->get(emuenv.mem);
@@ -5470,7 +5471,7 @@ EXPORT(int, sceGxmUnmapMemory, Ptr<void> base) {
         return RET_ERROR(SCE_GXM_ERROR_INVALID_POINTER);
     }
 
-        // this memory range may contain trapped region, so untrap everything to make sure
+    // this memory range may contain trapped region, so untrap everything to make sure
     // we don't run into issues later
     // TODO: call a mem function to invalidate the range instead
     uint8_t* addr_start = base.cast<uint8_t>().get(emuenv.mem);
@@ -5480,7 +5481,7 @@ EXPORT(int, sceGxmUnmapMemory, Ptr<void> base) {
     }
 
     if (emuenv.renderer->features.enable_memory_mapping && ite->second.size > 0)
-	    renderer::send_single_command(*emuenv.renderer, nullptr, renderer::CommandOpcode::MemoryUnmap, true, base);
+        renderer::send_single_command(*emuenv.renderer, nullptr, renderer::CommandOpcode::MemoryUnmap, true, base);
 
     emuenv.gxm.memory_mapped_regions.erase(ite);
     return 0;
