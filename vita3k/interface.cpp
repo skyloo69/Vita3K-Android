@@ -684,7 +684,8 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             };
 
             // Get Sce Ctrl button from key
-            const auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
+           //  const auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
+            auto sce_ctrl_btn = get_sce_ctrl_btn_from_scancode(event.key.keysym.scancode);
 
             if (gui.is_capturing_keys && event.key.keysym.scancode) {
                 gui.is_key_capture_dropped = false;
@@ -703,7 +704,7 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             
 #ifdef ANDROID
             if(event.key.keysym.sym == SDLK_AC_BACK)
-                const auto sce_ctrl_btn = SCE_CTRL_PSBUTTON;
+                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
 #else
             // toggle gui state
             if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
