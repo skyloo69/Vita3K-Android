@@ -268,14 +268,15 @@ static std::vector<std::string> get_archive_contents_path(const ZipPtr &zip) {
 }
 
 std::vector<ContentInfo> install_archive(EmuEnvState &emuenv, GuiState *gui, const fs::path &archive_path, const std::function<void(ArchiveContents)> &progress_callback) {
-    if (!fs::exists(archive_path)) {
-        LOG_CRITICAL("Failed to load archive file in path: {}", archive_path.generic_path());
+    FILE *vpk_fp = host::dialog::filesystem::resolve_host_handle(archive_path);
+
+    if (!vpk_fp) {
+        LOG_CRITICAL("Failed to load archive file in path: {}", archive_path.generic_path().string());
         return {};
     }
     const ZipPtr zip(new mz_zip_archive, delete_zip);
     std::memset(zip.get(), 0, sizeof(*zip));
 
-    FILE *vpk_fp = FOPEN(archive_path.generic_path().c_str(), "rb");
 
     if (!mz_zip_reader_init_cfile(zip.get(), vpk_fp, 0, 0)) {
         LOG_CRITICAL("miniz error reading archive: {}", miniz_get_error(zip));
@@ -426,8 +427,10 @@ static ExitCode load_app_impl(SceUID &main_module_id, EmuEnvState &emuenv) {
     LOG_INFO("Resolution multiplier: {}", emuenv.cfg.resolution_multiplier);
     if (emuenv.ctrl.controllers_num) {
         LOG_INFO("{} Controllers Connected", emuenv.ctrl.controllers_num);
-        for (auto i = 0; i < emuenv.ctrl.controllers_num; i++)
-            LOG_INFO("Controller {}: {}", i, emuenv.ctrl.controllers_name[i]);
+        int ctrl_idx = 0;
+        for (auto i = 0; i < 4; i++)
+            if (emuenv.ctrl.controllers_name[i])
+                LOG_INFO("Controller {}: {}", ctrl_idx++, emuenv.ctrl.controllers_name[i]);
         if (emuenv.ctrl.has_motion_support)
             LOG_INFO("Controller has motion support");
     }
