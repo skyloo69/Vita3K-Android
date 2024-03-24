@@ -24,13 +24,11 @@
 
 #include <mem/ptr.h>
 
-// #include <dynarmic/frontend/A32/a32_ir_emitter.h>
-
 class ArmDynarmicCP15 : public Dynarmic::A32::Coprocessor {
     uint32_t tpidruro;
 
 public:
-//    using CoprocReg = Dynarmic::A32::CoprocReg;
+    using CoprocReg = Dynarmic::A32::CoprocReg;
 
     explicit ArmDynarmicCP15()
         : tpidruro(0) {
