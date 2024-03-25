@@ -414,7 +414,7 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
             }
         } else {
             LOG_ERROR("Error open lang file xml: {}", lang_xml_path);
-            LOG_DEBUG("error: {} position: {}", load_xml_res.description(), load_xml_res.offset);
+            LOG_DEBUG("error: {} position: {}", lang_content.description(), lang_content.offset);
         }
     } else
         LOG_ERROR("Lang file xml not found: {}", lang_xml_path);
