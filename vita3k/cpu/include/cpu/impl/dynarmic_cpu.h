@@ -17,15 +17,18 @@
 
 #pragma once
 
-#include <cpu/functions.h>
 #include <dynarmic/interface/A32/a32.h>
+#include <dynarmic/interface/A32/context.h>
 #include <dynarmic/interface/A32/coprocessor.h>
 #include <dynarmic/interface/exclusive_monitor.h>
 
+#include <cpu/functions.h>
+#include <cpu/impl/interface.h>
 #ifdef USE_UNICORN
 #include <cpu/impl/unicorn_cpu.h>
 #endif
 
+#include <functional>
 #include <memory>
 
 class ArmDynarmicCallback;
@@ -84,8 +87,7 @@ public:
     void set_fpscr(uint32_t val) override;
 
     CPUContext save_context() override;
-    void load_context(const CPUContext &ctx) override;
-    void invalidate_jit_cache(Address start, size_t length) override;
+    void load_context(CPUContext context) override;
 
     bool is_thumb_mode() override;
     int step() override;
@@ -98,5 +100,5 @@ public:
     bool get_log_mem() override;
 
     std::size_t processor_id() const override;
-    
+    void invalidate_jit_cache(Address start, size_t length) override;
 };
