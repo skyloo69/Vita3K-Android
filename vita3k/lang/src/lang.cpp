@@ -36,7 +36,7 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
     emuenv.common_dialog.lang = {};
     emuenv.ime.lang = {};
 
-    const auto set_lang = [&](std::string language) {
+    const auto set_lang = [&](const std::string &language) {
         lang.user_lang[GUI] = language;
         lang.user_lang[LIVE_AREA] = language;
     };
@@ -83,7 +83,7 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
         outfile.close();
     }
 
-    const auto is_user_lang_static = std::find(list_user_lang_static.begin(), list_user_lang_static.end(), emuenv.cfg.user_lang) != list_user_lang_static.end();
+    const auto is_user_lang_static = vector_utils::contains(list_user_lang_static, emuenv.cfg.user_lang);
 
     // Load lang xml
     pugi::xml_document lang_xml;
@@ -160,7 +160,7 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
                         if (!child.empty()) {
                             dest.clear();
                             for (const auto day : child)
-                                dest.push_back(day.text().as_string());
+                                dest.emplace_back(day.text().as_string());
                         }
                     };
 
@@ -412,10 +412,12 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
                 // Welcome
                 set_lang_string(lang.welcome, lang_child.child("welcome"));
             }
-        } else
-            LOG_ERROR("Error open lang file xml: {}", lang_xml_path.string());
+        } else {
+            LOG_ERROR("Error open lang file xml: {}", lang_xml_path);
+            LOG_DEBUG("error: {} position: {}", load_xml_res.description(), load_xml_res.offset);
+        }
     } else
-        LOG_ERROR("Lang file xml not found: {}", lang_xml_path.string());
+        LOG_ERROR("Lang file xml not found: {}", lang_xml_path);
 }
 
 } // namespace lang
