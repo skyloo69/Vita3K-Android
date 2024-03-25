@@ -23,12 +23,14 @@
 #include <mem/ptr.h>
 #include <util/log.h>
 #include <util/types.h>
+
 #ifdef USE_DYNARMIC
 #include <cpu/impl/dynarmic_cpu.h>
 #endif
 #ifdef USE_UNICORN
 #include <cpu/impl/unicorn_cpu.h>
 #endif
+
 #include <cassert>
 #include <cpu/state.h>
 #include <cstring>
