@@ -93,7 +93,7 @@ public:
     bool is_thumb_mode() override;
 
     CPUContext save_context() override;
-    void load_context(CPUContext &ctx) override;
+    void load_context(CPUContext &ctx);
     void invalidate_jit_cache(Address start, size_t length) override;
 
     bool hit_breakpoint() override;
