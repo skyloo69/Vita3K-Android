@@ -369,7 +369,7 @@ CPUContext UnicornCPU::save_context() {
     return ctx;
 }
 
-void UnicornCPU::load_context(CPUContext &ctx) {
+void UnicornCPU::load_context(CPUContext ctx) {
     for (size_t i = 0; i < ctx.fpu_registers.size(); i++) {
         set_float_reg(i, ctx.fpu_registers[i]);
     }
