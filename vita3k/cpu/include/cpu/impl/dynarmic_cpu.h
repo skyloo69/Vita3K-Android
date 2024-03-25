@@ -87,7 +87,7 @@ public:
     void set_fpscr(uint32_t val) override;
 
     CPUContext save_context() override;
-    void load_context(CPUContext context) override;
+    void load_context(const CPUContext &ctx) override;
 
     bool is_thumb_mode() override;
     int step() override;
