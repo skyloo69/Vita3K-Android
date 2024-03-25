@@ -412,12 +412,10 @@ void init_lang(LangState &lang, EmuEnvState &emuenv) {
                 // Welcome
                 set_lang_string(lang.welcome, lang_child.child("welcome"));
             }
-        } else {
-            LOG_ERROR("Error open lang file xml: {}", lang_xml_path);
-            LOG_DEBUG("error: {} position: {}", lang_content.description(), lang_content.offset);
-        }
+        } else
+            LOG_ERROR("Error open lang file xml: {}", lang_xml_path.string());
     } else
-        LOG_ERROR("Lang file xml not found: {}", lang_xml_path);
+        LOG_ERROR("Lang file xml not found: {}", lang_xml_path.string());
 }
 
 } // namespace lang
