@@ -301,7 +301,8 @@ std::unique_ptr<Dynarmic::A32::Jit> DynarmicCPU::make_jit() {
         config.page_table = (log_mem || !cpu_opt) ? nullptr : reinterpret_cast<decltype(config.page_table)>(parent->mem->page_table.get());
         config.absolute_offset_page_table = true;
     } else if (!log_mem && cpu_opt) {
-        config.fastmem_pointer = std::bit_cast<uintptr_t>(parent->mem->memory.get());
+        // config.fastmem_pointer = std::bit_cast<uintptr_t>(parent->mem->memory.get());
+        config.fastmem_pointer = (log_mem || !cpu_opt) ? nullptr : parent->mem->memory.get();
     }
     config.hook_hint_instructions = true;
     config.enable_cycle_counting = false;
