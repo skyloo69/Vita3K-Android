@@ -41,7 +41,7 @@ struct ci_compare {
 
 typedef std::map<std::string, std::string, ci_compare> HeadersMapType;
 
-enum SceHttpsErrorCode {
+enum SceHttpsErrorCode : uint32_t {
     SCE_HTTPS_ERROR_CERT = 0x80435060,
     SCE_HTTPS_ERROR_HANDSHAKE = 0x80435061,
     SCE_HTTPS_ERROR_IO = 0x80435062,
