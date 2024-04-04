@@ -7,5 +7,7 @@ version: 2
 updates:
   - package-ecosystem: "gitsubmodule"
     directory: "/"
+    allow:
+      - dependency-name: "external/SPIRV-Cross"
     schedule:
       interval: "weekly"
