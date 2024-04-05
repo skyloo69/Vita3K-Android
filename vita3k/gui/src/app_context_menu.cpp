@@ -20,10 +20,8 @@
 #include <config/state.h>
 #include <config/version.h>
 #include <gui/functions.h>
-#ifndef ANDROID
 #include <include/cpu.h>
 #include <include/environment.h>
-#endif
 #include <io/state.h>
 #include <renderer/state.h>
 
