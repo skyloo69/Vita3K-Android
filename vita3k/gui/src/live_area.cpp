@@ -25,8 +25,6 @@
 #include <packages/functions.h>
 #include <renderer/state.h>
 
-#include <util/safe_time.h>
-
 #include <io/VitaIoDevice.h>
 #include <io/vfs.h>
 #include <util/log.h>
@@ -255,7 +253,7 @@ void init_live_area(GuiState &gui, EmuEnvState &emuenv, const std::string &app_p
                 if (default_contents)
                     vfs::read_file(VitaIoDevice::vs0, buffer, emuenv.pref_path, "data/internal/livearea/default/sce_sys/livearea/contents/" + contents.second);
                 else if (app_device == VitaIoDevice::vs0)
-                    vfs::read_file(VitaIoDevice::vs0, buffer, emuenv.pref_path, "app/" + app_path + "/sce_sys/livearea/contents/" + contents.second);
+                    vfs::read_file(VitaIoDevice::vs0, buffer, emuenv.pref_path, fmt::format("app/{}/sce_sys/livearea/contents/{}", app_path, bg_name));
                 else
                     vfs::read_app_file(buffer, emuenv.pref_path, app_path, live_area_path / "contents" / contents.second);
 
@@ -443,7 +441,7 @@ void init_live_area(GuiState &gui, EmuEnvState &emuenv, const std::string &app_p
                             vfs::FileBuffer buffer;
 
                             if (app_device == VitaIoDevice::vs0)
-                                vfs::read_file(VitaIoDevice::vs0, buffer, emuenv.pref_path, "app/" + app_path + "/sce_sys/livearea/contents/" + bg_name);
+                                vfs::read_file(VitaIoDevice::vs0, buffer, emuenv.pref_path, fmt::format("app/{}/sce_sys/livearea/contents/{}", app_path, img_name));
                             else
                                 vfs::read_app_file(buffer, emuenv.pref_path, app_path, live_area_path / "contents" / bg_name);
 
@@ -834,15 +832,21 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
                 // Origin
                 if (liveitem[app_path][frame.id]["text"]["origin"].second.empty() || (liveitem[app_path][frame.id]["text"]["origin"].second == "background")) {
-                    if (gui.live_items[app_path][frame.id].contains("background"))
-                        str_size = bg_scal_size, text_pos = bg_pos;
-                    else if (!liveitem[app_path][frame.id]["text"]["origin"].second.empty() && gui.live_items[app_path][frame.id].contains("image"))
-                        str_size = img_scal_size, text_pos = img_pos;
+                    if (gui.live_items[app_path][frame.id].contains("background")) {
+                        str_size = bg_scal_size;
+                        text_pos = bg_pos;
+                    } else if (!liveitem[app_path][frame.id]["text"]["origin"].second.empty() && gui.live_items[app_path][frame.id].contains("image")) {
+                        str_size = img_scal_size;
+                        text_pos = img_pos;
+                    }
                 } else if (liveitem[app_path][frame.id]["text"]["origin"].second == "image") {
-                    if (gui.live_items[app_path][frame.id].contains("image"))
-                        str_size = img_scal_size, text_pos = img_pos;
-                    else if (gui.live_items[app_path][frame.id].contains("background"))
-                        str_size = bg_scal_size, text_pos = bg_pos;
+                    if (gui.live_items[app_path][frame.id].contains("image")) {
+                        str_size = img_scal_size;
+                        text_pos = img_pos;
+                    } else if (gui.live_items[app_path][frame.id].contains("background")) {
+                        str_size = bg_scal_size;
+                        text_pos = bg_pos;
+                    }
                 }
 
                 auto str_wrap = scal_size_frame.x;
@@ -897,8 +901,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
                             if (liveitem[app_path][frame.id]["text"]["origin"].second == "image") {
                                 if (gui.live_items[app_path][frame.id].contains("background"))
                                     str_size.x = bg_scal_size.x - img_scal_size.x - (img_pos.x - bg_pos.x);
-                                else
-                                    str_size = scal_size_frame, text_pos = pos_frame;
+                                else {
+                                    str_size = scal_size_frame;
+                                    text_pos = pos_frame;
+                                }
                             }
                         } else
                             str_pos_init.x = (str_size.x - calc_text_size.x) / 2.0f;
@@ -915,8 +921,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
                             if (liveitem[app_path][frame.id]["text"]["origin"].second == "image") {
                                 if (gui.live_items[app_path][frame.id].contains("background"))
                                     str_size.x = bg_scal_size.x - img_scal_size.x - (img_pos.x - bg_pos.x);
-                                else
-                                    str_size = scal_size_frame, text_pos = pos_frame;
+                                else {
+                                    str_size = scal_size_frame;
+                                    text_pos = pos_frame;
+                                }
                             }
                         }
                     }
@@ -932,8 +940,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
                         if (liveitem[app_path][frame.id]["text"]["origin"].second == "image") {
                             if (gui.live_items[app_path][frame.id].contains("background"))
                                 str_size.x = bg_scal_size.x - img_scal_size.x - (img_pos.x - bg_pos.x);
-                            else
-                                str_size = scal_size_frame, text_pos = pos_frame;
+                            else {
+                                str_size = scal_size_frame;
+                                text_pos = pos_frame;
+                            }
                         }
                     }
                 }
@@ -1048,7 +1058,6 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const auto POS_START = ImVec2(VIEWPORT_POS.x + POS_BUTTON.x + (START_BUTTON_SIZE.x - START_SIZE.x) / 2.f, VIEWPORT_POS.y + POS_BUTTON.y + (START_BUTTON_SIZE.y - START_SIZE.y) / 2.f);
     const auto SELECT_SIZE = ImVec2(GATE_SIZE.x - (10.f * SCALE.x), GATE_SIZE.y - (5.f * SCALE.y));
     const auto SELECT_POS = ImVec2(GATE_POS.x + (5.f * SCALE.y), GATE_POS.y + (2.f * SCALE.y));
-    const auto SIZE_GATE = ImVec2(GATE_POS.x + GATE_SIZE.x, GATE_POS.y + GATE_SIZE.y);
 
     const auto BUTTON_SIZE = ImVec2(72.f * SCALE.x, 30.f * SCALE.y);
 
