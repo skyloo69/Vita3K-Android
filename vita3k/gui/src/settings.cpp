@@ -657,7 +657,7 @@ void draw_settings(GuiState &gui, EmuEnvState &emuenv) {
 #include <config/functions.h>
 #include <config/state.h>
 #include <gui/functions.h>
-#include <host/dialog/filesystem.hpp>
+#include <host/dialog/filesystem.h>
 #include <ime/functions.h>
 #include <io/device.h>
 #include <io/state.h>
