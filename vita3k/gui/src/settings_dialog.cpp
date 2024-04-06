@@ -38,6 +38,7 @@
 #include <string>
 #include <util/fs.h>
 #include <util/log.h>
+#include <util/string_utils.h>
 
 #include <SDL.h>
 
