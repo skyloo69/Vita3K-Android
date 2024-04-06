@@ -266,7 +266,7 @@ static void init_font(GuiState &gui, EmuEnvState &emuenv) {
             const auto sys_lang = static_cast<SceSystemParamLang>(emuenv.cfg.sys_lang);
             if (sys_lang == SCE_SYSTEM_PARAM_LANG_CHINESE_S) {
                 const auto fontpath = fs::path(default_font_path / "SourceHanSansSC-Bold-Min.ttf");
-                const std::vector<uint8_t> font_source = fs_utils::read_asset_raw(fontpath);
+                std::vector<uint8_t> font_source = fs_utils::read_asset_raw(fontpath);
                 if(!fs::exists(fontpath))
                     font_source = fs_utils::read_asset_raw(default_font_path / "NotoSerifCJK-Regular.ttc"); // default google fonts for uncode languange
 
