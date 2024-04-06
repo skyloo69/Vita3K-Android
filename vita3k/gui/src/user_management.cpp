@@ -532,8 +532,8 @@ void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
     const auto draw_avatar = [&](const std::string &user_id, const AvatarSize size, const ImVec2 origin_pos) {
         draw_user_bg(size, origin_pos);
         if (gui.users_avatar.contains(user_id)) {
-            ImVec2 AVATAR_POS = ImVec2(origin_pos.x + (user_avatar_infos.pos.x * SCALE.x), origin_pos.y + (user_avatar_infos.pos.y * SCALE.y));
-            ImVec2 AVATAR_SIZE = ImVec2(user_avatar_infos.size.x * SCALE.x, user_avatar_infos.size.y * SCALE.y);
+            ImVec2 AVATAR_POS = ImVec2(origin_pos.x + (users_avatar_infos.pos.x * SCALE.x), origin_pos.y + (users_avatar_infos.pos.y * SCALE.y));
+            ImVec2 AVATAR_SIZE = ImVec2(users_avatar_infos.size.x * SCALE.x, users_avatar_infos.size.y * SCALE.y);
             ImGui::SetCursorPos(AVATAR_POS);
             ImGui::Image(gui.users_avatar[user_id], AVATAR_SIZE);
         }
