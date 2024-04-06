@@ -59,7 +59,7 @@ static bool init_avatar(GuiState &gui, EmuEnvState &emuenv, const std::string &u
 
     int32_t width = 0;
     int32_t height = 0;
-
+    
     const std::vector<uint8_t> raw_data = fs_utils::read_asset_raw(avatar_path_path);
     if(raw_data.empty()){
         LOG_WARN("Avatar image doesn't exist: {}.", avatar_path_path);
@@ -532,8 +532,9 @@ void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
     const auto draw_avatar = [&](const std::string &user_id, const AvatarSize size, const ImVec2 origin_pos) {
         draw_user_bg(size, origin_pos);
         if (gui.users_avatar.contains(user_id)) {
-            ImVec2 AVATAR_POS = ImVec2(origin_pos.x + (users_avatar_infos.pos.x * SCALE.x), origin_pos.y + (users_avatar_infos.pos.y * SCALE.y));
-            ImVec2 AVATAR_SIZE = ImVec2(users_avatar_infos.size.x * SCALE.x, users_avatar_infos.size.y * SCALE.y);
+            const auto user_avatar_infos = users_avatar_infos[user_id][size];
+            ImVec2 AVATAR_POS = ImVec2(origin_pos.x + (user_avatar_infos.pos.x * SCALE.x), origin_pos.y + (user_avatar_infos.pos.y * SCALE.y));
+            AVATAR_SIZE = ImVec2(user_avatar_infos.size.x * SCALE.x, user_avatar_infos.size.y * SCALE.x);
             ImGui::SetCursorPos(AVATAR_POS);
             ImGui::Image(gui.users_avatar[user_id], AVATAR_SIZE);
         }
@@ -615,13 +616,13 @@ void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
                 if ((user_item_rect_half > HALF_SIZE_USER) || (user_item_rect_half < HALF_SIZE_USER))
                     ImGui::SetScrollHereX(0.5f);
             }
-            
+#if defined(__Win32__) && !defined(__linux__) && !defined(__APPLE__)
             if (ImGui::BeginPopupContextItem("##user_context_menu")) {
                 if (ImGui::MenuItem(lang["open_user_folder"].c_str()))
                     open_path((user_path / user.first).string());
                 ImGui::EndPopup();
             }
-            
+#endif
             ImGui::SetCursorPos(ImVec2(USER_POS.x + USER_NAME_PADDING, USER_POS.y + MED_AVATAR_SIZE.y + (5.f * SCALE.y)));
             ImGui::PushTextWrapPos(USER_POS.x + MED_AVATAR_SIZE.x - USER_NAME_PADDING);
             ImGui::TextColored(GUI_COLOR_TEXT, "%s", user.second.name.c_str());
