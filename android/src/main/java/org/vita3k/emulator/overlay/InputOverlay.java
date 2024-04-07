@@ -553,7 +553,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
               R.drawable.button_r_pressed, ButtonType.TRIGGER_R,
               ControlId.r1, orientation, OVERLAY_MASK_BASIC));
 
-      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l2,
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_,
               R.drawable.button_l2_pressed, ButtonType.TRIGGER_L2,
               ControlId.l2, orientation, OVERLAY_MASK_L2R2));
   
