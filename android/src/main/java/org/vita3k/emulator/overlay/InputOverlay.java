@@ -571,7 +571,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     
       overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_hide,
               R.drawable.button_hide_pressed, ButtonType.BUTTON_TOUCH_HIDE,
-              ControlId.hide, orientation, OVERLAY_MASK_TOUCH_HIDE));
+              ControlId.hide, orientation, OVERLAY_MASK_BASIC));
     
       overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_touch_f,
               R.drawable.button_touch_b, ButtonType.BUTTON_TOUCH_SWITCH,
@@ -700,10 +700,12 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
             || legacyId == ButtonType.TRIGGER_R
             || legacyId == ButtonType.TRIGGER_L2
             || legacyId == ButtonType.TRIGGER_R2
+            || legacyId == ButtonType.TRIGGER_L3
+            || legacyId == ButtonType.TRIGGER_R3
             || legacyId == ButtonType.BUTTON_START
             || legacyId == ButtonType.BUTTON_SELECT)
       scale = 0.25f;
-    else if(legacyId == ButtonType.BUTTON_TOUCH_SWITCH)
+    else if(legacyId == ButtonType.BUTTON_TOUCH_SWITCH || ButtonType.BUTTON_TOUCH_HIDE)
       scale = 0.11f;
 
     scale *= mGlobalScale;
@@ -958,6 +960,19 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
             (((float) res.getInteger(R.integer.TRIGGER_R2_X) / 1000) * maxX));
     sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-Y",
             (((float) res.getInteger(R.integer.TRIGGER_R2_Y) / 1000) * maxY));
+
+    sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-X",
+            (((float) res.getInteger(R.integer.TRIGGER_L3_X) / 1000) * maxX));
+    sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-Y",
+            (((float) res.getInteger(R.integer.TRIGGER_L3_Y) / 1000) * maxY));
+    sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-X",
+            (((float) res.getInteger(R.integer.TRIGGER_R3_X) / 1000) * maxX));
+    sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-Y",
+      sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_HIDE + "-X",
+            (((float) res.getInteger(R.integer.BUTTON_TOUCH_HIDE_X) / 1000) * maxX));
+    sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_HIDE + "-Y",
+            (((float) res.getInteger(R.integer.BUTTON_TOUCH_HIDE_Y) / 1000) * maxY));
+    
     sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-X",
             (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_X) / 1000) * maxX));
     sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-Y",
@@ -988,6 +1003,9 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     public static final int TRIGGER_R = 21;
     public static final int TRIGGER_L2 = 22;
     public static final int TRIGGER_R2 = 23;
+    public static final int TRIGGER_L3 = 24;
+    public static final int TRIGGER_R3 = 25;
+    public static final int BUTTON_TOUCH_HIDE = 1023;
     public static final int BUTTON_TOUCH_SWITCH = 1024;
   }
 
@@ -1006,12 +1024,15 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     public static final int ddown = 12;
     public static final int dleft = 13;
     public static final int dright = 14;
-
+    public static final int l3 = 15;
+    public static final int r3 = 16;
+    
     // they are axis for sdl but buttons for the ps vita
     public static final int l2 = -4;
     public static final int r2 = -5;
 
     // button to switch between front and back touch
+    public static final int hide = 1023;
     public static final int touch = 1024;
 
     public static final int axis_left_x = 0;
