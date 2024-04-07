@@ -553,18 +553,30 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
               R.drawable.button_r_pressed, ButtonType.TRIGGER_R,
               ControlId.r1, orientation, OVERLAY_MASK_BASIC));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l2,
-            R.drawable.button_l2_pressed, ButtonType.TRIGGER_L2,
-            ControlId.l2, orientation, OVERLAY_MASK_L2R2));
-
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r2,
-            R.drawable.button_r2_pressed, ButtonType.TRIGGER_R2,
-            ControlId.r2, orientation, OVERLAY_MASK_L2R2));
-
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_touch_f,
-            R.drawable.button_touch_b, ButtonType.BUTTON_TOUCH_SWITCH,
-            ControlId.touch, orientation, OVERLAY_MASK_TOUCH_SCREEN_SWITCH));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l2,
+              R.drawable.button_l2_pressed, ButtonType.TRIGGER_L2,
+              ControlId.l2, orientation, OVERLAY_MASK_L2R2));
+  
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r2,
+              R.drawable.button_r2_pressed, ButtonType.TRIGGER_R2,
+              ControlId.r2, orientation, OVERLAY_MASK_L2R2));
+      
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r3,
+              R.drawable.button_r3_pressed, ButtonType.TRIGGER_R3,
+              ControlId.r3, orientation, OVERLAY_MASK_L2R2));
+  
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l3,
+              R.drawable.button_l3_pressed, ButtonType.TRIGGER_L3,
+              ControlId.l3, orientation, OVERLAY_MASK_L2R2));
     
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_hide,
+              R.drawable.button_hide_pressed, ButtonType.BUTTON_TOUCH_HIDE,
+              ControlId.hide, orientation, OVERLAY_MASK_TOUCH_HIDE));
+    
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_touch_f,
+              R.drawable.button_touch_b, ButtonType.BUTTON_TOUCH_SWITCH,
+              ControlId.touch, orientation, OVERLAY_MASK_TOUCH_SCREEN_SWITCH));
+
       overlayDpads.add(initializeOverlayDpad(getContext(), R.drawable.dpad_idle,
               R.drawable.dpad_up,
               R.drawable.dpad_up_left,
