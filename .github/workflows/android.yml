@@ -54,6 +54,11 @@ jobs:
           export JAVA_HOME=$(echo $JAVA_HOME_17_X64)
           ./gradlew --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease  assembleDebug
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vita3k-${{ env.git_short_sha }}-reportbug.txt
+          path: /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/**
+        
       - name: Compute git short sha
         shell: bash
         run: echo "git_short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
