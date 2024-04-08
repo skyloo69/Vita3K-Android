@@ -53,12 +53,13 @@ jobs:
           cp -r vita3k/shaders-builtin android/assets
           export JAVA_HOME=$(echo $JAVA_HOME_17_X64)
           ./gradlew --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease  assembleDebug
-
+          zip -r report.zip /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/
+          
       - uses: actions/upload-artifact@v4
         with:
-          name: vita3k-${{ env.git_short_sha }}-reportbug.txt
+          name: vita3k-${{ env.git_short_sha }}-reportbug.zip
           if: always()
-          path: /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/**
+          path: /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/report.zip
         
       - name: Compute git short sha
         shell: bash
