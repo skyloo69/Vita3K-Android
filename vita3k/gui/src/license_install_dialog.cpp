@@ -20,6 +20,7 @@
 #include <host/dialog/filesystem.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <packages/functions.h>
+#include <util/string_utils.h>
 
 namespace gui {
 

@@ -303,8 +303,8 @@ int main(int argc, char *argv[]) {
             while (!emuenv.cfg.initial_setup) {
                 if (handle_events(emuenv, gui)) {
                     gui::draw_begin(gui, emuenv);
-                    gui::draw_end(gui);
-                   // gui::draw_end(gui);
+                    gui::draw_initial_setup(gui, emuenv);
+                    gui::draw_end(gui, emuenv.window.get());
                     emuenv.renderer->swap_window(emuenv.window.get());
                 } else
                     return QuitRequested;
@@ -340,7 +340,7 @@ int main(int argc, char *argv[]) {
             if (is_rif)
                 copy_license(emuenv, *cfg.content_path);
             else if (!is_archive && !is_directory)
-                LOG_ERROR("File dropped: [{}] is not supported.", *cfg.content_path);
+                LOG_ERROR("File dropped: [{}] is not supported.", cfg.content_path->string());
 
             emuenv.cfg.content_path.reset();
             if (!cfg.console)
@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
                 gui::draw_vita_area(gui, emuenv);
                 gui::draw_ui(gui, emuenv);
 
-                gui::draw_end(gui);
+                gui::draw_end(gui, emuenv.window.get());
                 emuenv.renderer->swap_window(emuenv.window.get());
 #ifdef TRACY_ENABLE
                 FrameMark; // Tracy - Frame end mark for UI rendering loop
@@ -494,7 +494,7 @@ int main(int argc, char *argv[]) {
             emuenv.renderer->precompile_shader(hash);
             gui::draw_pre_compiling_shaders_progress(gui, emuenv, uint32_t(emuenv.renderer->shaders_cache_hashs.size()));
 
-            gui::draw_end(gui);
+            gui::draw_end(gui, emuenv.window.get());
             emuenv.renderer->swap_window(emuenv.window.get());
         }
     }
@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
         gui::draw_common_dialog(gui, emuenv);
         draw_app_background(gui, emuenv);
 
-        gui::draw_end(gui);
+        gui::draw_end(gui, emuenv.window.get());
         emuenv.renderer->swap_window(emuenv.window.get());
 
 #ifdef TRACY_ENABLE
@@ -568,7 +568,7 @@ int main(int argc, char *argv[]) {
             gui::draw_ui(gui, emuenv);
         }
 
-        gui::draw_end(gui);
+        gui::draw_end(gui, emuenv.window.get());
         emuenv.renderer->swap_window(emuenv.window.get());
 #ifdef TRACY_ENABLE
         FrameMark; // Tracy - Frame end mark for game rendering loop

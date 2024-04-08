@@ -1,4 +1,4 @@
-// Vita3K emulator project
+﻿// Vita3K emulator project
 // Copyright (C) 2024 Vita3K team
 //
 // This program is free software; you can redistribute it and/or modify
@@ -48,9 +48,7 @@ static std::map<std::string, Theme> themes_info;
 static std::vector<std::pair<std::string, time_t>> themes_list;
 
 static void get_themes_list(GuiState &gui, EmuEnvState &emuenv) {
-    gui.themes_preview.clear();
-    themes_info.clear();
-    themes_list.clear();
+    gui.themes_preview.clear(), themes_info.clear(), themes_list.clear();
 
     const auto theme_path{ emuenv.pref_path / "ux0/theme" };
     const auto fw_theme_path{ emuenv.pref_path / "vs0/data/internal/theme" };
@@ -131,7 +129,7 @@ static void get_themes_list(GuiState &gui, EmuEnvState &emuenv) {
                 themes_info[content_id].size = theme_size / KiB(1);
                 themes_info[content_id].version = infomation.child("m_contentVer").text().as_string();
 
-                themes_list.emplace_back(content_id, updated);
+                themes_list.push_back({ content_id, updated });
             } else
                 LOG_ERROR("theme not found for title: {}", content_id);
         }
@@ -634,7 +632,8 @@ void draw_settings(GuiState &gui, EmuEnvState &emuenv) {
 
                 // Delete user background
                 if (!delete_user_background.empty()) {
-                    vector_utils::erase_first(gui.users[emuenv.io.user_id].backgrounds, delete_user_background);
+                    const auto bg = std::find(gui.users[emuenv.io.user_id].backgrounds.begin(), gui.users[emuenv.io.user_id].backgrounds.end(), delete_user_background);
+                    gui.users[emuenv.io.user_id].backgrounds.erase(bg);
                     gui.user_backgrounds.erase(delete_user_background);
                     gui.user_backgrounds_infos.erase(delete_user_background);
                     if (!gui.users[emuenv.io.user_id].backgrounds.empty())
@@ -666,10 +665,10 @@ void draw_settings(GuiState &gui, EmuEnvState &emuenv) {
                 if (ImGui::Selectable(theme_background.home_screen_backgrounds["add_background"].c_str(), false, ImGuiSelectableFlags_None, SIZE_PACKAGE)) {
                     fs::path background_path = "";
                     host::dialog::filesystem::Result result = host::dialog::filesystem::open_file(background_path, { { "Image file", { "bmp", "gif", "jpg", "png", "tif" } } });
-                    auto background_path_string = fs_utils::path_to_utf8(background_path.native());
-                    if ((result == host::dialog::filesystem::Result::SUCCESS) && (!gui.user_backgrounds.contains(background_path_string))) {
-                        if (init_user_background(gui, emuenv, background_path_string)) {
-                            gui.users[emuenv.io.user_id].backgrounds.push_back(background_path_string);
+
+                    if ((result == host::dialog::filesystem::Result::SUCCESS) && (!gui.user_backgrounds.contains(background_path.string()))) {
+                        if (init_user_background(gui, emuenv, background_path.string())) {
+                            gui.users[emuenv.io.user_id].backgrounds.push_back(background_path.string());
                             gui.users[emuenv.io.user_id].use_theme_bg = false;
                             save_user(gui, emuenv, emuenv.io.user_id);
                         }
@@ -898,7 +897,7 @@ void draw_settings(GuiState &gui, EmuEnvState &emuenv) {
                         ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.f, 0.5f));
                         ImGui::PushID(lang.first);
                         ImGui::SetWindowFontScale(1.f);
-                        const auto is_lang_enable = vector_utils::contains(emuenv.cfg.ime_langs, uint64_t(lang.first));
+                        const auto is_lang_enable = std::find(emuenv.cfg.ime_langs.begin(), emuenv.cfg.ime_langs.end(), lang.first) != emuenv.cfg.ime_langs.end();
                         if (ImGui::Selectable(is_lang_enable ? "V" : "##lang", false, ImGuiSelectableFlags_SpanAllColumns, ImVec2(0.f, SIZE_SELECT)))
                             selected = std::to_string(lang.first);
                         ImGui::NextColumn();
@@ -942,11 +941,11 @@ void draw_settings(GuiState &gui, EmuEnvState &emuenv) {
                             // Sort Ime lang in good order
                             if (emuenv.cfg.ime_langs.size() > 1) {
                                 std::vector<uint64_t> cfg_ime_langs_temp;
-                                for (const auto &[lang_id, _] : emuenv.ime.lang.ime_keyboards) {
-                                    if (vector_utils::contains(emuenv.cfg.ime_langs, (uint64_t)lang_id))
-                                        cfg_ime_langs_temp.push_back(lang_id);
+                                for (const auto &lang : emuenv.ime.lang.ime_keyboards) {
+                                    if (std::find(emuenv.cfg.ime_langs.begin(), emuenv.cfg.ime_langs.end(), (uint64_t)lang.first) != emuenv.cfg.ime_langs.end())
+                                        cfg_ime_langs_temp.push_back(lang.first);
                                 }
-                                emuenv.cfg.ime_langs = std::move(cfg_ime_langs_temp);
+                                emuenv.cfg.ime_langs = cfg_ime_langs_temp;
                             }
                         }
                         config::serialize_config(emuenv.cfg, emuenv.config_path);

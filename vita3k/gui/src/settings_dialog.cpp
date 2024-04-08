@@ -35,6 +35,10 @@
 
 #include <emuenv/state.h>
 
+#include <misc/cpp/imgui_stdlib.h>
+
+#include <cpu/functions.h>
+
 #include <string>
 #include <util/fs.h>
 #include <util/log.h>
@@ -44,6 +48,7 @@
 
 #include <algorithm>
 #include <pugixml.hpp>
+#include <sstream>
 
 #undef ERROR
 
@@ -70,11 +75,11 @@ void get_modules_list(GuiState &gui, EmuEnvState &emuenv) {
     if (fs::exists(modules_path) && !fs::is_empty(modules_path)) {
         for (const auto &module : fs::directory_iterator(modules_path)) {
             if (module.path().extension() == ".suprx")
-                gui.modules.emplace_back(module.path().filename().replace_extension().string(), false);
+                gui.modules.push_back({ module.path().filename().replace_extension().string(), false });
         }
 
         for (auto &m : gui.modules)
-            m.second = vector_utils::contains(config.lle_modules, m.first);
+            m.second = std::find(config.lle_modules.begin(), config.lle_modules.end(), m.first) != config.lle_modules.end();
 
         std::sort(gui.modules.begin(), gui.modules.end(), [](const auto &ma, const auto &mb) {
             if (ma.second == mb.second)
@@ -154,7 +159,7 @@ static bool get_custom_config(EmuEnvState &emuenv, const std::string &app_path) 
                 const auto core_child = config_child.child("core");
                 config.modules_mode = core_child.attribute("modules-mode").as_int();
                 for (auto &m : core_child.child("lle-modules"))
-                    config.lle_modules.emplace_back(m.text().as_string());
+                    config.lle_modules.push_back(m.text().as_string());
             }
 
             // Load CPU Config
@@ -274,14 +279,13 @@ void init_config(GuiState &gui, EmuEnvState &emuenv, const std::string &app_path
     get_list_user_lang(emuenv.static_assets_path);
     if (emuenv.static_assets_path != emuenv.shared_path)
         get_list_user_lang(emuenv.shared_path);
-    #ifdef ANDROID
+#ifdef ANDROID
     // files are not in a folder
     list_user_lang.push_back("id");
     list_user_lang.push_back("ms");
-    list_user_lang.push_back("ua");
 #endif
 
-    current_user_lang = emuenv.cfg.user_lang.empty() ? 0 : (vector_utils::find_index(list_user_lang, emuenv.cfg.user_lang) + 1);
+    current_user_lang = emuenv.cfg.user_lang.empty() ? 0 : (std::distance(list_user_lang.begin(), std::find(list_user_lang.begin(), list_user_lang.end(), emuenv.cfg.user_lang))) + 1;
 
     get_modules_list(gui, emuenv);
     config.stretch_the_display_area = emuenv.cfg.stretch_the_display_area;
@@ -502,7 +506,7 @@ void set_config(EmuEnvState &emuenv, const std::string &app_path, bool custom) {
         set_vsync_state(emuenv.cfg.current_config.v_sync);
     if (emuenv.renderer->support_custom_drivers())
         emuenv.renderer->set_turbo_mode(emuenv.cfg.turbo_mode);
-    
+
     emuenv.renderer->res_multiplier = emuenv.cfg.current_config.resolution_multiplier;
     emuenv.renderer->set_anisotropic_filtering(emuenv.cfg.current_config.anisotropic_filtering);
     emuenv.renderer->set_stretch_display(emuenv.cfg.stretch_the_display_area);
@@ -526,7 +530,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
     auto &lang = gui.lang.settings_dialog;
-    auto &common = emuenv.common_dialog.lang.common;
     auto &firmware_font = gui.lang.install_dialog.firmware_install;
 
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_MENUBAR);
@@ -690,7 +693,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                     }
                 }
             }
-            
+
             if (is_ingame)
                 ImGui::BeginDisabled();
 
@@ -713,7 +716,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 #endif
         const bool has_integer_multiplier = static_cast<int>(config.resolution_multiplier * 4.0f) % 4 == 0;
         // OpenGL does not support surface sync with a non-integer resolution multiplier
-        if (!is_vulkan && !has_integer_multiplier)
+        if (!is_vulkan && has_integer_multiplier)
             has_surface_sync = false;
 
         if (!has_surface_sync)
@@ -934,6 +937,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.gpu["shader_cache_description"].c_str());
         }
+
         if (emuenv.renderer->features.spirv_shader) {
             ImGui::SameLine();
             ImGui::Checkbox(lang.gpu["spirv_shader"].c_str(), &emuenv.cfg.spirv_shader);
@@ -958,13 +962,13 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
     // Audio
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_MENUBAR);
-    if (ImGui::BeginTabItem(lang.audio["title"].c_str())) {
+    if (ImGui::BeginTabItem("Audio")) {
         ImGui::PopStyleColor();
         ImGui::Spacing();
         if (!emuenv.io.app_path.empty())
             ImGui::BeginDisabled();
         static const char *LIST_BACKEND_AUDIO[] = { "SDL", "Cubeb" };
-        if (ImGui::Combo(lang.audio["audio_backend"].c_str(), &audio_backend_idx, LIST_BACKEND_AUDIO, IM_ARRAYSIZE(LIST_BACKEND_AUDIO)))
+        if (ImGui::Combo(lang.audio["audio_backend"].c_str(), reinterpret_cast<int *>(&audio_backend_idx), LIST_BACKEND_AUDIO, IM_ARRAYSIZE(LIST_BACKEND_AUDIO)))
             emuenv.cfg.audio_backend = LIST_BACKEND_AUDIO[audio_backend_idx];
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.audio["select_audio_backend"].c_str());
@@ -1018,14 +1022,16 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 #ifndef ANDROID
         ImGui::Spacing();
         ImGui::Checkbox(lang.emulator["boot_apps_full_screen"].c_str(), &emuenv.cfg.boot_apps_full_screen);
-        ImGui::Spacing();
 #endif
+        ImGui::Spacing();
+
         const char *LIST_LOG_LEVEL[] = { lang.emulator["trace"].c_str(), "Debug", lang.emulator["info"].c_str(), lang.emulator["warning"].c_str(), lang.emulator["error"].c_str(), lang.emulator["critical"].c_str(), lang.emulator["off"].c_str() };
         if (ImGui::Combo(lang.emulator["log_level"].c_str(), &emuenv.cfg.log_level, LIST_LOG_LEVEL, IM_ARRAYSIZE(LIST_LOG_LEVEL)))
             logging::set_level(static_cast<spdlog::level::level_enum>(emuenv.cfg.log_level));
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.emulator["select_log_level"].c_str());
         ImGui::Spacing();
+
         ImGui::Checkbox(lang.emulator["archive_log"].c_str(), &emuenv.cfg.archive_log);
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.emulator["archive_log_description"].c_str());
@@ -1079,6 +1085,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::SetTooltip("%s", lang.emulator["case_insensitive_description"].c_str());
 #endif
         ImGui::Separator();
+//#ifndef ANDROID
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["emu_storage_folder"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["emu_storage_folder"].c_str());
         ImGui::Spacing();
@@ -1104,6 +1111,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.emulator["reset_emu_path_description"].c_str());
         }
+//#endif
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["custom_config_settings"].c_str()).x / 2.f));
@@ -1131,12 +1139,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.gui["info_bar_description"].c_str());
         ImGui::Spacing();
-        const std::string system_lang_name = fmt::format("{}: {}", lang.system["title"], get_sys_lang_name(emuenv.cfg.sys_lang));
+        const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
         std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
         static std::map<std::string, std::string> static_list_user_lang_names = {
             { "id", "Indonesia" },
             { "ms", "Malaysia" },
-            { "ua", reinterpret_cast<const char *>(u8"Українська") },
         };
         for (const auto &l : list_user_lang)
             list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
@@ -1435,11 +1442,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Spacing();
     static const auto BUTTON_SIZE = ImVec2(120.f * SCALE.x, 0.f);
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - BUTTON_SIZE.x - (10.f * SCALE.x));
-    if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
+    if (ImGui::Button(lang.main_window["close"].c_str(), BUTTON_SIZE))
         settings_dialog = false;
     ImGui::SameLine(0, 20.f * SCALE.x);
     const auto is_apply = !emuenv.io.app_path.empty() && (!is_custom_config || (emuenv.app_path == emuenv.io.app_path));
-        const auto is_reboot = !emuenv.io.app_path.empty() 
+    const auto is_reboot = !emuenv.io.app_path.empty() 
         && (emuenv.renderer->current_backend != emuenv.backend_renderer 
             || config.resolution_multiplier != emuenv.renderer->res_multiplier
             || config.custom_driver_name != emuenv.renderer->current_custom_driver);

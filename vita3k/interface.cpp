@@ -162,7 +162,7 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
                 if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
                     glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
                 ImGui::Render();
-                gui::draw_end(*gui);
+                gui::draw_end(*gui, emuenv.window.get());
                 emuenv.renderer->swap_window(emuenv.window.get());
             }
             switch (status) {

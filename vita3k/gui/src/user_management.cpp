@@ -59,7 +59,7 @@ static bool init_avatar(GuiState &gui, EmuEnvState &emuenv, const std::string &u
 
     int32_t width = 0;
     int32_t height = 0;
-    
+
     const std::vector<uint8_t> raw_data = fs_utils::read_asset_raw(avatar_path_path);
     if(raw_data.empty()){
         LOG_WARN("Avatar image doesn't exist: {}.", avatar_path_path);
@@ -121,8 +121,8 @@ void get_users_list(GuiState &gui, EmuEnvState &emuenv) {
                 // Load sort Apps list settings
                 auto sort_apps_list = user_child.child("sort-apps-list");
                 if (!sort_apps_list.empty()) {
-                    user.sort_apps_type = static_cast<SortType>(sort_apps_list.attribute("type").as_uint());
-                    user.sort_apps_state = static_cast<SortState>(sort_apps_list.attribute("state").as_uint());
+                    user.sort_apps_type = SortType(sort_apps_list.attribute("type").as_uint());
+                    user.sort_apps_state = SortState(sort_apps_list.attribute("state").as_uint());
                 }
 
                 // Load theme settings
@@ -143,7 +143,7 @@ void get_users_list(GuiState &gui, EmuEnvState &emuenv) {
 
                 // Load backgrounds path
                 for (const auto &bg : user_child.child("backgrounds"))
-                    user.backgrounds.emplace_back(bg.text().as_string());
+                    user.backgrounds.push_back(bg.text().as_string());
             }
         }
     }
@@ -331,7 +331,7 @@ void browse_users_management(GuiState &gui, EmuEnvState &emuenv, const uint32_t 
     const auto users_list_available_size = static_cast<int32_t>(users_list_available.size() - 1);
 
     // Find current selected app index in apps list filtered
-    const int32_t available_index = vector_utils::find_index(users_list_available, current_user_id_selected);
+    auto users_list_available_index = std::find(users_list_available.begin(), users_list_available.end(), current_user_id_selected);
 
     const auto first_user_id_available = users_list_available.front();
     // When user press a button, enable navigation by buttons
@@ -341,7 +341,7 @@ void browse_users_management(GuiState &gui, EmuEnvState &emuenv, const uint32_t 
         if (menu_selected == SELECT) {
             if (gui.users.empty())
                 menu_selected = CREATE;
-            else if (available_index == -1)
+            else if (users_list_available_index == users_list_available.end())
                 // Set first index of users list if current index is invalid
                 current_user_id_selected = first_user_id_available;
         }
@@ -349,6 +349,7 @@ void browse_users_management(GuiState &gui, EmuEnvState &emuenv, const uint32_t 
         return;
     }
 
+    const auto available_index = static_cast<int32_t>(std::distance(users_list_available.begin(), users_list_available_index));
     const auto prev_available_index = users_list_available[std::max(available_index - 1, 0)];
     const auto next_available_index = users_list_available[std::min(available_index + 1, users_list_available_size)];
 
@@ -529,12 +530,14 @@ void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
     };
 
     // Draw user avatar
-    const auto draw_avatar = [&](const std::string &user_id, const AvatarSize size, const ImVec2 origin_pos) {
+    const auto draw_avatar = [&](const std::string user_id, const AvatarSize size, const ImVec2 origin_pos) {
         draw_user_bg(size, origin_pos);
         if (gui.users_avatar.contains(user_id)) {
+            ImVec2 AVATAR_SIZE;
+            ImVec2 AVATAR_POS;
             const auto user_avatar_infos = users_avatar_infos[user_id][size];
-            ImVec2 AVATAR_POS = ImVec2(origin_pos.x + (user_avatar_infos.pos.x * SCALE.x), origin_pos.y + (user_avatar_infos.pos.y * SCALE.y));
-            ImVec2 AVATAR_SIZE = ImVec2(user_avatar_infos.size.x * SCALE.x, user_avatar_infos.size.y * SCALE.x);
+            AVATAR_POS = ImVec2(origin_pos.x + (user_avatar_infos.pos.x * SCALE.x), origin_pos.y + (user_avatar_infos.pos.y * SCALE.y));
+            AVATAR_SIZE = ImVec2(user_avatar_infos.size.x * SCALE.x, user_avatar_infos.size.y * SCALE.x);
             ImGui::SetCursorPos(AVATAR_POS);
             ImGui::Image(gui.users_avatar[user_id], AVATAR_SIZE);
         }
@@ -684,7 +687,6 @@ void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::TextColored(GUI_COLOR_TEXT, "%s", lang["name"].c_str());
         ImGui::SetCursorPos(INPUT_NAME_POS);
         ImGui::PushItemWidth(INPUT_NAME_SIZE);
-        // It's correct to use std::string this way because of small string optimization (string is small enough to be stored in the string object itself)
         if (ImGui::InputText("##user_name", temp.name.data(), SCE_NP_ONLINEID_MAX_LENGTH))
             temp.name = temp.name.data();
         ImGui::PopItemWidth();

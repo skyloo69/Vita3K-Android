@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <config/state.h>
 #include <display/state.h>
+#include <glutil/gl.h>
 #include <io/VitaIoDevice.h>
 #include <io/state.h>
 #include <io/vfs.h>
@@ -265,14 +266,8 @@ static void init_font(GuiState &gui, EmuEnvState &emuenv) {
 
             const auto sys_lang = static_cast<SceSystemParamLang>(emuenv.cfg.sys_lang);
             if (sys_lang == SCE_SYSTEM_PARAM_LANG_CHINESE_S) {
-                auto fontpath = fs::path(default_font_path / "SourceHanSansSC-Bold-Min.ttf");
-                
-                if(!fs::exists(fontpath))
-                    fontpath = fs::path(default_font_path / "NotoSerifCJK-Regular.ttc"); // default google fonts for uncode languange
+                const std::vector<uint8_t> font_source = fs_utils::read_asset_raw(default_font_path / "SourceHanSansSC-Bold-Min.ttf");
 
-                std::vector<uint8_t> font_source = fs_utils::read_asset_raw(fontpath);
-                LOG_INFO("Using font: {},", fontpath);
-                
                 if (!font_source.empty()) {
                     font_data = malloc(font_source.size());
                     memcpy(font_data, font_source.data(), font_source.size());
@@ -513,11 +508,11 @@ void save_apps_cache(GuiState &gui, EmuEnvState &emuenv) {
     if (apps_cache.is_open()) {
         // Write Size of apps list
         const auto size = gui.app_selector.user_apps.size();
-        apps_cache.write((const char *)&size, sizeof(size));
+        apps_cache.write((char *)&size, sizeof(size));
 
         // Write version of cache
         const uint32_t versionInFile = 1;
-        apps_cache.write((const char *)&versionInFile, sizeof(uint32_t));
+        apps_cache.write((char *)&versionInFile, sizeof(uint32_t));
 
         // Write language of cache
         gui.app_selector.apps_cache_lang = emuenv.cfg.sys_lang;
@@ -714,11 +709,11 @@ std::map<DateTime, std::string> get_date_time(GuiState &gui, EmuEnvState &emuenv
     return date_time_str;
 }
 
-ImTextureID load_image(GuiState &gui, const uint8_t *data, const std::uint32_t size) {
+ImTextureID load_image(GuiState &gui, const char *data, const std::uint32_t size) {
     int width;
     int height;
 
-    stbi_uc *img_data = stbi_load_from_memory(data, size, &width, &height,
+    stbi_uc *img_data = stbi_load_from_memory(reinterpret_cast<const stbi_uc *>(data), size, &width, &height,
         nullptr, STBI_rgb_alpha);
 
     if (!data)
@@ -782,7 +777,7 @@ void draw_begin(GuiState &gui, EmuEnvState &emuenv) {
         gui.app_selector.icon_async_loader->commit(gui);
 }
 
-void draw_end(GuiState &gui) {
+void draw_end(GuiState &gui, SDL_Window *window) {
     ImGui::Render();
     ImGui_ImplSdl_RenderDrawData(gui.imgui_state.get());
 }
