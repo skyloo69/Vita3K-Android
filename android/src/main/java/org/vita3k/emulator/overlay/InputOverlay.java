@@ -246,9 +246,11 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
             button.setPressedState(true);
             button.setTrackId(event.getPointerId(pointerIndex));
             concerned = true;
-			if(button.getLegacyId() == ButtonType.BUTTON_TOUCH_HIDE){
+			
+			if(button.getLegacyId() == ButtonType.BUTTON_TOUCH_HIDE)
               OVERLAY_TIME_BEFORE_HIDE = 0;
-            }
+            
+			
             if(button.getRole() == OVERLAY_MASK_TOUCH_SCREEN_SWITCH)
               setTouchState(button.getPressed());
             else
@@ -261,9 +263,11 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
           if (button.getTrackId() == event.getPointerId(pointerIndex))
           {
             button.setPressedState(false);
-            if(button.getLegacyId() == ButtonType.BUTTON_TOUCH_HIDE){
+			
+            if(button.getLegacyId() == ButtonType.BUTTON_TOUCH_HIDE)
               OVERLAY_TIME_BEFORE_HIDE = 10;
-            }
+            
+			
             if(button.getRole() != OVERLAY_MASK_TOUCH_SCREEN_SWITCH)
               setButton(button.getControl(), false);
 
