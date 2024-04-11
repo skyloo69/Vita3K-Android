@@ -65,7 +65,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vita3k-${{ env.git_short_sha }}-reportbug.zip
-          if: always()
           path: /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/report.zip
         
       - name: Compute git short sha
