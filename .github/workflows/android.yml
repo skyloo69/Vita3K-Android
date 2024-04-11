@@ -55,12 +55,14 @@ jobs:
           ./gradlew --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease  assembleDebug
           
 
-      - name: run zipper
+      - if : always()
+        name: ziping log
         run: |
           echo ZIPPER
           zip -r /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/report.zip /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/*
-          
-      - uses: actions/upload-artifact@v4
+      
+      - if : always()
+        uses: actions/upload-artifact@v4
         with:
           name: vita3k-${{ env.git_short_sha }}-reportbug.zip
           if: always()
