@@ -105,8 +105,8 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
             sensorState->counter = emuenv.motion.last_counter++;
         }
     }else{
-            sensorState->accelerometer = emuenv.cfg.tiltpos;
-            sensorState->gyro = 0;
+            sensorState->accelerometer = emuenv.cfg.tiltpos,0,0;
+            sensorState->gyro = 0,0,0;
     }
 
     for (int i = 1; i < numRecords; i++)
@@ -159,8 +159,8 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             }
         }
     }else{
-        sensorState->accelerometer = emuenv.cfg.tiltpos;
-        sensorState->gyro = 0;
+        sensorState->accelerometer = emuenv.cfg.tiltpos,0,0;
+        sensorState->gyro = 0,0,0;
     }
 
     return 0;
