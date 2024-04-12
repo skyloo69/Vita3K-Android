@@ -164,6 +164,19 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     }
     ImGui::Spacing();
     ImGui::Separator();
+    
+    if (ImGui::Checkbox("Enable acceleration-and-gyroscope", &emuenv.cfg.tiltsens)))
+        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+
+    if (!emuenv.cfg.tiltsens){
+        ImGui::Text("Emulate acceleration position");
+        ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
+        ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 90);
+        ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -90);
+    }
+    ImGui::Spacing();
+    ImGui::Separator();
+    
     if(emuenv.cfg.enable_gamepad_overlay && ImGui::Checkbox("Show front/back touchscreen switch button.", &emuenv.cfg.overlay_show_touch_switch)){
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), overlay_editing);
