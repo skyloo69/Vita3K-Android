@@ -82,8 +82,7 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
     if (!sensorState)
         return RET_ERROR(SCE_MOTION_ERROR_NULL_PARAMETER);
 
-    if(emuenv.cfg.tiltsens){
-        if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support) {
+        if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
             std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
             sensorState->accelerometer = get_acceleration(emuenv.motion);
             sensorState->gyro = get_gyroscope(emuenv.motion);
@@ -96,7 +95,9 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
             // some default values
             memset(sensorState, 0, sizeof(*sensorState));
             sensorState->accelerometer.z = -1.0;
-    
+            sensorState->accelerometer.x = float(emuenv.cfg.tiltpos);
+            sensorState->gyro = {0,0,0};
+            
             std::chrono::time_point<std::chrono::steady_clock> ts = std::chrono::steady_clock::now();
             uint64_t timestamp = std::chrono::duration_cast<std::chrono::microseconds>(ts.time_since_epoch()).count();
             sensorState->timestamp = timestamp;
@@ -104,12 +105,6 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
     
             sensorState->counter = emuenv.motion.last_counter++;
         }
-    }else{
-        sensorState->accelerometer.x = float(emuenv.cfg.tiltpos);
-        sensorState->accelerometer.y = 0;
-        sensorState->accelerometer.z = 0;
-        sensorState->gyro = {0,0,0};
-    }
 
     for (int i = 1; i < numRecords; i++)
         sensorState[i] = sensorState[0];
@@ -122,8 +117,7 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
     if (!motionState)
         return RET_ERROR(SCE_MOTION_ERROR_NULL_PARAMETER);
 
-    if(emuenv.cfg.tiltsens){
-        if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support) {
+        if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
             std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
             motionState->timestamp = emuenv.motion.last_accel_timestamp;
     
@@ -153,6 +147,7 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             motionState->hostTimestamp = timestamp;
     
             motionState->acceleration.z = -1.0;
+            motionState->acceleration.x = float(emuenv.cfg.tiltpos);
             motionState->deviceQuat.z = 1;
             for (int i = 0; i < 4; i++) {
                 // identity matrices
@@ -160,12 +155,6 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
                 reinterpret_cast<float *>(&motionState->nedMatrix.x.x)[i * 4 + i] = 1;
             }
         }
-    }else{
-        motionState->acceleration.x = float(emuenv.cfg.tiltpos);
-        motionState->acceleration.y = 0;
-        motionState->acceleration.z = 0;
-        motionState->angularVelocity = {0,0,0};
-    }
 
     return 0;
 }
