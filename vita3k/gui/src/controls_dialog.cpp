@@ -171,8 +171,8 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     if (!emuenv.cfg.tiltsens){
         ImGui::Text("Emulate acceleration position");
         ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
-        ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 90);
-        ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -90);
+        ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
+        ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
     }
     ImGui::Spacing();
     ImGui::Separator();
