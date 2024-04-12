@@ -161,10 +161,10 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             }
         }
     }else{
-        motionState->accelerometer.x = float(emuenv.cfg.tiltpos);
-        motionState->accelerometer.y = 0;
-        motionState->accelerometer.z = 0;
-        motionState->gyro = {0,0,0};
+        motionState->acceleration.x = float(emuenv.cfg.tiltpos);
+        motionState->acceleration.y = 0;
+        motionState->acceleration.z = 0;
+        motionState->angularVelocity = {0,0,0};
     }
 
     return 0;
