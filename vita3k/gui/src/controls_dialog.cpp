@@ -166,7 +166,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Spacing();
     ImGui::Separator();
     
-    if (ImGui::Checkbox("Enable acceleration-and-gyroscope", &emuenv.cfg.tiltsens))
+    if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
     if (!emuenv.cfg.tiltsens){
@@ -174,6 +174,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
         ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
         ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
+        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
     }
     ImGui::Spacing();
     ImGui::Separator();
