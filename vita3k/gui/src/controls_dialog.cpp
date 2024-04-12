@@ -165,7 +165,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Spacing();
     ImGui::Separator();
     
-    if (ImGui::Checkbox("Enable acceleration-and-gyroscope", &emuenv.cfg.tiltsens)))
+    if (ImGui::Checkbox("Enable acceleration-and-gyroscope", &emuenv.cfg.tiltsens))
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
     if (!emuenv.cfg.tiltsens){
