@@ -99,16 +99,19 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
     bool found_gyro = false;
     bool found_accel = false;
     for (ControllerList::iterator controller = state.controllers.begin(); controller != state.controllers.end();) {
-        if (SDL_GameControllerGetAttached(controller->second.controller.get())) {
-            found_accel |= controller->second.has_accel;
-            found_gyro |= controller->second.has_gyro;
-
-            ++controller;
-        } else {
-            state.free_ports[controller->second.port - 1] = true;
-            controller = state.controllers.erase(controller);
-            state.controllers_num--;
+        if(emuenv.cfg.tiltsens){
+            if (SDL_GameControllerGetAttached(controller->second.controller.get())) {
+                found_accel |= controller->second.has_accel;
+                found_gyro |= controller->second.has_gyro;
+    
+                ++controller;
+            } else {
+                state.free_ports[controller->second.port - 1] = true;
+                controller = state.controllers.erase(controller);
+                state.controllers_num--;
+            }
         }
+            
     }
 
     // Add new controllers
