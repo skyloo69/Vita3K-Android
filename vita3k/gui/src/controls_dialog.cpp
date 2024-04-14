@@ -15,7 +15,6 @@
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-#include "imgui.h"
 #include "private.h"
 
 #include <SDL_scancode.h>
@@ -161,19 +160,6 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         emuenv.cfg.overlay_opacity = 100;
         set_controller_overlay_scale(emuenv.cfg.overlay_scale);
         set_controller_overlay_opacity(emuenv.cfg.overlay_opacity);
-        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
-    }
-    ImGui::Spacing();
-    ImGui::Separator();
-    
-    if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
-        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
-
-    if (!emuenv.cfg.tiltsens){
-        ImGui::Text("Emulate acceleration position");
-        ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
-        ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
-        ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
     }
     ImGui::Spacing();
