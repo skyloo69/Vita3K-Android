@@ -1111,6 +1111,20 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.emulator["reset_emu_path_description"].c_str());
         }
+        
+        if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
+        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+
+        if (!emuenv.cfg.tiltsens){
+            ImGui::Spacing();
+            ImGui::Text("Emulate acceleration position");
+            ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
+            ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
+            ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
+            config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+        }
+        ImGui::Spacing();
+        ImGui::Separator();
 //#endif
         ImGui::Spacing();
         ImGui::Separator();
