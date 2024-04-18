@@ -136,12 +136,14 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                 new_controller.controller = controller;
                 new_controller.port = reserve_port(state);
 
-                new_controller.has_gyro = SDL_GameControllerHasSensor(controller.get(), SDL_SENSOR_GYRO);
-                if (new_controller.has_gyro)
-                    SDL_GameControllerSetSensorEnabled(controller.get(), SDL_SENSOR_GYRO, SDL_TRUE);
-                new_controller.has_accel = SDL_GameControllerHasSensor(controller.get(), SDL_SENSOR_ACCEL);
-                if (new_controller.has_accel)
-                    SDL_GameControllerSetSensorEnabled(controller.get(), SDL_SENSOR_ACCEL, SDL_TRUE);
+                if(emuenv.cfg.tiltsens){
+                   new_controller.has_gyro = SDL_GameControllerHasSensor(controller.get(), SDL_SENSOR_GYRO);
+                   if (new_controller.has_gyro)
+                       SDL_GameControllerSetSensorEnabled(controller.get(), SDL_SENSOR_GYRO, SDL_TRUE);
+                   new_controller.has_accel = SDL_GameControllerHasSensor(controller.get(), SDL_SENSOR_ACCEL);
+                   if (new_controller.has_accel)
+                       SDL_GameControllerSetSensorEnabled(controller.get(), SDL_SENSOR_ACCEL, SDL_TRUE);
+                }
 
                 new_controller.has_led = SDL_GameControllerHasLED(controller.get());
                 if (new_controller.has_led) {
@@ -152,9 +154,16 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                     }
                 }
 
-                found_gyro |= new_controller.has_gyro;
-                found_accel |= new_controller.has_accel;
-
+                if(emuenv.cfg.tiltsens){
+                   found_gyro |= new_controller.has_gyro;
+                   found_accel |= new_controller.has_accel;
+                   LOG_INFO("Buildin sensor enabled");
+                }else{
+                   found_gyro = false;
+                   found_accel = false;
+                   LOG_INFO("Buildin sensor disabled in settings!, enable in controller menu to enable it");
+                }
+                
                 state.controllers.emplace(guid, new_controller);
                 state.controllers_name[joystick_index] = SDL_GameControllerNameForIndex(joystick_index);
                 state.controllers_num++;
