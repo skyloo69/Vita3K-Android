@@ -96,6 +96,7 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
             memset(sensorState, 0, sizeof(*sensorState));
             sensorState->accelerometer.z = -1.0;
             sensorState->accelerometer.x = float(emuenv.cfg.tiltpos);
+            sensorState->accelerometer.y = 0;
             sensorState->gyro = {0,0,0};
             
             std::chrono::time_point<std::chrono::steady_clock> ts = std::chrono::steady_clock::now();
@@ -147,7 +148,9 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             motionState->hostTimestamp = timestamp;
     
             motionState->acceleration.z = -1.0;
+            motionState->acceleration.y = 0;
             motionState->acceleration.x = float(emuenv.cfg.tiltpos);
+            motionState->angularVelocity = {0,0,0};
             motionState->deviceQuat.z = 1;
             for (int i = 0; i < 4; i++) {
                 // identity matrices
