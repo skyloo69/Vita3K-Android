@@ -53,6 +53,7 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
+    Config &cfg;
     if(cfg.tiltsens){
         init_device_sensors(*this);
         
@@ -121,8 +122,9 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
         }
         return;
     }
-
-    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !cfg.tiltsens)
+    
+    Config &cfg;
+    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !Config.tiltsens)
         return;
 
     // make sure to use the data from only one accelerometer and gyroscope
