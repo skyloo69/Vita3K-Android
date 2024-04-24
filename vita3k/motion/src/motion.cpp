@@ -19,6 +19,7 @@
 #include <motion/motion.h>
 #include <motion/state.h>
 
+#include <config/state.h>
 #include <ctrl/state.h>
 #include <util/log.h>
 
@@ -51,11 +52,16 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
-    init_device_sensors(*this);
-
-    if(has_device_motion_support)
+    if(emuenv.cfg.tiltsens){
+        init_device_sensors(*this);
+        
+        if(has_device_motion_support)
         LOG_INFO("Device has builtin accelerometer and gyroscope.");
-
+        
+    }else{
+        LOG_INFO("Device builtin sensors disabled by config.");
+    }
+    
     // close them as having them opened uses battery
     if(device_accel){
         SDL_SensorClose(device_accel);
@@ -115,7 +121,7 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
         return;
     }
 
-    if (!ctrl_state.has_motion_support && !state.has_device_motion_support)
+    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !emuenv.cfg.tiltsens)
         return;
 
     // make sure to use the data from only one accelerometer and gyroscope
