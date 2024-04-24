@@ -124,7 +124,7 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
     }
     
     Config &cfg;
-    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !Config.tiltsens)
+    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !cfg.tiltsens)
         return;
 
     // make sure to use the data from only one accelerometer and gyroscope
