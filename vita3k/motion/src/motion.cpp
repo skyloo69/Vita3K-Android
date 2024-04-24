@@ -19,9 +19,8 @@
 #include <motion/motion.h>
 #include <motion/state.h>
 
+#include <config/config.h>
 #include <config/state.h>
-#include <emuenv/state.h>
-#include <ctrl/state.h>
 
 #include <util/log.h>
 
@@ -54,6 +53,7 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
+    EmuEnvState &emuenv;
     if(emuenv.cfg.tiltsens){
         init_device_sensors(*this);
         
