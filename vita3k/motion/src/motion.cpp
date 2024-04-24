@@ -20,7 +20,9 @@
 #include <motion/state.h>
 
 #include <config/state.h>
+#include <emuenv/state.h>
 #include <ctrl/state.h>
+
 #include <util/log.h>
 
 #include <SDL.h>
