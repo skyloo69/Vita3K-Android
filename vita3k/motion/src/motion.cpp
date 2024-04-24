@@ -53,8 +53,7 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
-    EmuEnvState &emuenv;
-    if(emuenv.cfg.tiltsens){
+    if(cfg.tiltsens){
         init_device_sensors(*this);
         
         if(has_device_motion_support)
@@ -123,7 +122,7 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
         return;
     }
 
-    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !emuenv.cfg.tiltsens)
+    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !cfg.tiltsens)
         return;
 
     // make sure to use the data from only one accelerometer and gyroscope
