@@ -91,7 +91,7 @@ static int reserve_port(CtrlState &state) {
 
 SceCtrlExternalInputMode get_type_of_controller(const int idx) {
     const auto type = SDL_GameControllerTypeForIndex(idx);
-    LOG_INFO("Controller type {}", type);
+    LOG_INFO("Controller type : {}", type);
     return (type == SDL_CONTROLLER_TYPE_PS4) || (type == SDL_CONTROLLER_TYPE_PS5) ? SCE_CTRL_TYPE_DS4 : SCE_CTRL_TYPE_DS3;
 }
 
