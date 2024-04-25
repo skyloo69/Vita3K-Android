@@ -91,7 +91,7 @@ static int reserve_port(CtrlState &state) {
 
 SceCtrlExternalInputMode get_type_of_controller(const int idx) {
     const auto type = SDL_GameControllerTypeForIndex(idx);
-    LOG_INFO("Controller type : {}", type);
+    LOG_DEBUG("Controller type idx : {}", idx);
     return (type == SDL_CONTROLLER_TYPE_PS4) || (type == SDL_CONTROLLER_TYPE_PS5) ? SCE_CTRL_TYPE_DS4 : SCE_CTRL_TYPE_DS3;
 }
 
@@ -156,11 +156,11 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                 if(emuenv.cfg.tiltsens){
                    found_gyro |= new_controller.has_gyro;
                    found_accel |= new_controller.has_accel;
-                   LOG_INFO("Buildin sensor enabled");
+                   LOG_INFO("Buildin accel and gyro sensor enabled");
                 }else{
                    found_gyro = false;
                    found_accel = false;
-                   LOG_INFO("Buildin sensor disabled in settings!, enable in controller menu to enable it");
+                   LOG_INFO("Buildin accel and gyro sensor disabled in settings!, enable in settings > emulator menu to enable it");
                 }
                 
                 state.controllers.emplace(guid, new_controller);
