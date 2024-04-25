@@ -91,6 +91,7 @@ static int reserve_port(CtrlState &state) {
 
 SceCtrlExternalInputMode get_type_of_controller(const int idx) {
     const auto type = SDL_GameControllerTypeForIndex(idx);
+    LOG_INFO("Controller type {}", type);
     return (type == SDL_CONTROLLER_TYPE_PS4) || (type == SDL_CONTROLLER_TYPE_PS5) ? SCE_CTRL_TYPE_DS4 : SCE_CTRL_TYPE_DS3;
 }
 
@@ -99,19 +100,17 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
     bool found_gyro = false;
     bool found_accel = false;
     for (ControllerList::iterator controller = state.controllers.begin(); controller != state.controllers.end();) {
-        if(emuenv.cfg.tiltsens){
             if (SDL_GameControllerGetAttached(controller->second.controller.get())) {
-                found_accel |= controller->second.has_accel;
-                found_gyro |= controller->second.has_gyro;
-    
+                if(emuenv.cfg.tiltsens){
+                   found_accel |= controller->second.has_accel;
+                   found_gyro |= controller->second.has_gyro;
+                }
                 ++controller;
             } else {
                 state.free_ports[controller->second.port - 1] = true;
                 controller = state.controllers.erase(controller);
                 state.controllers_num--;
             }
-        }
-            
     }
 
     // Add new controllers
@@ -172,6 +171,7 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
     }
 
     state.has_motion_support = found_gyro && found_accel;
+    LOG_TRACE("Controller motion support code :  {}", state.has_motion_support);
 }
 
 static float keys_to_axis(const uint8_t *keys, SDL_Scancode code1, SDL_Scancode code2) {
