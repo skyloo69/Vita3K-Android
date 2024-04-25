@@ -19,9 +19,7 @@
 #include <motion/motion.h>
 #include <motion/state.h>
 
-#include <config/config.h>
-#include <config/state.h>
-
+#include <ctrl/state.h>
 #include <util/log.h>
 
 #include <SDL.h>
@@ -53,18 +51,11 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
-    Config config;
-    Config &cfg = config;
-    if(cfg.tiltsens){
-        init_device_sensors(*this);
-        
-        if(has_device_motion_support)
+    init_device_sensors(*this);
+
+    if(has_device_motion_support)
         LOG_INFO("Device has builtin accelerometer and gyroscope.");
-        
-    }else{
-        LOG_INFO("Device builtin sensors disabled by config.");
-    }
-    
+
     // close them as having them opened uses battery
     if(device_accel){
         SDL_SensorClose(device_accel);
@@ -124,9 +115,7 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
         return;
     }
 
-    Config config;
-    Config &cfg = config;
-    if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !cfg.tiltsens)
+    if (!ctrl_state.has_motion_support && !state.has_device_motion_support)
         return;
 
     // make sure to use the data from only one accelerometer and gyroscope
