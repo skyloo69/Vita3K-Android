@@ -37,9 +37,10 @@ jobs:
           vcpkg install boost-system:arm64-android boost-filesystem:arm64-android boost-program-options:arm64-android boost-icl:arm64-android boost-variant:arm64-android openssl:arm64-android zlib:arm64-android
 
       - name: Decode Keystore
-        env:
-          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE }}
-        run: echo $KEYSTORE_ENCODED | base64 --decode > "/home/runner/keystore.jks"
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE }}" > "/home/runner/keystore.jks.asc"
+          gpg -d --passphrase "${{ secrets.SIGNING_STORE_PASSWORD}" --batch "/home/runner/keystore.jks.asc" > "/home/runner/keystore.jks"
+          ls -l /home/runner/
 
       - name: Gradle build
         env:
