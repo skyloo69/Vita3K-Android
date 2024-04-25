@@ -53,7 +53,7 @@ static void init_device_sensors(MotionState& state){
 }
 
 void MotionState::init(){
-    Config &cfg;
+    Config &cfg = config;
     if(cfg.tiltsens){
         init_device_sensors(*this);
         
@@ -123,7 +123,7 @@ void refresh_motion(MotionState &state, CtrlState &ctrl_state) {
         return;
     }
     
-    Config &cfg;
+    Config &cfg = config;
     if (!ctrl_state.has_motion_support && !state.has_device_motion_support && !cfg.tiltsens)
         return;
 
