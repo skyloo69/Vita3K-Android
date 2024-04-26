@@ -9,10 +9,10 @@ android {
 
 	defaultConfig {
 		applicationId "org.vita3k.emulator"
-		minSdk 29
+		minSdk 28
 		targetSdk 34
 		versionCode 11
-		versionName "0.2.0-11-UndenS"
+		versionName "0.2.0-11.5-ikhoeyZX"
 
 		externalNativeBuild {
 			cmake {
@@ -61,6 +61,7 @@ android {
 			}
 			minifyEnabled true
 			shrinkResources true
+			signingConfig signingConfigs.release
 			proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 		}
 	}
