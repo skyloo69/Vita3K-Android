@@ -728,6 +728,7 @@ You will need to move your old folder to the new location manually.</change_emu_
 You will need to move your old folder to the new location manually.</reset_emu_path_description>
 			<custom_config_settings>Custom Config Settings</custom_config_settings>
 			<clear_custom_config>Clear Custom Config</clear_custom_config>
+			<sensor_settings>Buildin Sensor setting</sensor_settings>
 		</emulator>
 		<gui name="GUI">
 			<show_gui>GUI Visible</show_gui>
