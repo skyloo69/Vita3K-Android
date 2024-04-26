@@ -513,6 +513,7 @@ struct LangState {
             { "title", "Settings" },
             { "save_reboot", "Save & Reboot" },
             { "save_apply", "Save & Apply" },
+            { "close", "Close" },
             { "save", "Save" },
             { "keep_changes", "Click on Save to keep your changes." }
         };
