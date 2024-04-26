@@ -160,7 +160,7 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                 }else{
                    found_gyro = false;
                    found_accel = false;
-                   LOG_INFO("Buildin accel and gyro sensor disabled in settings!, enable in settings > emulator menu to enable it");
+                   LOG_INFO("Buildin accel and gyro sensor disabled in settings!, goto settings > emulator menu to enable it");
                 }
                 
                 state.controllers.emplace(guid, new_controller);
@@ -171,7 +171,6 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
     }
 
     state.has_motion_support = found_gyro && found_accel;
-    LOG_TRACE("Controller motion support code :  {}", state.has_motion_support);
 }
 
 static float keys_to_axis(const uint8_t *keys, SDL_Scancode code1, SDL_Scancode code2) {
