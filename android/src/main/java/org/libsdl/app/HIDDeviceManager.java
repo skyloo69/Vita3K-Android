@@ -66,12 +66,15 @@ public class HIDDeviceManager {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
+                Log.i(TAG,"CALL INTENT : ACTION_USB_DEVICE_ATTACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceAttached(usbDevice);
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
+                Log.i(TAG,"CALL INTENT : ACTION_USB_DEVICE_DETACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceDetached(usbDevice);
             } else if (action.equals(HIDDeviceManager.ACTION_USB_PERMISSION)) {
+                Log.i(TAG,"CALL INTENT : ACTION_USB_PERMISSION");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDevicePermission(usbDevice, intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false));
             }
@@ -145,7 +148,7 @@ public class HIDDeviceManager {
             return;
         }
 
-        /*
+        
         // Logging
         for (UsbDevice device : mUsbManager.getDeviceList().values()) {
             Log.i(TAG,"Path: " + device.getDeviceName());
@@ -186,7 +189,7 @@ public class HIDDeviceManager {
             }
         }
         Log.i(TAG," No more devices connected.");
-        */
+        
 
         // Register for USB broadcasts and permission completions
         IntentFilter filter = new IntentFilter();
