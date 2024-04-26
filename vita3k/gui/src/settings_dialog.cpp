@@ -1111,7 +1111,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.emulator["reset_emu_path_description"].c_str());
         }
-        
+
+        ImGui::Separator();
+        ImGui::Spacing();
+        ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["sensor_settings"].c_str());
+        ImGui::Spacing();
         if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
@@ -1158,6 +1162,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         static std::map<std::string, std::string> static_list_user_lang_names = {
             { "id", "Indonesia" },
             { "ms", "Malaysia" },
+            { "ua", "Ukraina"},
         };
         for (const auto &l : list_user_lang)
             list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
