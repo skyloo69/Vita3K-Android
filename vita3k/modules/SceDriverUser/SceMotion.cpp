@@ -82,7 +82,7 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
     if (!sensorState)
         return RET_ERROR(SCE_MOTION_ERROR_NULL_PARAMETER);
 
-    if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support) {
+    if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
         std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
         sensorState->accelerometer = get_acceleration(emuenv.motion);
         sensorState->gyro = get_gyroscope(emuenv.motion);
@@ -95,7 +95,10 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
         // some default values
         memset(sensorState, 0, sizeof(*sensorState));
         sensorState->accelerometer.z = -1.0;
-
+        sensorState->accelerometer.x = float(emuenv.cfg.tiltpos);
+        sensorState->accelerometer.y = 0;
+        sensorState->gyro = {0,0,0};
+        
         std::chrono::time_point<std::chrono::steady_clock> ts = std::chrono::steady_clock::now();
         uint64_t timestamp = std::chrono::duration_cast<std::chrono::microseconds>(ts.time_since_epoch()).count();
         sensorState->timestamp = timestamp;
@@ -115,7 +118,7 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
     if (!motionState)
         return RET_ERROR(SCE_MOTION_ERROR_NULL_PARAMETER);
 
-    if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support) {
+    if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
         std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
         motionState->timestamp = emuenv.motion.last_accel_timestamp;
 
@@ -145,6 +148,9 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
         motionState->hostTimestamp = timestamp;
 
         motionState->acceleration.z = -1.0;
+        motionState->acceleration.y = 0;
+        motionState->acceleration.x = float(emuenv.cfg.tiltpos);
+        motionState->angularVelocity = {0,0,0};
         motionState->deviceQuat.z = 1;
         for (int i = 0; i < 4; i++) {
             // identity matrices
