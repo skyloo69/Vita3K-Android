@@ -645,7 +645,8 @@ struct LangState {
             { "reset_emu_path", "Reset Emulator Path" },
             { "reset_emu_path_description", "Reset Vita3K emulator path to the default.\nYou will need to move your old folder to the new location manually." },
             { "custom_config_settings", "Custom Config Settings" },
-            { "clear_custom_config", "Clear Custom Config" }
+            { "clear_custom_config", "Clear Custom Config" },
+            { "sensor_settings", "Buildin Sensor settings" }
         };
         std::map<std::string, std::string> gui = {
             { "title", "GUI" },
