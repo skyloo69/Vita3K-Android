@@ -43,22 +43,17 @@
 namespace renderer::gl {
 
 GLContext::GLContext()
-    if(gpu_name.contains("MALI")){
-        : vertex_stream_ring_buffer(GL_ARRAY_BUFFER, MiB(128))
-        , index_stream_ring_buffer(GL_ELEMENT_ARRAY_BUFFER, MiB(64))
-        , vertex_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(0)) 
-        , fragment_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
-        , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(0))
-        , fragment_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8)) {
+    : vertex_stream_ring_buffer(GL_ARRAY_BUFFER, MiB(128))
+    , index_stream_ring_buffer(GL_ELEMENT_ARRAY_BUFFER, MiB(64))
+    , vertex_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
+    , fragment_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
+    , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8))
+    , fragment_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8)) {
+    if(gpu_name.contains("Mali") || gpu_name.contains("PowerVR")){
+        std::memset(&previous_vert_info, 0, 0);
     }else{
-        : vertex_stream_ring_buffer(GL_ARRAY_BUFFER, MiB(128))
-        , index_stream_ring_buffer(GL_ELEMENT_ARRAY_BUFFER, MiB(64))
-        , vertex_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
-        , fragment_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
-        , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8))
-        , fragment_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8)) {
+        std::memset(&previous_vert_info, 0, sizeof(shader::RenderVertUniformBlock));
     }
-    std::memset(&previous_vert_info, 0, sizeof(shader::RenderVertUniformBlock));
     std::memset(&previous_frag_info, 0, sizeof(shader::RenderFragUniformBlock));
 }
 
