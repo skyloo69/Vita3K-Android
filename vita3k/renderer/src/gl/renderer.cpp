@@ -49,6 +49,7 @@ GLContext::GLContext()
     , fragment_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
     , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8))
     , fragment_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8)) {
+    const std::string gpu_name = reinterpret_cast<const GLchar *>(glGetString(GL_RENDERER));
     if(gpu_name.contains("Mali") || gpu_name.contains("PowerVR")){
         std::memset(&previous_vert_info, 0, 0);
     }else{
