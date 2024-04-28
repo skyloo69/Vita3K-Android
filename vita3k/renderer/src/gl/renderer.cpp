@@ -48,7 +48,7 @@ GLContext::GLContext()
         , index_stream_ring_buffer(GL_ELEMENT_ARRAY_BUFFER, MiB(64))
         , vertex_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(0)) 
         , fragment_uniform_stream_ring_buffer(GL_SHADER_STORAGE_BUFFER, MiB(256))
-        , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8))
+        , vertex_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(0))
         , fragment_info_uniform_buffer(GL_UNIFORM_BUFFER, MiB(8)) {
     }else{
         : vertex_stream_ring_buffer(GL_ARRAY_BUFFER, MiB(128))
