@@ -201,7 +201,9 @@ void pre_compile_program(GLState &renderer, const ShadersHash &hash) {
         const auto vert_hash_hex = convert_hash_to_hex(hash.vert);
         const SharedGLObject vert_shader = compile_shader(renderer.shaders_path, renderer.shader_version,
             vert_hash_hex, "vert", GL_VERTEX_SHADER, renderer.vertex_shader_cache, hash.vert);
+        LOG_DEBUG("Compile Vertex Shader");
         if (!vert_shader) {
+            LOG_DEBUG("Compile Vertex Shader failed!");
             return;
         }
 
@@ -238,19 +240,25 @@ static SharedGLObject get_or_compile_shader(const SceGxmProgram *program, const 
 
 SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmRecordState &state, const FeatureState &features, const MemState &mem,
     bool shader_cache, bool spirv, bool maskupdate) {
+    const std::string gpu_name = reinterpret_cast<const GLchar *>(glGetString(GL_RENDERER));
     R_PROFILE(__func__);
 
     assert(state.fragment_program);
     assert(state.vertex_program);
 
-    const SceGxmVertexProgram &vertex_program_gxm = *state.vertex_program.get(mem);
     const SceGxmFragmentProgram &fragment_program_gxm = *state.fragment_program.get(mem);
 
     const GLFragmentProgram &fragment_program = *reinterpret_cast<GLFragmentProgram *>(
         fragment_program_gxm.renderer_data.get());
-
-    const GLVertexProgram &vertex_program = *reinterpret_cast<GLVertexProgram *>(
+    
+    if(gpu_name.contains("Mali") || gpu_name.contains("PowerVR")){
+        LOG_TRACE("Vertex SSBO Not supported!, ignoring");
+    }else{
+        const SceGxmVertexProgram &vertex_program_gxm = *state.vertex_program.get(mem);
+    
+        const GLVertexProgram &vertex_program = *reinterpret_cast<GLVertexProgram *>(
         vertex_program_gxm.renderer_data.get());
+    }
 
     const ProgramHashes hashes(fragment_program.hash, vertex_program.hash);
 
@@ -290,6 +298,7 @@ SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmR
     if (shader_cache_hash_index == renderer.shaders_cache_hashs.end()) {
         renderer.shaders_cache_hashs.push_back({ fragment_program.hash, vertex_program.hash });
         save_shaders_cache_hashs(renderer, renderer.shaders_cache_hashs);
+        LOG_DEBUG("Save shader cache haches");
     }
 
     return program;
