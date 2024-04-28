@@ -241,6 +241,7 @@ static SharedGLObject get_or_compile_shader(const SceGxmProgram *program, const 
 SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmRecordState &state, const FeatureState &features, const MemState &mem,
     bool shader_cache, bool spirv, bool maskupdate) {
     const std::string gpu_name = reinterpret_cast<const GLchar *>(glGetString(GL_RENDERER));
+    
     R_PROFILE(__func__);
 
     assert(state.fragment_program);
@@ -251,7 +252,7 @@ SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmR
     const GLFragmentProgram &fragment_program = *reinterpret_cast<GLFragmentProgram *>(
         fragment_program_gxm.renderer_data.get());
     
-    if(gpu_name.contains("Mali") || gpu_name.contains("PowerVR")){
+    if(strstr(gpu_name.c_str(), "Mali") || strstr(gpu_name.c_str(), "PowerVR")){
         LOG_TRACE("Vertex SSBO Not supported!, ignoring");
     }else{
         const SceGxmVertexProgram &vertex_program_gxm = *state.vertex_program.get(mem);
