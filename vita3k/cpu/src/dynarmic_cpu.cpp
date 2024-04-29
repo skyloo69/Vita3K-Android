@@ -21,11 +21,10 @@
 #include <set>
 #include <util/bit_cast.h>
 #include <util/log.h>
-#include <util/bit_cast.h>
 
 #include <mem/ptr.h>
 
-//#include <dynarmic/frontend/A32/a32_ir_emitter.h>
+// #include <dynarmic/frontend/A32/a32_ir_emitter.h>
 
 class ArmDynarmicCP15 : public Dynarmic::A32::Coprocessor {
     uint32_t tpidruro;
@@ -119,7 +118,7 @@ public:
 
     void PreCodeTranslationHook(bool is_thumb, Dynarmic::A32::VAddr pc, Dynarmic::A32::IREmitter &ir) override {
         if (cpu->log_code) {
-           // ir.CallHostFunction(&TraceInstruction, ir.Imm64((uint64_t)this), ir.Imm64(pc), ir.Imm64(is_thumb));
+    //        ir.CallHostFunction(&TraceInstruction, ir.Imm64((uint64_t)this), ir.Imm64(pc), ir.Imm64(is_thumb));
         }
     }
 
@@ -302,8 +301,7 @@ std::unique_ptr<Dynarmic::A32::Jit> DynarmicCPU::make_jit() {
         config.page_table = (log_mem || !cpu_opt) ? nullptr : reinterpret_cast<decltype(config.page_table)>(parent->mem->page_table.get());
         config.absolute_offset_page_table = true;
     } else if (!log_mem && cpu_opt) {
-        // config.fastmem_pointer = std::bit_cast<uintptr_t>(parent->mem->memory.get());
-        config.fastmem_pointer = (log_mem || !cpu_opt) ? nullptr : parent->mem->memory.get();
+        config.fastmem_pointer = std::bit_cast<uintptr_t>(parent->mem->memory.get());
     }
     config.hook_hint_instructions = true;
     config.enable_cycle_counting = false;
@@ -336,6 +334,7 @@ int DynarmicCPU::run() {
     do {
         halt_reason = jit->Run();
     } while (halt_reason == Dynarmic::HaltReason::Step || halt_reason == Dynarmic::HaltReason::CacheInvalidation);
+   
     return halted;
 }
 
