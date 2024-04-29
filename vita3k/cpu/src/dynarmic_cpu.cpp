@@ -21,6 +21,7 @@
 #include <set>
 #include <util/bit_cast.h>
 #include <util/log.h>
+#include <util/bit_cast.h>
 
 #include <mem/ptr.h>
 
