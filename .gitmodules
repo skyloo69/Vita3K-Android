@@ -75,7 +75,7 @@
 [submodule "external/dynarmic"]
 	path = external/dynarmic
 	url = https://github.com/ikhoeyZX/dynarmic.git
-	branch = master
+	branch = aarch64
 [submodule "external/fmt"]
 	path = external/fmt
 	url = https://github.com/fmtlib/fmt.git
