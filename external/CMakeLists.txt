@@ -221,6 +221,8 @@ option(ENABLE_SPVREMAPPER "Enables building of SPVRemapper" OFF)
 option(ENABLE_GLSLANG_BINARIES "Builds glslang and spirv-remap" OFF)
 option(ENABLE_HLSL "Enables HLSL input support" OFF)
 option(ENABLE_CTEST "Enables testing" OFF)
+option(ALLOW_EXTERNAL_SPIRV_TOOLS "Call external SpirV-tools" ON)
+option(ENABLE_OPT "Use SpirV tools for glslang" ON)
 add_subdirectory(glslang)
 
 option(SPIRV_CROSS_CLI "Build the CLI binary. Requires SPIRV_CROSS_STATIC." OFF)
