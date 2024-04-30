@@ -775,7 +775,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (config.resolution_multiplier == 0.5f)
             ImGui::BeginDisabled();
         if (ImGui::Button("<", ImVec2(20.f * SCALE.x, 0)))
-            config.resolution_multiplier -= 0.25f;
+            config.resolution_multiplier -= 0.05f;
         if (config.resolution_multiplier == 0.5f)
             ImGui::EndDisabled();
         ImGui::SameLine(0, 5.f * SCALE.x);
@@ -793,7 +793,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (config.resolution_multiplier == 8.0f)
             ImGui::BeginDisabled();
         if (ImGui::Button(">", ImVec2(20.f * SCALE.x, 0)))
-            config.resolution_multiplier += 0.25f;
+            config.resolution_multiplier += 0.05f;
         if (config.resolution_multiplier == 8.0f)
             ImGui::EndDisabled();
         ImGui::SameLine();
@@ -967,7 +967,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
         if (!emuenv.io.app_path.empty())
             ImGui::BeginDisabled();
-        static const char *LIST_BACKEND_AUDIO[] = { "SDL", "Cubeb" };
+        static const char *LIST_BACKEND_AUDIO[] = { "Cubeb", "SDL", "None" };
         if (ImGui::Combo(lang.audio["audio_backend"].c_str(), reinterpret_cast<int *>(&audio_backend_idx), LIST_BACKEND_AUDIO, IM_ARRAYSIZE(LIST_BACKEND_AUDIO)))
             emuenv.cfg.audio_backend = LIST_BACKEND_AUDIO[audio_backend_idx];
         if (ImGui::IsItemHovered())
