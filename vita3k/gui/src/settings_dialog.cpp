@@ -1114,10 +1114,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         ImGui::Separator();
         ImGui::Spacing();
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["sensor_settings"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["sensor_settings"].c_str());
         ImGui::Spacing();
         if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
-        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+            config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
         if (!emuenv.cfg.tiltsens){
             ImGui::Spacing();
