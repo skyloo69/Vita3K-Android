@@ -36,7 +36,7 @@ static std::vector<const char *> contributors_list = {
     "Croden1999", "d3m3vilurr", "Danik2343", "DerRM", "devnoname120",
     "dima-xd", "dracc", "edwinr", "Felipefpl", "FlotterCodername",
     "Frain-Breeze", "francois-berder", "FromAlaska", "Ghabry", "hobyst",
-    "HuanJiCanShang", "ichisadashioko", "illusion0001", "isJuhn",
+    "HuanJiCanShang", "ichisadashioko", "ikhoeyZX", "illusion0001", "isJuhn",
     "jdoe0000000", "jlachniet", "Johnnynator", "johnothwolo", "Kaitul",
     "kd-11", "KhoraLee", "lephilousophe", "lybxlpsv", "MaddTheSane",
     "Margen67", "merryhime", "mirusu400", "mkersey", "mrcmunir",
@@ -49,7 +49,7 @@ static std::vector<const char *> contributors_list = {
 };
 
 static std::vector<const char *> supporters_list = {
-    "j0hnnybrav0", "TacoOblivion", "Undeadbob"
+    "j0hnnybrav0", "TacoOblivion", "Undeadbob", "uplush"
 };
 
 void draw_about_dialog(GuiState &gui, EmuEnvState &emuenv) {
@@ -72,7 +72,7 @@ void draw_about_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Text("%s", lang["vita3k"].c_str());
 #ifdef ANDROID
     ImGui::Spacing();
-    ImGui::TextWrapped("%s", "If you did not download this emulator from Vita3K's official discord, paid for it or it contains ads, uninstall it immediatly.");
+    ImGui::TextWrapped("%s", "Note: This is not an Official release!, this is a custom preview that i will create PR / manually merge from PC version in main repo. If you see this contains ads or paid for it BLAME SOMEONE WHO MODIFIED IT!, because i NEVER DO THAT!");
 #endif
     ImGui::Spacing();
     ImGui::TextWrapped("%s", lang["about_vita3k"].c_str());
