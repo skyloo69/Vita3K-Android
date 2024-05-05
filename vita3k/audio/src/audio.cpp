@@ -113,7 +113,7 @@ void AudioState::set_backend(const std::string &adapter_name) {
     } else if (adapter_name == "Cubeb") {
         adapter = std::make_unique<CubebAudioAdapter>(*this);
     } else if (adapter_name == "None") {
-        adapter_name = nullptr;
+        adapter_name = {0,1,0}; // freq, channel, size
         LOG_DEBUG("Audio disable!");
         break;
     } else {
