@@ -277,6 +277,7 @@ public class Emulator extends SDLActivity
                                 result_uri_string = result_uri_string.replace("tree/", "storage/");    // external storage like SDCARD or USB storage
                             }
 
+                            /*
                             // replace All symbol strings
                             // based from this example https://stackoverflow.com/questions/55100473/decode-and-replace-hex-values-in-a-string-in-java
                             result_uri_string = result_uri_string.replace("%", "\\x");
@@ -289,7 +290,7 @@ public class Emulator extends SDLActivity
                                 char   bin = (char)num;            // cast int to char
                                 m.appendReplacement(sb, bin+"");   // replace hex with char         
                             }
-                         /* 
+                          
                             m.appendTail(sb);
                             result_uri_string = sb.toString();
                             LOG_INFO("New path location: {}", result_uri_string);
