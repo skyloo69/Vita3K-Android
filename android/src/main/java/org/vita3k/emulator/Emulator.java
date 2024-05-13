@@ -35,6 +35,8 @@ import androidx.documentfile.provider.DocumentFile;
 import android.os.Environment;
 import android.provider.Settings;
 
+import android.support.v7.app.AppCompatActivity;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,32 +158,21 @@ public class Emulator extends SDLActivity
 
     @Keep
     public void changeDir(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-            if (Environment.isExternalStorageManager()){
-                Intent intent = new Intent()
-                .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) // must declare again because it will crash emulator due permission denial
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            
-                startActivityForResult(intent, 546);
-            }else{
-                Intent intent = new Intent();    
-                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION); // open settings for file access permission
-                Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
-                startActivityForResult(intent, 547);
-            }
+        if (Environment.isExternalStorageManager()){
+            Intent intent = new Intent()
+            .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) // must declare again because it will crash emulator due permission denial
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        
+            startActivityForResult(intent, 546);
         }else{
-            ActivityCompat.requestPermissions(
-                    this,
-                    new String[]{
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                    },
-                    546
-            );
+            Intent intent = new Intent();    
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION); // open settings for file access permission
+            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+            startActivityForResult(intent, 547);
         }
     }
 
