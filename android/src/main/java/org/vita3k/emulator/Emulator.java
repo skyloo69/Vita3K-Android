@@ -141,8 +141,6 @@ public class Emulator extends SDLActivity
         ProcessPhoenix.triggerRebirth(getContext(), restart_intent);
     }
 
-    //static final int FILE_DIALOG_CODE = 545; // no need, just declare directly 
-
     @Keep
     public void showFileDialog(){
         Intent intent = new Intent()
@@ -150,7 +148,6 @@ public class Emulator extends SDLActivity
                 .setAction(Intent.ACTION_GET_CONTENT);
 
         intent = Intent.createChooser(intent, "Choose a file");
-    //    startActivityForResult(intent, FILE_DIALOG_CODE);
         startActivityForResult(intent, 545);
     }
 
@@ -268,7 +265,16 @@ public class Emulator extends SDLActivity
                             }
                             result_uri_string = result_uri_string.replace("%3A", "/");
                             result_uri_string = result_uri_string.replace("%2F", "/"); // fix sub folder
-                            result_uri_string = result_uri_string.replace("%20", " "); // incase contains space
+
+                            StringBuilder sb = new StringBuilder(result_uri_string);
+                            Pattern pattern = Pattern.compile("[%xX][0-9a-fA-F]+");
+                            Matcher matcher = pattern.matcher(result_uri_string);
+                            while(matcher.find()) {
+                                int indexOfHexCode = sb.indexOf(matcher.group());
+                                sb.replace(indexOfHexCode, indexOfHexCode+matcher.group().length(), Character.toString((char)Integer.parseInt(matcher.group().substring(1), 16)));
+                            }
+
+                            result_uri_string = sb.toString();
                             result_fd = 0;
                         }else{
                             result_fd = 0;
