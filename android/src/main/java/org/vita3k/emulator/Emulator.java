@@ -35,6 +35,10 @@ import androidx.documentfile.provider.DocumentFile;
 import android.os.Environment;
 import android.provider.Settings;
 
+// symbol fixer?
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Emulator extends SDLActivity
 {
     private InputOverlay mOverlay;
@@ -272,9 +276,20 @@ public class Emulator extends SDLActivity
                             }else{
                                 result_uri_string = result_uri_string.replace("tree/", "storage/");    // external storage like SDCARD or USB storage
                             }
-                            result_uri_string = result_uri_string.replace("%3A", "/");
-                            result_uri_string = result_uri_string.replace("%2F", "/"); // fix sub folder
-                            result_uri_string = result_uri_string.replace("%20", " "); // incase contains space
+
+                            // replace All symbol strings
+                            StringBuffer sb = new StringBuffer();
+                            Pattern p = Pattern.compile("\\x[0-9A-F]+");
+                            Matcher m = p.matcher(result_uri_string);
+                            while(m.find()){           
+                                String hex = m.group();            //find hex values            
+                                int    num = Integer.parseInt(hex.replace("\\x", ""), 16);  //parse to int            
+                                char   bin = (char)num;            // cast int to char
+                                m.appendReplacement(sb, bin+"");   // replace hex with char         
+                            }
+                            m.appendTail(sb);
+                            result_uri_string = sb.toString();
+                            LOG_INFO("New path location: {}", result_uri_string);
                             result_fd = 0;
                         }else{
                             result_fd = 0;
