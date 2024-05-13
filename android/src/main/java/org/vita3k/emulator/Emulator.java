@@ -289,9 +289,11 @@ public class Emulator extends SDLActivity
                                 char   bin = (char)num;            // cast int to char
                                 m.appendReplacement(sb, bin+"");   // replace hex with char         
                             }
+                         /* 
                             m.appendTail(sb);
                             result_uri_string = sb.toString();
                             LOG_INFO("New path location: {}", result_uri_string);
+                        */
                             result_fd = 0;
                         }else{
                             result_fd = 0;
