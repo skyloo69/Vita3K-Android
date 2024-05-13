@@ -117,7 +117,15 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
     if (result == host::dialog::filesystem::Result::SUCCESS && emulator_path.native() != emuenv.pref_path.native()) {
         // Refresh the working paths
         emuenv.pref_path = fs::path(emulator_path.native()) / "";
-
+#ifdef ANDROID
+        // Create .nomedia to hide all psvita system folder content
+        auto tmp = fs::path(emuenv.pref_path / ".nomedia");
+        if(!fs::exists(tmp)){
+            fs::ofstream( emuenv.pref_path / "tmp.txt" );
+            fs::rename( emuenv.pref_path / "tmp.txt", tmp );
+        }
+#endif
+        
         // TODO: Move app old to new path
         reset_emulator(gui, emuenv);
         LOG_INFO("Successfully moved Vita3K path to: {}", emuenv.pref_path);
