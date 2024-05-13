@@ -49,7 +49,6 @@
 #include <algorithm>
 #include <pugixml.hpp>
 #include <sstream>
-#include <unistd.h>
 
 #undef ERROR
 
@@ -120,7 +119,8 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
         emuenv.pref_path = fs::path(emulator_path.native()) / "";
         auto tmp = fs::path(emuenv.pref_path / ".nomedia");
         if(!fs::exists(tmp)){
-            execl("/system/bin/touch tmp");
+            fs::ofstream( emuenv.pref_path / "tmp.txt" );
+            fs::rename( emuenv.pref_path / "tmp.txt", tmp );
             LOG_INFO(".nomedia created");
         }
 
