@@ -35,10 +35,6 @@ import androidx.documentfile.provider.DocumentFile;
 import android.os.Environment;
 import android.provider.Settings;
 
-// symbol fixer?
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Emulator extends SDLActivity
 {
     private InputOverlay mOverlay;
@@ -160,22 +156,22 @@ public class Emulator extends SDLActivity
 
     @Keep
     public void changeDir(){
-            if (Environment.isExternalStorageManager()){
-                Intent intent = new Intent()
-                .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) // must declare again because it will crash emulator due permission denial
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            
-                startActivityForResult(intent, 546);
-            }else{
-                Intent intent = new Intent();    
-                intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION); // open settings for file access permission
-                Uri uri = Uri.fromParts("package", this.getPackageName(), null);
-                intent.setData(uri);
-                startActivity(intent);
-                startActivityForResult(intent, 547);
-            }
+        if (Environment.isExternalStorageManager()){
+            Intent intent = new Intent()
+            .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) // must declare again because it will crash emulator due permission denial
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        
+            startActivityForResult(intent, 546);
+        }else{
+            Intent intent = new Intent();    
+            intent.setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION); // open settings for file access permission
+            Uri uri = Uri.fromParts("package", this.getPackageName(), null);
+            intent.setData(uri);
+            startActivity(intent);
+            startActivityForResult(intent, 547);
+        }
     }
 
     private File getFileFromUri(Uri uri){
@@ -270,23 +266,9 @@ public class Emulator extends SDLActivity
                             }else{
                                 result_uri_string = result_uri_string.replace("tree/", "storage/");    // external storage like SDCARD or USB storage
                             }
-
-                            // replace All symbol strings
-                            // based from this example https://stackoverflow.com/questions/55100473/decode-and-replace-hex-values-in-a-string-in-java
-                            result_uri_string = result_uri_string.replace("%", "\\x");
-                            StringBuffer sb = new StringBuffer();
-                            Pattern p = Pattern.compile("\\\\x[0-9A-F]+");
-                            Matcher m = p.matcher(result_uri_string);
-                            while(m.find()){           
-                                String hex = m.group();            //find hex values            
-                                int    num = Integer.parseInt(hex.replace("\\x", ""), 16);  //parse to int            
-                                char   bin = (char)num;            // cast int to char
-                                m.appendReplacement(sb, bin+"");   // replace hex with char         
-                            }
-                          
-                            m.appendTail(sb);
-                            result_uri_string = sb.toString();
-                            LOG_INFO("New path location: {}", result_uri_string);
+                            result_uri_string = result_uri_string.replace("%3A", "/");
+                            result_uri_string = result_uri_string.replace("%2F", "/"); // fix sub folder
+                            result_uri_string = result_uri_string.replace("%20", " "); // incase contains space
                             result_fd = 0;
                         }else{
                             result_fd = 0;
