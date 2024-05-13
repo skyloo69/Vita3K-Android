@@ -83,6 +83,7 @@
         android:hardwareAccelerated="true"
         android:appCategory="game"
         android:isGame="true"
+        android:requestLegacyExternalStorage="true"
         android:hasFragileUserData="true" tools:targetApi="q">
 
         <!-- Example of setting SDL hints from AndroidManifest.xml:
