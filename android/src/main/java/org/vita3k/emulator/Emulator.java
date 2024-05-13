@@ -35,8 +35,6 @@ import androidx.documentfile.provider.DocumentFile;
 import android.os.Environment;
 import android.provider.Settings;
 
-import android.support.v7.app.AppCompatActivity;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -146,6 +144,8 @@ public class Emulator extends SDLActivity
         ProcessPhoenix.triggerRebirth(getContext(), restart_intent);
     }
 
+    //static final int FILE_DIALOG_CODE = 545; // no need, just declare directly 
+
     @Keep
     public void showFileDialog(){
         Intent intent = new Intent()
@@ -153,6 +153,7 @@ public class Emulator extends SDLActivity
                 .setAction(Intent.ACTION_GET_CONTENT);
 
         intent = Intent.createChooser(intent, "Choose a file");
+    //    startActivityForResult(intent, FILE_DIALOG_CODE);
         startActivityForResult(intent, 545);
     }
 
