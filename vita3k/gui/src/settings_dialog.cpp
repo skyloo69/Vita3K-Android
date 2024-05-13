@@ -121,7 +121,7 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
         if(!fs::exist(tmp)){
             fs::ofstream( tmp );
             fs::close( tmp );
-            LOG_INFO("{} created", tmp);
+            LOG_INFO(".nomedia created");
         }
 
         // TODO: Move app old to new path
