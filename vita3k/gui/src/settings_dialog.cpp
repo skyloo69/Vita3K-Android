@@ -49,7 +49,7 @@
 #include <algorithm>
 #include <pugixml.hpp>
 #include <sstream>
-#include <iostream>
+#include <unistd.h>
 
 #undef ERROR
 
