@@ -117,8 +117,8 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
     if (result == host::dialog::filesystem::Result::SUCCESS && emulator_path.native() != emuenv.pref_path.native()) {
         // Refresh the working paths
         emuenv.pref_path = fs::path(emulator_path.native()) / "";
-        auto tmp = fs::path(emuenv.pref_path/.nomedia);
-        if(!fs::exist(tmp)){
+        auto tmp = fs::path(emuenv.pref_path / ".nomedia");
+        if(!fs::exists(tmp)){
             fs::ofstream( tmp );
             fs::close( tmp );
             LOG_INFO(".nomedia created");
