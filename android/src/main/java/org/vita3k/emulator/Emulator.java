@@ -278,8 +278,9 @@ public class Emulator extends SDLActivity
                             }
 
                             // replace All symbol strings
+                            result_uri_string = result_uri_string.replace("%", "\\x");
                             StringBuffer sb = new StringBuffer();
-                            Pattern p = Pattern.compile("\\x[0-9A-F]+");
+                            Pattern p = Pattern.compile("\\\\x[0-9A-F]+");
                             Matcher m = p.matcher(result_uri_string);
                             while(m.find()){           
                                 String hex = m.group();            //find hex values            
