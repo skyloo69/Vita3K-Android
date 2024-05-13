@@ -269,9 +269,18 @@ public class Emulator extends SDLActivity
                             }else{
                                 result_uri_string = result_uri_string.replace("tree/", "storage/");    // external storage like SDCARD or USB storage
                             }
-                            result_uri_string = result_uri_string.replace("%3A", "/");
+                            result_uri_string = result_uri_string.replace("%3A", "/"); 
                             result_uri_string = result_uri_string.replace("%2F", "/"); // fix sub folder
-                            result_uri_string = result_uri_string.replace("%20", " "); // incase contains space
+
+                            StringBuilder sb = new StringBuilder(result_uri_string);
+                            Pattern pattern = Pattern.compile("[%xX][0-9a-fA-F]+");
+                            Matcher matcher = pattern.matcher(result_uri_string);
+                            while(matcher.find()) {
+                                int indexOfHexCode = sb.indexOf(matcher.group());
+                                sb.replace(indexOfHexCode, indexOfHexCode+matcher.group().length(), Character.toString((char)Integer.parseInt(matcher.group().substring(1), 16)));
+                            }
+
+                            result_uri_string = sb.toString();
                             result_fd = 0;
                         }else{
                             result_fd = 0;
