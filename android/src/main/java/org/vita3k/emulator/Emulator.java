@@ -35,6 +35,9 @@ import androidx.documentfile.provider.DocumentFile;
 import android.os.Environment;
 import android.provider.Settings;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Emulator extends SDLActivity
 {
     private InputOverlay mOverlay;
