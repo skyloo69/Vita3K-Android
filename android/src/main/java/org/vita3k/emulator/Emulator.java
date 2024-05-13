@@ -278,6 +278,7 @@ public class Emulator extends SDLActivity
                             }
 
                             // replace All symbol strings
+                            // based from this example https://stackoverflow.com/questions/55100473/decode-and-replace-hex-values-in-a-string-in-java
                             result_uri_string = result_uri_string.replace("%", "\\x");
                             StringBuffer sb = new StringBuffer();
                             Pattern p = Pattern.compile("\\\\x[0-9A-F]+");
