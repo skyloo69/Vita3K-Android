@@ -160,7 +160,6 @@ public class Emulator extends SDLActivity
 
     @Keep
     public void changeDir(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()){
                 Intent intent = new Intent()
                 .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
@@ -177,11 +176,6 @@ public class Emulator extends SDLActivity
                 startActivity(intent);
                 startActivityForResult(intent, 547);
             }
-        }else{
-        // for Android 10 lower
-           ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 547);
-        }
-  } 
     }
 
     private File getFileFromUri(Uri uri){
@@ -277,7 +271,6 @@ public class Emulator extends SDLActivity
                                 result_uri_string = result_uri_string.replace("tree/", "storage/");    // external storage like SDCARD or USB storage
                             }
 
-                            /*
                             // replace All symbol strings
                             // based from this example https://stackoverflow.com/questions/55100473/decode-and-replace-hex-values-in-a-string-in-java
                             result_uri_string = result_uri_string.replace("%", "\\x");
@@ -294,7 +287,6 @@ public class Emulator extends SDLActivity
                             m.appendTail(sb);
                             result_uri_string = sb.toString();
                             LOG_INFO("New path location: {}", result_uri_string);
-                        */
                             result_fd = 0;
                         }else{
                             result_fd = 0;
