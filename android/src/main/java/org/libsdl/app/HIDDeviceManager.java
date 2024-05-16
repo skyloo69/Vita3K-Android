@@ -196,9 +196,9 @@ public class HIDDeviceManager {
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         filter.addAction(HIDDeviceManager.ACTION_USB_PERMISSION);
-        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-            filter..SetPackage(getPackageName());
-        }
+//        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+//            filter..SetPackage(getPackageName());
+//        }
         mContext.registerReceiver(mUsbBroadcast, filter);
 
         for (UsbDevice usbDevice : mUsbManager.getDeviceList().values()) {
