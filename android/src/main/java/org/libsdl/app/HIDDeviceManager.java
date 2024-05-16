@@ -583,7 +583,7 @@ public class HIDDeviceManager {
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
                     Intent intent = new Intent(ACTION_USB_PERMISSION);
                     intent.setPackage(getPackageName());
-                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_MUTABLE));
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, intent, FLAG_MUTABLE));
                 }else{
                     if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
                         flags = FLAG_MUTABLE;
