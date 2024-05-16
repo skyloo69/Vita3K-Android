@@ -172,6 +172,7 @@ static spv::Function *make_fx10_unpack_func(spv::Builder &b, const SpirvUtilFunc
 
     spv::Id type_i32 = b.makeIntType(32);
     spv::Id ivec3 = b.makeVectorType(type_i32, 3);
+    spv::Id uvec3 = b.makeVectorType(b.makeUintType(32), 3);
     spv::Id type_f32 = b.makeFloatType(32);
     spv::Id type_f32_v3 = b.makeVectorType(type_f32, 3);
 
@@ -182,25 +183,25 @@ static spv::Function *make_fx10_unpack_func(spv::Builder &b, const SpirvUtilFunc
 
     spv::Id extracted = fx10_unpack_func->getParamId(0);
 
-    // Cast to uint first
+    // Cast to int first
     extracted = b.createUnaryOp(spv::OpBitcast, type_i32, extracted);
     spv::Id vec = b.createCompositeConstruct(ivec3, { extracted, extracted, extracted });
 
-    // vec = vec >> ivec3(0,10,20);
+    // vec = vec >> uvec3(0,10,20);
     // note: note entirely sure, I really hope the layout is the same as in a 32-bit little-endian integer
-    const spv::Id shift_amount = b.createCompositeConstruct(ivec3, { b.makeIntConstant(0), b.makeIntConstant(10), b.makeIntConstant(20) });
+    const spv::Id shift_amount = b.makeCompositeConstant(uvec3, { b.makeUintConstant(0), b.makeUintConstant(10), b.makeUintConstant(20) });
     vec = b.createBinOp(spv::OpShiftRightLogical, ivec3, vec, shift_amount);
 
     // sign-extend the 10-bit integer:
     // vec <<= 22 (logical)
     // vec >>= 22 (arithmetic)
-    spv::Id extend_amount = b.makeIntConstant(22);
-    extend_amount = b.createCompositeConstruct(ivec3, { extend_amount, extend_amount, extend_amount });
+    spv::Id extend_amount = b.makeUintConstant(22);
+    extend_amount = b.makeCompositeConstant(uvec3, { extend_amount, extend_amount, extend_amount });
     vec = b.createBinOp(spv::OpShiftLeftLogical, ivec3, vec, extend_amount);
     vec = b.createBinOp(spv::OpShiftRightArithmetic, ivec3, vec, extend_amount);
 
     // normalize it
-    vec = convert_to_float(b, vec, DataType::C10, true);
+    vec = convert_to_float(b, utils, vec, DataType::C10, true);
 
     b.makeReturn(false, vec);
     b.setBuildPoint(last_build_point);
@@ -263,38 +264,22 @@ static spv::Function *make_unpack_func(spv::Builder &b, const FeatureState &feat
     unpack_func->setReturnPrecision(spv::DecorationRelaxedPrecision);
     spv::Id extracted = unpack_func->getParamId(0);
 
-    extracted = b.createUnaryOp(spv::OpBitcast, is_signed ? type_i32 : type_ui32, extracted);
+    const spv::Id result_type = is_signed ? type_i32 : type_ui32;
+    extracted = b.createUnaryOp(spv::OpBitcast, result_type, extracted);
+
+    const auto comp_bits = 32 / comp_count;
+    spv::Id comp_bits_val = b.makeUintConstant(comp_bits);
 
     std::vector<spv::Id> comps;
 
-    const auto comp_bits = 32 / comp_count;
-
     for (int i = 0; i < comp_count; ++i) {
-        spv::Id comp;
-
-        if (is_signed) {
-            comp = b.createTriOp(spv::OpBitFieldSExtract, type_i32, extracted, b.makeIntConstant(comp_bits * i), b.makeIntConstant(comp_bits));
-        } else {
-            comp = b.createTriOp(spv::OpBitFieldUExtract, type_ui32, extracted, b.makeIntConstant(comp_bits * i), b.makeIntConstant(comp_bits));
-        }
+        const spv::Op op = is_signed ? spv::OpBitFieldSExtract : spv::OpBitFieldUExtract;
+        spv::Id comp = b.createTriOp(op, result_type, extracted, b.makeUintConstant(comp_bits * i), comp_bits_val);
 
         comps.push_back(comp);
     }
 
     auto output = b.createCompositeConstruct(output_type, comps);
-
-    if (is_signed) {
-        // Sign extended them. Thanks kd-11 for method.
-        spv::Id sign_check_vec_type = b.makeVectorType(b.makeBoolType(), comp_count);
-        std::vector<std::uint32_t> constants(comp_count, b.makeIntConstant(1 << (comp_bits - 1)));
-        std::vector<std::uint32_t> constant_bias(comp_count, b.makeIntConstant(1 << comp_bits));
-
-        spv::Id sign_check_vec = b.createBinOp(spv::OpSLessThan, sign_check_vec_type, output,
-            b.makeCompositeConstant(output_type, constants));
-        spv::Id bias_vec = b.makeCompositeConstant(output_type, constant_bias);
-
-        output = b.createTriOp(spv::OpSelect, output_type, sign_check_vec, output, b.createBinOp(spv::OpISub, output_type, output, bias_vec));
-    }
 
     b.makeReturn(false, output);
     b.setBuildPoint(last_build_point);
@@ -361,14 +346,10 @@ static spv::Function *make_pack_func(spv::Builder &b, const FeatureState &featur
 
     const spv::Id comp_type = b.getContainedTypeId(input_type);
 
-    auto output = b.makeUintConstant(0);
+    auto output = is_signed ? b.makeIntConstant(0) : b.makeUintConstant(0);
     for (int i = 0; i < comp_count; ++i) {
-        auto comp = b.createBinOp(spv::OpVectorExtractDynamic, comp_type, extracted, b.makeIntConstant(i));
-
-        if (is_signed)
-            comp = b.createUnaryOp(spv::OpBitcast, type_ui32, comp);
-
-        output = b.createOp(spv::OpBitFieldInsert, type_ui32, { output, comp, b.makeIntConstant(comp_bits * i), b.makeIntConstant(comp_bits) });
+        spv::Id comp = b.createBinOp(spv::OpVectorExtractDynamic, comp_type, extracted, b.makeIntConstant(i));
+        output = b.createOp(spv::OpBitFieldInsert, comp_type, { output, comp, b.makeIntConstant(comp_bits * i), b.makeIntConstant(comp_bits) });
     }
 
     output = b.createUnaryOp(spv::OpBitcast, type_f32, output);
@@ -577,7 +558,7 @@ static spv::Id make_or_get_buffer_ptr(spv::Builder &b, shader::usse::utils::Spir
     return utils.buffer_address_vec[buffer_utils_idx][is_write];
 }
 
-void buffer_address_access(spv::Builder &b, const SpirvShaderParameters &params, SpirvUtilFunctions &utils, const FeatureState &features, Operand dest, int dest_offset, spv::Id addr, uint32_t component_size, uint32_t nb_components, bool is_fragment, int buffer_idx, bool is_buffer_store) {
+void buffer_address_access(spv::Builder &b, const SpirvShaderParameters &params, SpirvUtilFunctions &utils, const FeatureState &features, Operand dest, int dest_offset, spv::Id addr, uint32_t component_size, uint32_t nb_components, int buffer_idx, bool is_buffer_store) {
     const spv::Id i32 = b.makeIntType(32);
     const spv::Id zero = b.makeIntConstant(0);
 
@@ -1302,7 +1283,7 @@ void store(spv::Builder &b, const SpirvShaderParameters &params, SpirvUtilFuncti
     // Floor down to nearest component that a float can hold. We originally want to optimize it to store from the first offset in float unit that writes the data.
     // But for unit size smaller than float, we have to start from the beginning in float unit.
     const int num_comp_in_float = static_cast<int>(4 / size_comp);
-    nearest_swizz_on = (int)((nearest_swizz_on / num_comp_in_float) * num_comp_in_float);
+    nearest_swizz_on = nearest_swizz_on / num_comp_in_float * num_comp_in_float;
 
     if (dest.type != DataType::F32) {
         std::vector<spv::Id> composites;
@@ -1446,27 +1427,26 @@ spv::Id unwrap_type(spv::Builder &b, spv::Id type) {
     return type;
 }
 
-// will break in 32-bit host
-static std::pair<float, float> get_int_normalize_range_constants(DataType type) {
+static float get_int_normalize_range_constants(DataType type) {
     switch (type) {
     case DataType::UINT8:
-        return { 0.0f, 255.0f };
+        return 255.0f;
     case DataType::INT8:
-        return { 128.0f, 127.0f };
+        return 127.0f;
     case DataType::C10:
-        // signed 10-bit
-        return { 512.0f, 511.0f };
+        // signed 10-bit, with a range of [-2, 2]
+        return 255.0f;
     case DataType::UINT16:
-        return { 0.0f, 65535.0f };
+        return 65535.0f;
     case DataType::INT16:
-        return { 32768.0f, 32767.0f };
+        return 32767.0f;
     case DataType::UINT32:
-        return { 0.0f, 4294967295.0f };
+        return 4294967295.0f;
     case DataType::INT32:
-        return { 2147483648.0f, 2147483647.0f };
+        return 2147483647.0f;
     default:
         assert(false);
-        return { 0.0f, 0.0f };
+        return 0.0f;
     }
 }
 
@@ -1481,7 +1461,7 @@ static spv::Id create_constant_vector_or_scalar(spv::Builder &b, spv::Id constan
     return b.createCompositeConstruct(b.makeVectorType(b.getTypeId(constant), comp_count), oprs);
 }
 
-spv::Id convert_to_float(spv::Builder &b, spv::Id opr, DataType type, bool normal) {
+spv::Id convert_to_float(spv::Builder &b, const SpirvUtilFunctions &utils, spv::Id opr, DataType type, bool normal) {
     const auto spv_type = unwrap_type(b, b.getTypeId(opr));
     const auto comp_count = b.isVector(opr) ? b.getNumComponents(opr) : 1;
     const auto target_type = b.isVector(opr) ? b.makeVectorType(b.makeFloatType(32), comp_count) : b.makeFloatType(32);
@@ -1496,22 +1476,15 @@ spv::Id convert_to_float(spv::Builder &b, spv::Id opr, DataType type, bool norma
     }
 
     if (normal) {
-        const auto constant_range = get_int_normalize_range_constants(type);
-        const auto normalizer = b.makeFloatConstant(constant_range.second);
-        const auto normalizer_vec = create_constant_vector_or_scalar(b, normalizer, comp_count);
+        const float normalizer = b.makeFloatConstant(get_int_normalize_range_constants(type));
+        const spv::Id normalizer_vec = create_constant_vector_or_scalar(b, normalizer, comp_count);
 
+        opr = b.createBinOp(spv::OpFDiv, target_type, opr, normalizer_vec);
         if (is_sint) {
-            const auto zero_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(0.0f), comp_count);
-            const auto b_vec_type = make_vector_or_scalar_type(b, b.makeBoolType(), comp_count);
-
-            const auto normalizer_neg = b.makeFloatConstant(constant_range.first);
-            const auto normalize_vec_neg = create_constant_vector_or_scalar(b, normalizer_neg, comp_count);
-
-            opr = b.createTriOp(spv::OpSelect, target_type, b.createBinOp(spv::OpFOrdLessThan, b_vec_type, opr, zero_vec),
-                b.createBinOp(spv::OpFDiv, target_type, opr, normalize_vec_neg),
-                b.createBinOp(spv::OpFDiv, target_type, opr, normalizer_vec));
-        } else {
-            opr = b.createBinOp(spv::OpFDiv, target_type, opr, normalizer_vec);
+            // opr = max(-1.0f, opr) (or -2.0f for fx10)
+            float lower_bound = type == DataType::C10 ? -2.f : -1.f;
+            const spv::Id minus1 = create_constant_vector_or_scalar(b, b.makeFloatConstant(lower_bound), comp_count);
+            opr = b.createBuiltinCall(target_type, utils.std_builtins, GLSLstd450FMax, { opr, minus1 });
         }
     }
     return opr;
@@ -1527,26 +1500,16 @@ spv::Id convert_to_int(spv::Builder &b, const SpirvUtilFunctions &utils, spv::Id
     const auto target_type = b.isVector(opr) ? b.makeVectorType(target_comp_type, comp_count) : target_comp_type;
 
     if (normal) {
-        const auto constant_range = get_int_normalize_range_constants(type);
-        const auto normalizer = b.makeFloatConstant(constant_range.second);
+        const float constant_range = get_int_normalize_range_constants(type);
+        const spv::Id normalizer = b.makeFloatConstant(constant_range);
         const auto normalizer_vec = create_constant_vector_or_scalar(b, normalizer, comp_count);
-        const auto range_begin_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(is_uint ? 0.f : -1.f), comp_count);
-        const auto range_end_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(1.f), comp_count);
+        const bool is_fx10 = type == DataType::C10; // fx10 range is [-2,2]
+        const auto range_begin_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(is_uint ? 0.f : (is_fx10 ? -2.f : -1.f)), comp_count);
+        const auto range_end_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(is_fx10 ? 2.f : 1.f), comp_count);
 
+        // opr = round(clamp(opr * norm), -1, 1)
         opr = b.createBuiltinCall(opr_type, utils.std_builtins, GLSLstd450FClamp, { opr, range_begin_vec, range_end_vec });
-        if (is_uint) {
-            opr = b.createBinOp(spv::OpFMul, opr_type, opr, normalizer_vec);
-        } else {
-            const auto zero_vec = create_constant_vector_or_scalar(b, b.makeFloatConstant(0.f), comp_count);
-            const auto b_vec_type = make_vector_or_scalar_type(b, b.makeBoolType(), comp_count);
-
-            const auto normalizer_neg = b.makeFloatConstant(constant_range.first);
-            const auto normalize_vec_neg = create_constant_vector_or_scalar(b, normalizer_neg, comp_count);
-
-            opr = b.createTriOp(spv::OpSelect, opr_type, b.createBinOp(spv::OpFOrdLessThan, b_vec_type, opr, zero_vec),
-                b.createBinOp(spv::OpFMul, opr_type, opr, normalize_vec_neg),
-                b.createBinOp(spv::OpFMul, opr_type, opr, normalizer_vec));
-        }
+        opr = b.createBinOp(spv::OpFMul, opr_type, opr, normalizer_vec);
         opr = b.createBuiltinCall(opr_type, utils.std_builtins, GLSLstd450Round, { opr });
     }
 
