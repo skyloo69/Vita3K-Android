@@ -581,15 +581,18 @@ public class HIDDeviceManager {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-                    flags = FLAG_MUTABLE;
+                    Intent intent = new Intent(ACTION_USB_PERMISSION);
                     intent.setPackage(getPackageName());
-                } if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
-                    flags = FLAG_MUTABLE;
-                } else {
-                    flags = 0;
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_MUTABLE));
+                }else{
+                    if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
+                        flags = FLAG_MUTABLE;
+                    } else {
+                        flags = 0;
+                    }
+                    
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 }
-                
-                mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 
             } catch (Exception e) {
                 Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
