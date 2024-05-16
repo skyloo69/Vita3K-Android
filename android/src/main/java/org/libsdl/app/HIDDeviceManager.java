@@ -584,7 +584,7 @@ public class HIDDeviceManager {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-                    flags = PendingIntent.FLAG_IMMUTABLE;
+                    flags = int(PendingIntent.FLAG_IMMUTABLE);
                 }else if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
                     flags = FLAG_MUTABLE;
                 } else {
