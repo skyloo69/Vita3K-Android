@@ -126,7 +126,7 @@ void write_escaped_path(basic_memory_buffer<Char> &quoted,
 template <typename Char>
 struct formatter<fs::path, Char> {
 private:
-    format_specs<Char> specs_;
+    format_spec<Char> specs_;
     detail::arg_ref<Char> width_ref_;
     bool debug_ = false;
     char path_type_ = 'n';
