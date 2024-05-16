@@ -196,6 +196,9 @@ public class HIDDeviceManager {
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         filter.addAction(HIDDeviceManager.ACTION_USB_PERMISSION);
+        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+            filter..SetPackage(getPackageName());
+        }
         mContext.registerReceiver(mUsbBroadcast, filter);
 
         for (UsbDevice usbDevice : mUsbManager.getDeviceList().values()) {
@@ -581,14 +584,12 @@ public class HIDDeviceManager {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION)
-                                                                                                               .SetPackage(context.getPackageName()), PendingIntent.FLAG_IMMUTABLE));
-                }else{
-                    if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
-                        flags = FLAG_MUTABLE;
-                    } else {
-                        flags = 0;
-                    }
+                    flags = PendingIntent.FLAG_IMMUTABLE;
+                }else if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
+                    flags = FLAG_MUTABLE;
+                } else {
+                    flags = 0;
+                }
                     
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 }
