@@ -148,7 +148,7 @@ public class HIDDeviceManager {
             return;
         }
 
-        
+        /*
         // Logging
         for (UsbDevice device : mUsbManager.getDeviceList().values()) {
             Log.i(TAG,"Path: " + device.getDeviceName());
@@ -189,7 +189,7 @@ public class HIDDeviceManager {
             }
         }
         Log.i(TAG," No more devices connected.");
-        
+        */
 
         // Register for USB broadcasts and permission completions
         IntentFilter filter = new IntentFilter();
@@ -580,12 +580,17 @@ public class HIDDeviceManager {
             try {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
-                if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
+                if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+                    flags = FLAG_MUTABLE;
+                    intent.setPackage(getPackageName());
+                } if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
                     flags = FLAG_MUTABLE;
                 } else {
                     flags = 0;
                 }
+                
                 mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
+                
             } catch (Exception e) {
                 Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
                 HIDDeviceOpenResult(deviceID, false);
