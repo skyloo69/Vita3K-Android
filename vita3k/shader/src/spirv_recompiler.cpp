@@ -322,14 +322,8 @@ static spv::Id create_input_variable(spv::Builder &b, SpirvShaderParameters &par
             }
         }
 
-        if (is_integer_data_type(dest.type)) {
-            if (b.isFloatType(utils::unwrap_type(b, b.getTypeId(var)))) {
-                var = utils::convert_to_int(b, utils, var, dest.type, true);
-            } else if (convert_to_float) {
-                var = utils::convert_to_float(b, var, dest.type, false);
-                dest.type = (dest.type == DataType::INT32 || dest.type == DataType::UINT32) ? DataType::F32 : DataType::F16;
-            }
-        }
+        if (is_integer_data_type(dest.type) && b.isFloatType(utils::unwrap_type(b, b.getTypeId(var))))
+            var = utils::convert_to_int(b, utils, var, dest.type, true);
 
         if (is_4th_component_1) {
             // set the 4th component to 1, because it's what the shader is expecting it to be
