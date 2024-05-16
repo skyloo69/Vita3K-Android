@@ -512,7 +512,7 @@ bool USSETranslatorVisitor::vpck(
 
     // source is int destination is float
     if (is_float_data_type(inst.opr.dest.type) && !is_float_data_type(inst.opr.src1.type)) {
-        source = utils::convert_to_float(m_b, source, inst.opr.src1.type, scale);
+        source = utils::convert_to_float(m_b, m_util_funcs, source, inst.opr.src1.type, scale);
     }
 
     // source is float destination is int
@@ -756,7 +756,7 @@ bool USSETranslatorVisitor::vldst(
     spv::Id base = m_b.createBinOp(spv::OpIAdd, i32_type, source_0, source_1);
 
     if (m_features.enable_memory_mapping) {
-        utils::buffer_address_access(m_b, m_spirv_params, m_util_funcs, m_features, to_store, to_store_offset, base, get_data_type_size(type_to_ldst), current_number_to_fetch, m_program.is_fragment(), -1, is_store);
+        utils::buffer_address_access(m_b, m_spirv_params, m_util_funcs, m_features, to_store, to_store_offset, base, get_data_type_size(type_to_ldst), current_number_to_fetch, -1, is_store);
     } else {
         if (is_store) {
             LOG_ERROR("Store opcode is not supported without memory mapping");
