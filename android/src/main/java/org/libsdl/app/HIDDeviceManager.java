@@ -107,9 +107,7 @@ public class HIDDeviceManager {
 
     private HIDDeviceManager(final Context context) {
         mContext = context;
-//        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-//            mContext.SetPackage(getPackageName());
-//        }
+
         HIDDeviceRegisterCallback();
 
         mSharedPreferences = mContext.getSharedPreferences("hidapi", Context.MODE_PRIVATE);
@@ -583,6 +581,7 @@ public class HIDDeviceManager {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+                    mUsbManager.SetPackage(getPackageName());
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
                     
                 }else{
