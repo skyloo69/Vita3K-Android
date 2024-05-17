@@ -107,9 +107,9 @@ public class HIDDeviceManager {
 
     private HIDDeviceManager(final Context context) {
         mContext = context;
-        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-            mContext.SetPackage(getPackageName());
-        }
+//        if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+//            mContext.SetPackage(getPackageName());
+//        }
         HIDDeviceRegisterCallback();
 
         mSharedPreferences = mContext.getSharedPreferences("hidapi", Context.MODE_PRIVATE);
