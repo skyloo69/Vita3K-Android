@@ -175,10 +175,10 @@ public class HIDDeviceManager {
 
     private void initializeUSB() {
         mUsbManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
-        if (mUsbManager == null) {
+/*        if (mUsbManager == null) {
             return;
         }
-
+*/
         /*
         // Logging
         for (UsbDevice device : mUsbManager.getDeviceList().values()) {
@@ -246,6 +246,15 @@ public class HIDDeviceManager {
         }
     }
 
+    private boolean isHIDDeviceUSB(UsbDevice usbDevice) {
+        for (int interface_number = 0; interface_number < usbDevice.getInterfaceCount(); ++interface_number) {
+            if (isHIDDeviceInterface(usbDevice, interface_number)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private boolean isHIDDeviceInterface(UsbDevice usbDevice, UsbInterface usbInterface) {
         if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_HID) {
             return true;
