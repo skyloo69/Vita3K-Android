@@ -351,17 +351,15 @@ public class HIDDeviceManager {
     }
 
     private void handleUsbDevicePermission(UsbDevice usbDevice, boolean permission_granted) {
-        for (HIDDevice device : mDevicesById.values()) {
-            if (usbDevice.equals(device.getDevice())) {
-                Log.v(TAG,"USB controller, is exist");
-                boolean opened = false;
-                if (permission_granted) {
-                    opened = device.open();
-                    Log.v(TAG,"USB controller Ppermission OK!");
-                }
-                HIDDeviceOpenResult(device.getId(), opened);
-            }
+        HIDDeviceUSB device = mUSBDevices.get(usbDevice);
+        if (device == null)
+            return;
+
+        boolean opened = false;
+        if (permission_granted) {
+            opened = device.open();
         }
+        HIDDeviceOpenResult(device.getId(), opened);
     }
 
     private void connectHIDDeviceUSB(UsbDevice usbDevice) {
