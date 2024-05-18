@@ -601,22 +601,33 @@ public class HIDDeviceManager {
             return false;
         }
 
-        for (HIDDeviceUSB device : mUSBDevices.values()) {
-            if (deviceID == device.getId()) {
-                UsbDevice usbDevice = device.getDevice();
-                if (!mUsbManager.hasPermission(usbDevice)) {
-                    HIDDeviceOpenPending(deviceID);
-                    try {
-                        mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), 0));
-                    } catch (Exception e) {
-                        Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
-                        HIDDeviceOpenResult(deviceID, false);
+         // Look to see if this is a USB device and we have permission to access it
+        UsbDevice usbDevice = device.getDevice();
+        Log.v(TAG, "GET USB device " + usbDevice);
+        if (usbDevice != null && !mUsbManager.hasPermission(usbDevice)) {
+            HIDDeviceOpenPending(deviceID);
+            try {
+                final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
+                int flags;
+                if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
+                   Log.v(TAG, "Android 14 USB request");
+                }else{
+                    if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
+                        flags = FLAG_MUTABLE;
+                        Log.v(TAG, "Android 12 USB request");
+                    } else {
+                        flags = 0;
                     }
+                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 }
-                return false;
+
+            } catch (Exception e) {
+                Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
+                HIDDeviceOpenResult(deviceID, false);
             }
-            break;
-        }
+             return false;
+        }     
 
         try {
             return device.open();
