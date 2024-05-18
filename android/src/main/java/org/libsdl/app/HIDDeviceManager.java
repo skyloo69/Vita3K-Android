@@ -364,22 +364,14 @@ public class HIDDeviceManager {
 
     private void connectHIDDeviceUSB(UsbDevice usbDevice) {
         synchronized (this) {
-            int interface_mask = 0;
-            for (int interface_index = 0; interface_index < usbDevice.getInterfaceCount(); interface_index++) {
-                UsbInterface usbInterface = usbDevice.getInterface(interface_index);
-                if (isHIDDeviceInterface(usbDevice, usbInterface)) {
-                    // Check to see if we've already added this interface
-                    // This happens with the Xbox Series X controller which has a duplicate interface 0, which is inactive
-                    int interface_id = usbInterface.getId();
-                    if ((interface_mask & (1 << interface_id)) != 0) {
-                        continue;
-                    }
-                    interface_mask |= (1 << interface_id);
-
-                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_index);
+            for (int interface_number = 0; interface_number < usbDevice.getInterfaceCount(); interface_number++) {
+                if (isHIDDeviceInterface(usbDevice, interface_number)) {
+                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_number);
                     int id = device.getId();
+                    mUSBDevices.put(usbDevice, device);
                     mDevicesById.put(id, device);
-                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), usbInterface.getId(), usbInterface.getInterfaceClass(), usbInterface.getInterfaceSubclass(), usbInterface.getInterfaceProtocol());
+                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), interface_number);
+                    break;
                 }
             }
         }
