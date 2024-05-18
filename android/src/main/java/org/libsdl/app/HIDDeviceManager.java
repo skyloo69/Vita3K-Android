@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.os.Build;
 import android.util.Log;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,8 +20,9 @@ import android.hardware.usb.*;
 import android.os.Handler;
 import android.os.Looper;
 
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 public class HIDDeviceManager {
@@ -65,12 +67,15 @@ public class HIDDeviceManager {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
+                Log.v(TAG,"CALL INTENT : ACTION_USB_DEVICE_ATTACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceAttached(usbDevice);
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
+                Log.v(TAG,"CALL INTENT : ACTION_USB_DEVICE_DETACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceDetached(usbDevice);
             } else if (action.equals(HIDDeviceManager.ACTION_USB_PERMISSION)) {
+                Log.v(TAG,"CALL INTENT : ACTION_USB_PERMISSION");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDevicePermission(usbDevice, intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false));
             }
@@ -104,6 +109,8 @@ public class HIDDeviceManager {
     private HIDDeviceManager(final Context context) {
         mContext = context;
 
+        HIDDeviceRegisterCallback();
+
         // Make sure we have the HIDAPI library loaded with the native functions
         try {
             SDL.loadLibrary("hidapi");
@@ -121,7 +128,7 @@ public class HIDDeviceManager {
                         // If our context is an activity, exit rather than crashing when we can't
                         // call our native functions.
                         Activity activity = (Activity)context;
-        
+
                         activity.finish();
                     }
                     catch (ClassCastException cce) {
@@ -134,8 +141,6 @@ public class HIDDeviceManager {
             return;
         }
         
-        HIDDeviceRegisterCallback();
-
         mSharedPreferences = mContext.getSharedPreferences("hidapi", Context.MODE_PRIVATE);
         mIsChromebook = mContext.getPackageManager().hasSystemFeature("org.chromium.arc.device_management");
 
@@ -148,9 +153,6 @@ public class HIDDeviceManager {
         {
             mNextDeviceId = mSharedPreferences.getInt("next_device_id", 0);
         }
-
-        initializeUSB();
-        initializeBluetooth();
     }
 
     public Context getContext() {
@@ -173,6 +175,9 @@ public class HIDDeviceManager {
 
     private void initializeUSB() {
         mUsbManager = (UsbManager)mContext.getSystemService(Context.USB_SERVICE);
+        if (mUsbManager == null) {
+            return;
+        }
 
         /*
         // Logging
@@ -199,7 +204,7 @@ public class HIDDeviceManager {
                 Log.i(TAG,"  Interface protocol: " + mUsbInterface.getInterfaceProtocol());
                 Log.i(TAG,"  Endpoint count: " + mUsbInterface.getEndpointCount());
 
-                // Get endpoint details 
+                // Get endpoint details
                 for (int epi = 0; epi < mUsbInterface.getEndpointCount(); epi++)
                 {
                     UsbEndpoint mEndpoint = mUsbInterface.getEndpoint(epi);
@@ -241,31 +246,20 @@ public class HIDDeviceManager {
         }
     }
 
-    private boolean isHIDDeviceUSB(UsbDevice usbDevice) {
-        for (int interface_number = 0; interface_number < usbDevice.getInterfaceCount(); ++interface_number) {
-            if (isHIDDeviceInterface(usbDevice, interface_number)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isHIDDeviceInterface(UsbDevice usbDevice, int interface_number) {
-        UsbInterface usbInterface = usbDevice.getInterface(interface_number);
+    private boolean isHIDDeviceInterface(UsbDevice usbDevice, UsbInterface usbInterface) {
         if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_HID) {
             return true;
         }
-        if (interface_number == 0) {
-            if (isXbox360Controller(usbDevice, usbInterface) || isXboxOneController(usbDevice, usbInterface)) {
-                return true;
-            }
+        if (isXbox360Controller(usbDevice, usbInterface) || isXboxOneController(usbDevice, usbInterface)) {
+            return true;
         }
         return false;
     }
 
     private boolean isXbox360Controller(UsbDevice usbDevice, UsbInterface usbInterface) {
         final int XB360_IFACE_SUBCLASS = 93;
-        final int XB360_IFACE_PROTOCOL = 1; // Wired only
+        final int XB360_IFACE_PROTOCOL = 1; // Wired
+        final int XB360W_IFACE_PROTOCOL = 129; // Wireless
         final int[] SUPPORTED_VENDORS = {
             0x0079, // GPD Win 2
             0x044f, // Thrustmaster
@@ -275,8 +269,9 @@ public class HIDDeviceManager {
             0x06a3, // Saitek
             0x0738, // Mad Catz
             0x07ff, // Mad Catz
-            0x0e6f, // Unknown
+            0x0e6f, // PDP
             0x0f0d, // Hori
+            0x1038, // SteelSeries
             0x11c9, // Nacon
             0x12ab, // Unknown
             0x1430, // RedOctane
@@ -285,13 +280,19 @@ public class HIDDeviceManager {
             0x15e4, // Numark
             0x162e, // Joytech
             0x1689, // Razer Onza
+            0x1949, // Lab126, Inc.
             0x1bad, // Harmonix
+            0x20d6, // PowerA
             0x24c6, // PowerA
+            0x2c22, // Qanba
+            0x2dc8, // 8BitDo
+            0x9886, // ASTRO Gaming
         };
 
         if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_VENDOR_SPEC &&
             usbInterface.getInterfaceSubclass() == XB360_IFACE_SUBCLASS &&
-            usbInterface.getInterfaceProtocol() == XB360_IFACE_PROTOCOL) {
+            (usbInterface.getInterfaceProtocol() == XB360_IFACE_PROTOCOL ||
+             usbInterface.getInterfaceProtocol() == XB360W_IFACE_PROTOCOL)) {
             int vendor_id = usbDevice.getVendorId();
             for (int supportedVid : SUPPORTED_VENDORS) {
                 if (vendor_id == supportedVid) {
@@ -306,15 +307,21 @@ public class HIDDeviceManager {
         final int XB1_IFACE_SUBCLASS = 71;
         final int XB1_IFACE_PROTOCOL = 208;
         final int[] SUPPORTED_VENDORS = {
+            0x044f, // Thrustmaster
             0x045e, // Microsoft
             0x0738, // Mad Catz
-            0x0e6f, // Unknown
+            0x0e6f, // PDP
             0x0f0d, // Hori
+            0x10f5, // Turtle Beach
             0x1532, // Razer Wildcat
+            0x20d6, // PowerA
             0x24c6, // PowerA
+            0x2dc8, // 8BitDo
+            0x2e24, // Hyperkin
         };
 
-        if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_VENDOR_SPEC &&
+        if (usbInterface.getId() == 0 &&
+            usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_VENDOR_SPEC &&
             usbInterface.getInterfaceSubclass() == XB1_IFACE_SUBCLASS &&
             usbInterface.getInterfaceProtocol() == XB1_IFACE_PROTOCOL) {
             int vendor_id = usbDevice.getVendorId();
@@ -328,45 +335,56 @@ public class HIDDeviceManager {
     }
 
     private void handleUsbDeviceAttached(UsbDevice usbDevice) {
-        if (isHIDDeviceUSB(usbDevice)) {
-            connectHIDDeviceUSB(usbDevice);
-        }
+        connectHIDDeviceUSB(usbDevice);
     }
 
     private void handleUsbDeviceDetached(UsbDevice usbDevice) {
-        HIDDeviceUSB device = mUSBDevices.get(usbDevice);
-        if (device == null)
-            return;
-
-        int id = device.getId();
-        mUSBDevices.remove(usbDevice);
-        mDevicesById.remove(id);
-        device.shutdown();
-        HIDDeviceDisconnected(id);
+        List<Integer> devices = new ArrayList<Integer>();
+        for (HIDDevice device : mDevicesById.values()) {
+            if (usbDevice.equals(device.getDevice())) {
+                devices.add(device.getId());
+            }
+        }
+        for (int id : devices) {
+            HIDDevice device = mDevicesById.get(id);
+            mDevicesById.remove(id);
+            device.shutdown();
+            HIDDeviceDisconnected(id);
+        }
     }
 
     private void handleUsbDevicePermission(UsbDevice usbDevice, boolean permission_granted) {
-        HIDDeviceUSB device = mUSBDevices.get(usbDevice);
-        if (device == null)
-            return;
-
-        boolean opened = false;
-        if (permission_granted) {
-            opened = device.open();
+        for (HIDDevice device : mDevicesById.values()) {
+            if (usbDevice.equals(device.getDevice())) {
+                Log.v(TAG,"USB controller, is exist");
+                boolean opened = false;
+                if (permission_granted) {
+                    opened = device.open();
+                    Log.v(TAG,"USB controller Ppermission OK!");
+                }
+                HIDDeviceOpenResult(device.getId(), opened);
+            }
         }
-        HIDDeviceOpenResult(device.getId(), opened);
     }
 
     private void connectHIDDeviceUSB(UsbDevice usbDevice) {
         synchronized (this) {
-            for (int interface_number = 0; interface_number < usbDevice.getInterfaceCount(); interface_number++) {
-                if (isHIDDeviceInterface(usbDevice, interface_number)) {
-                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_number);
+            int interface_mask = 0;
+            for (int interface_index = 0; interface_index < usbDevice.getInterfaceCount(); interface_index++) {
+                UsbInterface usbInterface = usbDevice.getInterface(interface_index);
+                if (isHIDDeviceInterface(usbDevice, usbInterface)) {
+                    // Check to see if we've already added this interface
+                    // This happens with the Xbox Series X controller which has a duplicate interface 0, which is inactive
+                    int interface_id = usbInterface.getId();
+                    if ((interface_mask & (1 << interface_id)) != 0) {
+                        continue;
+                    }
+                    interface_mask |= (1 << interface_id);
+
+                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_index);
                     int id = device.getId();
-                    mUSBDevices.put(usbDevice, device);
                     mDevicesById.put(id, device);
-                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), interface_number);
-                    break;
+                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), usbInterface.getId(), usbInterface.getInterfaceClass(), usbInterface.getInterfaceSubclass(), usbInterface.getInterfaceProtocol());
                 }
             }
         }
@@ -375,8 +393,14 @@ public class HIDDeviceManager {
     private void initializeBluetooth() {
         Log.d(TAG, "Initializing Bluetooth");
 
-        if (mContext.getPackageManager().checkPermission(android.Manifest.permission.BLUETOOTH, mContext.getPackageName()) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT <= 30 /* Android 11.0 (R) */ &&
+            mContext.getPackageManager().checkPermission(android.Manifest.permission.BLUETOOTH, mContext.getPackageName()) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "Couldn't initialize Bluetooth, missing android.permission.BLUETOOTH");
+            return;
+        }
+
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE) || (Build.VERSION.SDK_INT < 18 /* Android 4.3 (JELLY_BEAN_MR2) */)) {
+            Log.d(TAG, "Couldn't initialize Bluetooth, this version of Android does not support Bluetooth LE");
             return;
         }
 
@@ -540,7 +564,7 @@ public class HIDDeviceManager {
             for (HIDDevice device : mDevicesById.values()) {
                 device.setFrozen(frozen);
             }
-        }        
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -562,34 +586,56 @@ public class HIDDeviceManager {
     ////////// JNI interface functions
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public boolean initialize(boolean usb, boolean bluetooth) {
+        Log.v(TAG, "initialize(" + usb + ", " + bluetooth + ")");
+
+        if (usb) {
+            initializeUSB();
+        }
+        if (bluetooth) {
+            initializeBluetooth();
+        }
+        return true;
+    }
+
     public boolean openDevice(int deviceID) {
+        Log.v(TAG, "openDevice deviceID=" + deviceID);
+        HIDDevice device = getDevice(deviceID);
+        if (device == null) {
+            HIDDeviceDisconnected(deviceID);
+            return false;
+        }
+
         // Look to see if this is a USB device and we have permission to access it
-        for (HIDDeviceUSB device : mUSBDevices.values()) {
-            if (deviceID == device.getId()) {
-                UsbDevice usbDevice = device.getDevice();
-                if (!mUsbManager.hasPermission(usbDevice)) {
-                    HIDDeviceOpenPending(deviceID);
-                    try {
-                        mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), 0));
-                    } catch (Exception e) {
-                        Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
-                        HIDDeviceOpenResult(deviceID, false);
+        UsbDevice usbDevice = device.getDevice();
+        Log.v(TAG, "GET USB device " + usbDevice);
+        if (usbDevice != null && !mUsbManager.hasPermission(usbDevice)) {
+            HIDDeviceOpenPending(deviceID);
+            try {
+                final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
+                int flags;
+                if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
+                   Log.v(TAG, "Android 14 USB request");
+                }else{
+                    if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
+                        flags = FLAG_MUTABLE;
+                        Log.v(TAG, "Android 12 USB request");
+                    } else {
+                        flags = 0;
                     }
-                    return false;
+                    
+                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 }
-                break;
+                
+            } catch (Exception e) {
+                Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
+                HIDDeviceOpenResult(deviceID, false);
             }
+            return false;
         }
 
         try {
-            Log.v(TAG, "openDevice deviceID=" + deviceID);
-            HIDDevice device;
-            device = getDevice(deviceID);
-            if (device == null) {
-                HIDDeviceDisconnected(deviceID);
-                return false;
-            }
-
             return device.open();
         } catch (Exception e) {
             Log.e(TAG, "Got exception: " + Log.getStackTraceString(e));
@@ -599,7 +645,7 @@ public class HIDDeviceManager {
 
     public int sendOutputReport(int deviceID, byte[] report) {
         try {
-            Log.v(TAG, "sendOutputReport deviceID=" + deviceID + " length=" + report.length);
+            //Log.v(TAG, "sendOutputReport deviceID=" + deviceID + " length=" + report.length);
             HIDDevice device;
             device = getDevice(deviceID);
             if (device == null) {
@@ -616,7 +662,7 @@ public class HIDDeviceManager {
 
     public int sendFeatureReport(int deviceID, byte[] report) {
         try {
-            Log.v(TAG, "sendFeatureReport deviceID=" + deviceID + " length=" + report.length);
+            //Log.v(TAG, "sendFeatureReport deviceID=" + deviceID + " length=" + report.length);
             HIDDevice device;
             device = getDevice(deviceID);
             if (device == null) {
@@ -633,7 +679,7 @@ public class HIDDeviceManager {
 
     public boolean getFeatureReport(int deviceID, byte[] report) {
         try {
-            Log.v(TAG, "getFeatureReport deviceID=" + deviceID);
+            //Log.v(TAG, "getFeatureReport deviceID=" + deviceID);
             HIDDevice device;
             device = getDevice(deviceID);
             if (device == null) {
@@ -672,7 +718,7 @@ public class HIDDeviceManager {
     private native void HIDDeviceRegisterCallback();
     private native void HIDDeviceReleaseCallback();
 
-    native void HIDDeviceConnected(int deviceID, String identifier, int vendorId, int productId, String serial_number, int release_number, String manufacturer_string, String product_string, int interface_number);
+    native void HIDDeviceConnected(int deviceID, String identifier, int vendorId, int productId, String serial_number, int release_number, String manufacturer_string, String product_string, int interface_number, int interface_class, int interface_subclass, int interface_protocol);
     native void HIDDeviceOpenPending(int deviceID);
     native void HIDDeviceOpenResult(int deviceID, boolean opened);
     native void HIDDeviceDisconnected(int deviceID);
