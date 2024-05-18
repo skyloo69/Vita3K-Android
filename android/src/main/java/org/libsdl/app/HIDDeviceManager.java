@@ -339,18 +339,15 @@ public class HIDDeviceManager {
     }
 
     private void handleUsbDeviceDetached(UsbDevice usbDevice) {
-        List<Integer> devices = new ArrayList<Integer>();
-        for (HIDDevice device : mDevicesById.values()) {
-            if (usbDevice.equals(device.getDevice())) {
-                devices.add(device.getId());
-            }
-        }
-        for (int id : devices) {
-            HIDDevice device = mDevicesById.get(id);
-            mDevicesById.remove(id);
-            device.shutdown();
-            HIDDeviceDisconnected(id);
-        }
+        HIDDeviceUSB device = mUSBDevices.get(usbDevice);
+        if (device == null)
+            return;
+
+        int id = device.getId();
+        mUSBDevices.remove(usbDevice);
+        mDevicesById.remove(id);
+        device.shutdown();
+        HIDDeviceDisconnected(id);
     }
 
     private void handleUsbDevicePermission(UsbDevice usbDevice, boolean permission_granted) {
