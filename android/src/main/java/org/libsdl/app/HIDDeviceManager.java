@@ -66,15 +66,15 @@ public class HIDDeviceManager {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
-                Log.i(TAG,"CALL INTENT : ACTION_USB_DEVICE_ATTACHED");
+                Log.v(TAG,"CALL INTENT : ACTION_USB_DEVICE_ATTACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceAttached(usbDevice);
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
-                Log.i(TAG,"CALL INTENT : ACTION_USB_DEVICE_DETACHED");
+                Log.v(TAG,"CALL INTENT : ACTION_USB_DEVICE_DETACHED");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceDetached(usbDevice);
             } else if (action.equals(HIDDeviceManager.ACTION_USB_PERMISSION)) {
-                Log.i(TAG,"CALL INTENT : ACTION_USB_PERMISSION");
+                Log.v(TAG,"CALL INTENT : ACTION_USB_PERMISSION");
                 UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDevicePermission(usbDevice, intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false));
             }
@@ -325,9 +325,11 @@ public class HIDDeviceManager {
     private void handleUsbDevicePermission(UsbDevice usbDevice, boolean permission_granted) {
         for (HIDDevice device : mDevicesById.values()) {
             if (usbDevice.equals(device.getDevice())) {
+                Log.v(TAG,"USB controller, is exist");
                 boolean opened = false;
                 if (permission_granted) {
                     opened = device.open();
+                    Log.v(TAG,"USB controller Ppermission OK!");
                 }
                 HIDDeviceOpenResult(device.getId(), opened);
             }
@@ -575,18 +577,19 @@ public class HIDDeviceManager {
 
         // Look to see if this is a USB device and we have permission to access it
         UsbDevice usbDevice = device.getDevice();
+        Log.v(TAG, "GET USB device " + usbDevice);
         if (usbDevice != null && !mUsbManager.hasPermission(usbDevice)) {
             HIDDeviceOpenPending(deviceID);
             try {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-                    mUsbManager.SetPackage(getPackageName());
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
-                    
+                   Log.v(TAG, "Android 14 USB request");
                 }else{
                     if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
                         flags = FLAG_MUTABLE;
+                        Log.v(TAG, "Android 12 USB request");
                     } else {
                         flags = 0;
                     }
