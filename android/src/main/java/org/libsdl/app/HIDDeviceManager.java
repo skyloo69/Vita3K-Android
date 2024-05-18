@@ -364,14 +364,22 @@ public class HIDDeviceManager {
 
     private void connectHIDDeviceUSB(UsbDevice usbDevice) {
         synchronized (this) {
-            for (int interface_number = 0; interface_number < usbDevice.getInterfaceCount(); interface_number++) {
-                if (isHIDDeviceInterface(usbDevice, interface_number)) {
-                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_number);
+            int interface_mask = 0;
+            for (int interface_index = 0; interface_index < usbDevice.getInterfaceCount(); interface_index++) {
+                UsbInterface usbInterface = usbDevice.getInterface(interface_index);
+                if (isHIDDeviceInterface(usbDevice, usbInterface)) {
+                    // Check to see if we've already added this interface
+                    // This happens with the Xbox Series X controller which has a duplicate interface 0, which is inactive
+                    int interface_id = usbInterface.getId();
+                    if ((interface_mask & (1 << interface_id)) != 0) {
+                        continue;
+                    }
+                    interface_mask |= (1 << interface_id);
+
+                    HIDDeviceUSB device = new HIDDeviceUSB(this, usbDevice, interface_index);
                     int id = device.getId();
-                    mUSBDevices.put(usbDevice, device);
                     mDevicesById.put(id, device);
-                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), interface_number);
-                    break;
+                    HIDDeviceConnected(id, device.getIdentifier(), device.getVendorId(), device.getProductId(), device.getSerialNumber(), device.getVersion(), device.getManufacturerName(), device.getProductName(), usbInterface.getId(), usbInterface.getInterfaceClass(), usbInterface.getInterfaceSubclass(), usbInterface.getInterfaceProtocol());
                 }
             }
         }
@@ -593,33 +601,21 @@ public class HIDDeviceManager {
             return false;
         }
 
-        // Look to see if this is a USB device and we have permission to access it
-        UsbDevice usbDevice = device.getDevice();
-        Log.v(TAG, "GET USB device " + usbDevice);
-        if (usbDevice != null && !mUsbManager.hasPermission(usbDevice)) {
-            HIDDeviceOpenPending(deviceID);
-            try {
-                final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
-                int flags;
-                if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (S) */) {
-                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), PendingIntent.FLAG_IMMUTABLE));
-                   Log.v(TAG, "Android 14 USB request");
-                }else{
-                    if (Build.VERSION.SDK_INT >= 31 /* Android 12.0 (S) */) {
-                        flags = FLAG_MUTABLE;
-                        Log.v(TAG, "Android 12 USB request");
-                    } else {
-                        flags = 0;
+        for (HIDDeviceUSB device : mUSBDevices.values()) {
+            if (deviceID == device.getId()) {
+                UsbDevice usbDevice = device.getDevice();
+                if (!mUsbManager.hasPermission(usbDevice)) {
+                    HIDDeviceOpenPending(deviceID);
+                    try {
+                        mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), 0));
+                    } catch (Exception e) {
+                        Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
+                        HIDDeviceOpenResult(deviceID, false);
                     }
-                    
-                    mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
                 }
-                
-            } catch (Exception e) {
-                Log.v(TAG, "Couldn't request permission for USB device " + usbDevice);
-                HIDDeviceOpenResult(deviceID, false);
+                return false;
             }
-            return false;
+            break;
         }
 
         try {
@@ -705,7 +701,7 @@ public class HIDDeviceManager {
     private native void HIDDeviceRegisterCallback();
     private native void HIDDeviceReleaseCallback();
 
-    native void HIDDeviceConnected(int deviceID, String identifier, int vendorId, int productId, String serial_number, int release_number, String manufacturer_string, String product_string, int interface_number);
+    native void HIDDeviceConnected(int deviceID, String identifier, int vendorId, int productId, String serial_number, int release_number, String manufacturer_string, String product_string, int interface_number, int interface_class, int interface_subclass, int interface_protocol);
     native void HIDDeviceOpenPending(int deviceID);
     native void HIDDeviceOpenResult(int deviceID, boolean opened);
     native void HIDDeviceDisconnected(int deviceID);
