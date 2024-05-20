@@ -9,7 +9,7 @@ android {
 
 	defaultConfig {
 		applicationId "org.vita3k.emulator"
-		minSdk 16
+		minSdk 28
 		targetSdk 34
 		versionCode 11
 		versionName "0.2.0-11.5-ikhoeyZX"
