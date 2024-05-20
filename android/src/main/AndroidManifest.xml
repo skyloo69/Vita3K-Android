@@ -21,17 +21,14 @@
         android:required="false" />
 
     <!-- Game controller support -->
-    <uses-feature
+ <!--   <uses-feature
         android:name="android.hardware.bluetooth"
-        android:required="false" />
+        android:required="false" /> -->
     <uses-feature
         android:name="android.hardware.gamepad"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.usb.host"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.usb.accessory"
         android:required="false" />
     <!-- External mouse input events -->
     <uses-feature
@@ -90,8 +87,6 @@
         <!-- Example of setting SDL hints from AndroidManifest.xml:
         <meta-data android:name="SDL_ENV.SDL_ACCELEROMETER_AS_JOYSTICK" android:value="0"/>
          -->
-        <uses-library android:name="com.android.future.usb.accessory" />
-        
         <activity android:name="Emulator"
             android:alwaysRetainTaskState="true"
             android:launchMode="singleInstance"
