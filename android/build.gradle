@@ -9,7 +9,7 @@ android {
 
 	defaultConfig {
 		applicationId "org.vita3k.emulator"
-		minSdk 28
+		minSdk 16
 		targetSdk 34
 		versionCode 11
 		versionName "0.2.0-11.5-ikhoeyZX"
@@ -97,7 +97,6 @@ android {
 }
 
 dependencies {
-	classpath 'com.android.tools.build:gradle:8.2.2'
 	implementation 'androidx.appcompat:appcompat:1.6.1'
 	implementation 'androidx.core:core:1.12.0'
 	implementation 'androidx.core:core-google-shortcuts:1.1.0'
