@@ -40,14 +40,15 @@
 	url = https://github.com/zeux/pugixml
 [submodule "external/sdl"]
 	path = external/sdl
-	url = https://github.com/Macdu/sdl-Android.git
+	url = https://github.com/libsdl-org/SDL.git
+	branch = v1.x
 [submodule "external/sdl2-cmake-scripts"]
 	path = external/sdl2-cmake-scripts
 	url = https://github.com/tcbrindle/sdl2-cmake-scripts
 [submodule "external/spdlog"]
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog
-	branch = v1.x
+	branch = SDL2
 [submodule "external/SPIRV-Cross"]
 	path = external/SPIRV-Cross
 	url = https://github.com/KhronosGroup/SPIRV-Cross.git
