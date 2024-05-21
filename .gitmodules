@@ -40,7 +40,8 @@
 	url = https://github.com/zeux/pugixml
 [submodule "external/sdl"]
 	path = external/sdl
-	url = https://github.com/ikhoeyZX/SDL.git
+	url = https://github.com/ikhoeyZX/sdl-Android.git
+	branch = android
 [submodule "external/sdl2-cmake-scripts"]
 	path = external/sdl2-cmake-scripts
 	url = https://github.com/tcbrindle/sdl2-cmake-scripts
