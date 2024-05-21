@@ -777,6 +777,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.gpu["internal_resolution_upscaling"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.gpu["internal_resolution_upscaling"].c_str());
         ImGui::Spacing();
+        bool manual=false;
+        if(manual==true){
         ImGui::PushID("Res scal");
         if (config.resolution_multiplier == 0.25f)
             ImGui::BeginDisabled();
@@ -811,12 +813,14 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
             ImGui::EndDisabled();
         ImGui::Spacing();
-
-        if (ImGui::Button("Manual", ImVec2(20.f * SCALE.x, 0))){
+        }else{
           int setdph = static_cast<int>(544 * config.resolution_multiplier);
           ImGui::Text("Manual screen size");
           ImGui::InputInt("Set", &setdph);
           config.resolution_multiplier = static_cast<int>(setdph / 544);
+        }
+        if (ImGui::Button("Manual"){
+            manual = !manual;
         }
         
         ImGui::Spacing();
