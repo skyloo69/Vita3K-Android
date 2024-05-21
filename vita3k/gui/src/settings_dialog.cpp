@@ -778,10 +778,10 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.gpu["internal_resolution_upscaling"].c_str());
         ImGui::Spacing();
         ImGui::PushID("Res scal");
-        if (config.resolution_multiplier == 0.5f)
+        if (config.resolution_multiplier == 0.25f)
             ImGui::BeginDisabled();
         if (ImGui::Button("<", ImVec2(20.f * SCALE.x, 0)))
-            config.resolution_multiplier -= 0.05f;
+            config.resolution_multiplier -= 0.25f;
         if (config.resolution_multiplier == 0.5f)
             ImGui::EndDisabled();
         ImGui::SameLine(0, 5.f * SCALE.x);
@@ -810,6 +810,15 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
             ImGui::EndDisabled();
+        ImGui::Spacing();
+
+        if (ImGui::Button("Manual", ImVec2(20.f * SCALE.x, 0))){
+          int setdph = static_cast<int>(544 * config.resolution_multiplier);
+          ImGui::Text("Manual screen size");
+          ImGui::InputInt("Set", &manualsh);
+          config.resolution_multiplier = static_cast<int>(setdph / 544);
+        }
+        
         ImGui::Spacing();
         const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
@@ -973,7 +982,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
         if (!emuenv.io.app_path.empty())
             ImGui::BeginDisabled();
-        static const char *LIST_BACKEND_AUDIO[] = { "Cubeb", "SDL", "None" };
+        static const char *LIST_BACKEND_AUDIO[] = { "SDL", "Cubeb" };
         if (ImGui::Combo(lang.audio["audio_backend"].c_str(), reinterpret_cast<int *>(&audio_backend_idx), LIST_BACKEND_AUDIO, IM_ARRAYSIZE(LIST_BACKEND_AUDIO)))
             emuenv.cfg.audio_backend = LIST_BACKEND_AUDIO[audio_backend_idx];
         if (ImGui::IsItemHovered())
@@ -1091,7 +1100,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::SetTooltip("%s", lang.emulator["case_insensitive_description"].c_str());
 #endif
         ImGui::Separator();
-//#ifndef ANDROID
+
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["emu_storage_folder"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["emu_storage_folder"].c_str());
         ImGui::Spacing();
@@ -1129,14 +1138,14 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (!emuenv.cfg.tiltsens){
             ImGui::Spacing();
             ImGui::Text("Emulate acceleration position");
-            ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
-            ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
-            ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
+            ImGui::RadioButton("0 degrees", &emuenv.cfg.tiltpos, 0);
+            ImGui::RadioButton("90 degrees", &emuenv.cfg.tiltpos, 1);
+            ImGui::RadioButton("-90 degrees", &emuenv.cfg.tiltpos, -1);
             config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         }
         ImGui::Spacing();
         ImGui::Separator();
-//#endif
+
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["custom_config_settings"].c_str()).x / 2.f));
