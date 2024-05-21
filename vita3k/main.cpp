@@ -261,6 +261,7 @@ int main(int argc, char *argv[]) {
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_STEAM, "1");
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_WII, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS3, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
