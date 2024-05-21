@@ -778,6 +778,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.gpu["internal_resolution_upscaling"].c_str());
         ImGui::Spacing();
         bool manual=false;
+
+        if (ImGui::Button("Manual")){
+            manual = !manual;
+        }
+        
         if(manual==true){
         ImGui::PushID("Res scal");
         if (config.resolution_multiplier == 0.25f)
@@ -818,9 +823,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           ImGui::Text("Manual screen size");
           ImGui::InputInt("Set", &setdph);
           config.resolution_multiplier = static_cast<int>(setdph / 544);
-        }
-        if (ImGui::Button("Manual")){
-            manual = !manual;
         }
         
         ImGui::Spacing();
