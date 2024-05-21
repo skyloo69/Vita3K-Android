@@ -815,7 +815,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::Button("Manual", ImVec2(20.f * SCALE.x, 0))){
           int setdph = static_cast<int>(544 * config.resolution_multiplier);
           ImGui::Text("Manual screen size");
-          ImGui::InputInt("Set", &manualsh);
+          ImGui::InputInt("Set", &setdph);
           config.resolution_multiplier = static_cast<int>(setdph / 544);
         }
         
