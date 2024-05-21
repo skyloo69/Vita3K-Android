@@ -779,10 +779,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
         static bool manual;
 
-        if (ImGui::Button("Manual screen size")){
+        if (ImGui::Button("Screen Size mode")){
             manual = !manual;
         }
-        
+        ImGui::Spacing();
+            
         if(manual==false){
         ImGui::PushID("Res scal");
         if (config.resolution_multiplier == 0.25f)
@@ -820,9 +821,10 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
         }else{
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
+          ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
           ImGui::Text("Manual screen size");
           ImGui::InputInt("Set", &setdph);
-          config.resolution_multiplier = static_cast<int>(setdph / 544);
+          config.resolution_multiplier = static_cast<float>(setdph / 544);
         }
         
         ImGui::Spacing();
