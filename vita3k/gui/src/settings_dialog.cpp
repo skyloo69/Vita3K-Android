@@ -819,7 +819,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           ImGui::InputInt("Set", &setdph);
           config.resolution_multiplier = static_cast<int>(setdph / 544);
         }
-        if (ImGui::Button("Manual"){
+        if (ImGui::Button("Manual")){
             manual = !manual;
         }
         
