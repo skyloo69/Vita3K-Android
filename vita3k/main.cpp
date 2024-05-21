@@ -261,18 +261,15 @@ int main(int argc, char *argv[]) {
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_STEAM, "1");
     	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_WII, "1");
-        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS3_SIXAXIS_DRIVER, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
-        SDL_SetHint(SDL_HINT_GAMECONTROLLER_SENSOR_FUSION, "0");
-
+        
         // Enable Switch controller
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_SWITCH, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS, "0");
-
-        SDL_SetEventEnabled(SDL_EVENT_JOYSTICK_UPDATE_COMPLETE, SDL_FALSE);
-        SDL_SetEventEnabled(SDL_EVENT_GAMEPAD_UPDATE_COMPLETE, SDL_FALSE);
 
 #ifdef ANDROID
         // The AAudio driver (used by default) is really really bad
