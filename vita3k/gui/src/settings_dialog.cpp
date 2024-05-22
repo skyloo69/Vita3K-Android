@@ -747,7 +747,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         // Screen Filter
         ImGui::Spacing();
-        uint8_t curr_filter = 0;
+        int curr_filter = 0;
         const std::array<const char *, 5> possible_filters = {
             lang.gpu["nearest"].c_str(),
             lang.gpu["bilinear"].c_str(),
@@ -784,7 +784,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             manual = !manual;
         }
         ImGui::Spacing();
-            
+
+        const auto res_scal;
         if(manual==false){
            ImGui::PushID("Res scal");
            if (config.resolution_multiplier == 0.25f)
@@ -795,7 +796,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
            ImGui::PushItemWidth(-100.f * SCALE.x);
-           int slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
+           uint8_t slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
            if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
                config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
                if (config.resolution_multiplier != 1.0f && !is_vulkan)
@@ -820,24 +821,29 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
                ImGui::EndDisabled();
            ImGui::Spacing();
+        
+           res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
+           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
+           ImGui::Text("%s", res_scal.c_str());
         }else{
-          static int setdph = static_cast<uint16_t>(544 * config.resolution_multiplier);
+          static int setdph = static_cast<int>(544 * config.resolution_multiplier);
+          res_scal = fmt::format("{}x", static_cast<int>(960 * config.resolution_multiplier));
           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
-          ImGui::Text("Manual screen size");
+          ImGui::Text("Insert screen height: ");
+          ImGui::SameLine();
+          ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
+          ImGui::Text("%s", res_scal.c_str());
+          ImGui::SameLine();
           ImGui::InputInt("Set", &setdph);
           if(setdph < 144 || setdph > 4352){
-              
+          
           }else{
-             config.resolution_multiplier = static_cast<float>(setdph / 544);
+              config.resolution_multiplier = static_cast<float>(setdph / 544);
           }
         }
-        
-        ImGui::Spacing();
-        const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
-        ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
-        ImGui::Text("%s", res_scal.c_str());
-        ImGui::PopID();
 
+        ImGui::Spacing();
+        ImGui::PopID();
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
@@ -935,7 +941,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 }
             }
 
-            static uint8_t current_mapping = std::find(mapping_methods_indexes.begin(), mapping_methods_indexes.end(), config.memory_mapping) - mapping_methods_indexes.begin();
+            static int current_mapping = std::find(mapping_methods_indexes.begin(), mapping_methods_indexes.end(), config.memory_mapping) - mapping_methods_indexes.begin();
             if (ImGui::Combo(lang.gpu["mapping_method"].c_str(), &current_mapping, mapping_methods_strings.data(), mapping_methods_strings.size())) {
                 config.memory_mapping = mapping_methods_indexes[current_mapping];
             }
