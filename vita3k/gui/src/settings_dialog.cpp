@@ -1193,14 +1193,14 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.gui["info_bar_description"].c_str());
         ImGui::Spacing();
-        static bool manuallang;
+        static bool syslang;
 
         if (ImGui::Button("Language type")){
-            manuallang = !manuallang;
+            syslang = !syslang;
         }
         ImGui::Spacing();
 
-        if(manuallang==false){
+        if(syslang==false){
            const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
            std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
            static std::map<std::string, std::string> static_list_user_lang_names = {
@@ -1222,15 +1222,17 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
         }else{
             
-           for (const auto &sys_lang : LIST_SYS_LANG) {
+           for (const auto &l : LIST_SYS_LANG) {
                ImGui::PushID(sys_lang.first);
+           
+           if (ImGui::Combo(lang.gui["sys_lang"].c_str(), &current_user_lang, sys_lang.data(), static_cast<int>(sys_lang.size()), 4)) {
+               if (current_user_lang != 0)
+                   emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
+               else
+                   emuenv.cfg.user_lang.clear();
+
+               lang::init_lang(gui.lang, emuenv);
            }
-           if (ImGui::Combo(lang.gui["sys_lang"].c_str(), &current_sys_lang, list_sys_lang_str.data(), static_cast<int>(list_sys_lang_str.size()), 4)) {
-                  if (current_user_lang != 0)
-                      emuenv.cfg.sys_lang = list_sys_lang[current_sys_lang - 1];
-               
-                  lang::init_lang(gui.lang, emuenv);
-           } 
         }
         
         ImGui::Spacing();
