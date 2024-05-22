@@ -1196,7 +1196,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         static bool manuallang;
 
         if (ImGui::Button("Language type")){
-            manual = !manual;
+            manuallang = !manuallang;
         }
         ImGui::Spacing();
 
@@ -1221,38 +1221,16 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if (ImGui::IsItemHovered())
                ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
         }else{
-            title_str = lang["select_language"];
-        ImGui::SetNextWindowPos(ImVec2(198.f * SCALE.x, 126.f * SCALE.y), ImGuiCond_Always);
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.f);
-        ImGui::BeginChild("##lang_list", ImVec2(WINDOW_SIZE.x - (200.f * SCALE.x), WINDOW_SIZE.y - (108.f * SCALE.y)), false, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoSavedSettings);
-        ImGui::Columns(3, nullptr, false);
-        ImGui::SetColumnWidth(0, 96.f * SCALE.x);
-        ImGui::SetColumnWidth(1, 30.f * SCALE.x);
-        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.f, 0.5f));
-        ImGui::PushStyleColor(ImGuiCol_Header, SELECT_COLOR);
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, SELECT_COLOR_HOVERED);
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, SELECT_COLOR_ACTIVE);
-        for (const auto &sys_lang : LIST_SYS_LANG) {
-            ImGui::PushID(sys_lang.first);
-            // Empty Padding
-            ImGui::NextColumn();
-            const auto is_current_lang = emuenv.cfg.sys_lang == sys_lang.first;
-            if (ImGui::Selectable(is_current_lang ? "V" : "##lang_list", false, ImGuiSelectableFlags_SpanAllColumns, ImVec2(WINDOW_SIZE.x, SELECT_SIZE))) {
-                emuenv.cfg.sys_lang = sys_lang.first;
-                lang::init_lang(gui.lang, emuenv);
-            }
-            ImGui::NextColumn();
-            ImGui::Selectable(sys_lang.second.c_str(), false, ImGuiSelectableFlags_None, ImVec2(WINDOW_SIZE.x, SELECT_SIZE));
-            ImGui::Separator();
-            ImGui::NextColumn();
-            ImGui::PopID();
-        }
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(3);
-        ImGui::Columns(1);
-        ImGui::ScrollWhenDragging();
-        ImGui::EndChild();
-        ImGui::PopStyleVar();
+            
+           for (const auto &sys_lang : LIST_SYS_LANG) {
+               ImGui::PushID(sys_lang.first);
+           }
+           if (ImGui::Combo(lang.gui["sys_lang"].c_str(), &current_sys_lang, list_sys_lang_str.data(), static_cast<int>(list_sys_lang_str.size()), 4)) {
+                  if (current_user_lang != 0)
+                      emuenv.cfg.sys_lang = list_sys_lang[current_sys_lang - 1];
+               
+                  lang::init_lang(gui.lang, emuenv);
+           } 
         }
         
         ImGui::Spacing();
