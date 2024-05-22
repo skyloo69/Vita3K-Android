@@ -1199,51 +1199,47 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         }
         ImGui::Spacing();
 
+      if(syslang==false){
         const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
         std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
-        std::map<std::string, std::string> static_list_user_lang_names;
-               
-        if(syslang==false){
-           static_list_user_lang_names = {
+        static std::map<std::string, std::string> static_list_user_lang_names = {
                { "id", "Indonesia" },
                { "ms", "Malaysia" },
                { "ua", "Ukraina" },
            };
-        }else{
-            static_list_user_lang_names = {
-               { "\x30", "Japanese" },
-               { "\x31", "English US" },
-               { "\x32", "French" },
-               { "\x33", "Spanish" },
-               { "\x34", "German" },
-               { "\x35", "Italia" },
-               { "\x36", "French" },
-               { "\x37", "Dutch" },
-               { "\x38", "Portugese" },
-               { "\x39", "Rusian" },
-               { "\x31\x30", "Korean" },
-               { "\x31\x31", "Chinese Traditional" },
-               { "\x31\x32", "Chinese Simplified" },
-           };
-        }
+        
            for (const auto &l : list_user_lang)
                list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
            if (ImGui::Combo(lang.gui["user_lang"].c_str(), &current_user_lang, list_user_lang_str.data(), static_cast<int>(list_user_lang_str.size()), 4)) {
-               if(syslang==false){
-                   if (current_user_lang != 0)
-                      emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
-                  else
-                      emuenv.cfg.user_lang.clear();
-               }else{
-                   if (current_user_lang != 0)
-                      emuenv.cfg.sys_lang = list_user_lang[current_user_lang - 1];       
-                   else
-                       emuenv.cfg.sys_lang = 1; // English US (as default)
-               }
-
+               if (current_user_lang != 0)
+                   emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
+               else
+                   emuenv.cfg.user_lang.clear();
+               
                lang::init_lang(gui.lang, emuenv);
            }
-           if (ImGui::IsItemHovered())
+      }else{
+          const char* langs[] = {
+               "Japanese",
+               "English US",
+               "French",
+               "Spanish",
+               "German",
+               "Italia",
+               "French",
+               "Dutch",
+               "Portugese",
+               "Rusian",
+               "Korean",
+               "Chinese Traditional",
+               "Chinese Simplified",
+           };
+    
+          static int lang_current = emuenv.cfg.sys_lang;
+          ImGui::Combo("System Language", &lang_current, langs, IM_ARRAYSIZE(langs)); 
+             emuenv.cfg.sys_lang = lang_current;       
+      }
+          if (ImGui::IsItemHovered())
                ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
         
         ImGui::Spacing();
