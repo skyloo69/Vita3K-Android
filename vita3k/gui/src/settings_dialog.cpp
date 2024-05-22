@@ -826,20 +826,21 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            ImGui::Text("%s", res_scal.c_str());
         }else{
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
-          const auto res_scal = fmt::format("{}x", static_cast<int>(960 * config.resolution_multiplier));
-          ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
+          const auto res_scal = fmt::format("{} x ", static_cast<int>(960 * config.resolution_multiplier));
           ImGui::Text("Insert screen height: ");
           ImGui::SameLine();
-          ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
           ImGui::Text("%s", res_scal.c_str());
           ImGui::SameLine();
-          ImGui::InputInt("Set", &setdph);
+          ImGui::InputInt("", &setdph);
           if(setdph < 144){
              setdph = 144;
           }else if(setdph > 4352){
              setdph = 4352;
           }
-          config.resolution_multiplier = static_cast<float>(setdph / 544);
+          float tmp = std::setprecision(10);
+                tmp =  static_cast<float>(setdph / 544);
+          LOG_INFO(fmt::format("Screen size is {}", tmp));
+          config.resolution_multiplier = tmp;
         }
 
         ImGui::Spacing();
