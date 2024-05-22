@@ -1200,40 +1200,51 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         }
         ImGui::Spacing();
 
+        const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
+        std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
+
         if(syslang==false){
-           const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
-           std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
            static std::map<std::string, std::string> static_list_user_lang_names = {
                { "id", "Indonesia" },
                { "ms", "Malaysia" },
                { "ua", "Ukraina" },
            };
+        }else{
+            static std::map<std::string, std::string> static_list_user_lang_names = {
+               { "0", "Japanese" },
+               { "1", "English US" },
+               { "2", "French" },
+               { "3", "Spanish" },
+               { "4", "German" },
+               { "5", "Italia" },
+               { "6", "French" },
+               { "7", "Dutch" },
+               { "8", "Portugese" },
+               { "9", "Rusian" },
+               { "10", "Korean" },
+               { "11", "Chinese Traditional" },
+               { "12", "Chinese Simplified" },
+           };
+        }
            for (const auto &l : list_user_lang)
                list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
            if (ImGui::Combo(lang.gui["user_lang"].c_str(), &current_user_lang, list_user_lang_str.data(), static_cast<int>(list_user_lang_str.size()), 4)) {
-               if (current_user_lang != 0)
-                   emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
-               else
-                   emuenv.cfg.user_lang.clear();
+               if(syslang==false){
+                   if (current_user_lang != 0)
+                      emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
+                  else
+                      emuenv.cfg.user_lang.clear();
+               }else{
+                   if (current_user_lang != 0)
+                      emuenv.cfg.sys_lang = list_user_lang[current_user_lang - 1];
+                   else
+                       emuenv.cfg.sys_lang = 1; // English US (as default)
+               }
 
                lang::init_lang(gui.lang, emuenv);
            }
            if (ImGui::IsItemHovered())
                ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
-        }else{
-            
-           for (const auto &l : LIST_SYS_LANG) {
-               ImGui::PushID(sys_lang.first);
-           
-           if (ImGui::Combo(lang.gui["sys_lang"].c_str(), &current_user_lang, sys_lang.data(), static_cast<int>(sys_lang.size()), 4)) {
-               if (current_user_lang != 0)
-                   emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
-               else
-                   emuenv.cfg.user_lang.clear();
-
-               lang::init_lang(gui.lang, emuenv);
-           }
-        }
         
         ImGui::Spacing();
         ImGui::Checkbox(lang.gui["display_info_message"].c_str(), &emuenv.cfg.display_info_message);
