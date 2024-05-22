@@ -838,8 +838,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
              setdph = 4352;
           }
           float tmp =  static_cast<float>(setdph / 544);
-          LOG_INFO("Screen size is {}", tmp%.4f);
-          config.resolution_multiplier = tmp%.4f);
+          LOG_INFO("Screen size is {}", tmp);
+          config.resolution_multiplier = tmp);
         }
 
         ImGui::Spacing();
