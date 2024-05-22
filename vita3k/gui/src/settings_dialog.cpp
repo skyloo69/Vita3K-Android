@@ -757,7 +757,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         };
         const int filters_available = emuenv.renderer->get_supported_filters();
         std::vector<const char *> filters;
-        for (uint8_t i = 0; i < possible_filters.size(); i++) {
+        for (int i = 0; i < possible_filters.size(); i++) {
             if (config.screen_filter == possible_filters[i])
                 curr_filter = filters.size();
 
@@ -925,8 +925,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             };
 
             // only get the mapping methods that are available on this GPU
-            uint8_t list_pos = 0;
-            for (uint8_t i = 0; i < 5; i++) {
+            int list_pos = 0;
+            for (int i = 0; i < 5; i++) {
                 if ((1 << i) & emuenv.renderer->supported_mapping_methods_mask) {
                     list_pos++;
                 } else {
