@@ -233,7 +233,7 @@ static CPUBackend set_cpu_backend(std::string &cpu_backend) {
     return cpu_backend == "Dynarmic" ? CPUBackend::Dynarmic : CPUBackend::Unicorn;
 }
 
-static uint8_t current_aniso_filter_log, max_aniso_filter_log, audio_backend_idx, current_user_lang;
+static int current_aniso_filter_log, max_aniso_filter_log, audio_backend_idx, current_user_lang;
 static std::vector<std::string> list_user_lang;
 
 /**
@@ -755,7 +755,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             "FXAA",
             "FSR"
         };
-        const uint8_t filters_available = emuenv.renderer->get_supported_filters();
+        const int filters_available = emuenv.renderer->get_supported_filters();
         std::vector<const char *> filters;
         for (uint8_t i = 0; i < possible_filters.size(); i++) {
             if (config.screen_filter == possible_filters[i])
@@ -795,7 +795,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
            ImGui::PushItemWidth(-100.f * SCALE.x);
-           uint8_t slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
+           int slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
            if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
                config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
                if (config.resolution_multiplier != 1.0f && !is_vulkan)
@@ -821,7 +821,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::Spacing();
         }else{
-          static uint16_t setdph = static_cast<uint16_t>(544 * config.resolution_multiplier);
+          static int setdph = static_cast<uint16_t>(544 * config.resolution_multiplier);
           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
           ImGui::Text("Manual screen size");
           ImGui::InputInt("Set", &setdph);
