@@ -785,7 +785,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         }
         ImGui::Spacing();
 
-        const auto res_scal;
         if(manual==false){
            ImGui::PushID("Res scal");
            if (config.resolution_multiplier == 0.25f)
@@ -822,12 +821,12 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::Spacing();
         
-           res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
+           const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
            ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
            ImGui::Text("%s", res_scal.c_str());
         }else{
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
-          res_scal = fmt::format("{}x", static_cast<int>(960 * config.resolution_multiplier));
+          const auto res_scal = fmt::format("{}x", static_cast<int>(960 * config.resolution_multiplier));
           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
           ImGui::Text("Insert screen height: ");
           ImGui::SameLine();
@@ -835,11 +834,12 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           ImGui::Text("%s", res_scal.c_str());
           ImGui::SameLine();
           ImGui::InputInt("Set", &setdph);
-          if(setdph < 144 || setdph > 4352){
-          
-          }else{
-              config.resolution_multiplier = static_cast<float>(setdph / 544);
+          if(setdph < 144){
+             setdph = 144;
+          }else if(setdph > 4352)
+             setdph = 4352;
           }
+          config.resolution_multiplier = static_cast<float>(setdph / 544);
         }
 
         ImGui::Spacing();
