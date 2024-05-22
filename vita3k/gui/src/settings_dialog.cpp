@@ -795,7 +795,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
            ImGui::PushItemWidth(-100.f * SCALE.x);
-           uint8_t slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
+           int slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
            if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
                config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
                if (config.resolution_multiplier != 1.0f && !is_vulkan)
