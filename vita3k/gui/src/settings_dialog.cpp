@@ -233,7 +233,7 @@ static CPUBackend set_cpu_backend(std::string &cpu_backend) {
     return cpu_backend == "Dynarmic" ? CPUBackend::Dynarmic : CPUBackend::Unicorn;
 }
 
-static int current_aniso_filter_log, max_aniso_filter_log, audio_backend_idx, current_user_lang;
+static uint8_t current_aniso_filter_log, max_aniso_filter_log, audio_backend_idx, current_user_lang;
 static std::vector<std::string> list_user_lang;
 
 /**
@@ -289,6 +289,7 @@ void init_config(GuiState &gui, EmuEnvState &emuenv, const std::string &app_path
     // files are not in a folder
     list_user_lang.push_back("id");
     list_user_lang.push_back("ms");
+    list_user_lang.push_back("ua");
 #endif
 
     current_user_lang = emuenv.cfg.user_lang.empty() ? 0 : (std::distance(list_user_lang.begin(), std::find(list_user_lang.begin(), list_user_lang.end(), emuenv.cfg.user_lang))) + 1;
@@ -746,7 +747,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         // Screen Filter
         ImGui::Spacing();
-        int curr_filter = 0;
+        uint8_t curr_filter = 0;
         const std::array<const char *, 5> possible_filters = {
             lang.gpu["nearest"].c_str(),
             lang.gpu["bilinear"].c_str(),
@@ -754,9 +755,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             "FXAA",
             "FSR"
         };
-        const int filters_available = emuenv.renderer->get_supported_filters();
+        const uint8_t filters_available = emuenv.renderer->get_supported_filters();
         std::vector<const char *> filters;
-        for (int i = 0; i < possible_filters.size(); i++) {
+        for (uint8_t i = 0; i < possible_filters.size(); i++) {
             if (config.screen_filter == possible_filters[i])
                 curr_filter = filters.size();
 
@@ -785,46 +786,50 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
             
         if(manual==false){
-        ImGui::PushID("Res scal");
-        if (config.resolution_multiplier == 0.25f)
-            ImGui::BeginDisabled();
-        if (ImGui::Button("<", ImVec2(20.f * SCALE.x, 0)))
-            config.resolution_multiplier -= 0.25f;
-        if (config.resolution_multiplier == 0.5f)
-            ImGui::EndDisabled();
-        ImGui::SameLine(0, 5.f * SCALE.x);
-        ImGui::PushItemWidth(-100.f * SCALE.x);
-        int slider_position = static_cast<int>(config.resolution_multiplier * 4);
-        if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
-            config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
-            if (config.resolution_multiplier != 1.0f && !is_vulkan)
-                config.disable_surface_sync = true;
-        }
-        ImGui::PopItemWidth();
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("%s", lang.gpu["internal_resolution_upscaling_description"].c_str());
-        ImGui::SameLine(0, 5 * SCALE.x);
-        if (config.resolution_multiplier == 8.0f)
-            ImGui::BeginDisabled();
-        if (ImGui::Button(">", ImVec2(20.f * SCALE.x, 0)))
-            config.resolution_multiplier += 0.05f;
-        if (config.resolution_multiplier == 8.0f)
-            ImGui::EndDisabled();
-        ImGui::SameLine();
-        if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
-            ImGui::BeginDisabled();
-        if (ImGui::Button(lang.gpu["reset"].c_str(), ImVec2(60.f * SCALE.x, 0)))
-            config.resolution_multiplier = 1.0f;
+           ImGui::PushID("Res scal");
+           if (config.resolution_multiplier == 0.25f)
+               ImGui::BeginDisabled();
+           if (ImGui::Button("<", ImVec2(20.f * SCALE.x, 0)))
+               config.resolution_multiplier -= 0.25f;
+           if (config.resolution_multiplier == 0.5f)
+               ImGui::EndDisabled();
+           ImGui::SameLine(0, 5.f * SCALE.x);
+           ImGui::PushItemWidth(-100.f * SCALE.x);
+           uint8_t slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
+           if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
+               config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
+               if (config.resolution_multiplier != 1.0f && !is_vulkan)
+                   config.disable_surface_sync = true;
+           }
+           ImGui::PopItemWidth();
+           if (ImGui::IsItemHovered())
+               ImGui::SetTooltip("%s", lang.gpu["internal_resolution_upscaling_description"].c_str());
+           ImGui::SameLine(0, 5 * SCALE.x);
+           if (config.resolution_multiplier == 8.0f)
+               ImGui::BeginDisabled();
+           if (ImGui::Button(">", ImVec2(20.f * SCALE.x, 0)))
+               config.resolution_multiplier += 0.05f;
+           if (config.resolution_multiplier == 8.0f)
+               ImGui::EndDisabled();
+           ImGui::SameLine();
+           if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
+               ImGui::BeginDisabled();
+           if (ImGui::Button(lang.gpu["reset"].c_str(), ImVec2(60.f * SCALE.x, 0)))
+               config.resolution_multiplier = 1.0f;
 
-        if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
-            ImGui::EndDisabled();
-        ImGui::Spacing();
+           if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
+               ImGui::EndDisabled();
+           ImGui::Spacing();
         }else{
-          static int setdph = static_cast<int>(544 * config.resolution_multiplier);
+          static uint16_t setdph = static_cast<uint16_t>(544 * config.resolution_multiplier);
           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f));
           ImGui::Text("Manual screen size");
           ImGui::InputInt("Set", &setdph);
-          config.resolution_multiplier = static_cast<float>(setdph / 544);
+          if(setdph < 144 || setdph > 4352){
+              
+          }else{
+             config.resolution_multiplier = static_cast<float>(setdph / 544);
+          }
         }
         
         ImGui::Spacing();
@@ -920,8 +925,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             };
 
             // only get the mapping methods that are available on this GPU
-            int list_pos = 0;
-            for (int i = 0; i < 5; i++) {
+            uint8_t list_pos = 0;
+            for (uint8_t i = 0; i < 5; i++) {
                 if ((1 << i) & emuenv.renderer->supported_mapping_methods_mask) {
                     list_pos++;
                 } else {
@@ -930,7 +935,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 }
             }
 
-            static int current_mapping = std::find(mapping_methods_indexes.begin(), mapping_methods_indexes.end(), config.memory_mapping) - mapping_methods_indexes.begin();
+            static uint8_t current_mapping = std::find(mapping_methods_indexes.begin(), mapping_methods_indexes.end(), config.memory_mapping) - mapping_methods_indexes.begin();
             if (ImGui::Combo(lang.gpu["mapping_method"].c_str(), &current_mapping, mapping_methods_strings.data(), mapping_methods_strings.size())) {
                 config.memory_mapping = mapping_methods_indexes[current_mapping];
             }
@@ -1186,7 +1191,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         static std::map<std::string, std::string> static_list_user_lang_names = {
             { "id", "Indonesia" },
             { "ms", "Malaysia" },
-            { "ua", "Ukraina"},
+            { "ua", reinterpret_cast<const char *>(u8"Українська") },
         };
         for (const auto &l : list_user_lang)
             list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
