@@ -1201,7 +1201,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
         std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
-        static std::map<std::string, std::string> static_list_user_lang_names;
+        std::map<std::string, std::string> static_list_user_lang_names;
                
         if(syslang==false){
            static_list_user_lang_names = {
@@ -1211,19 +1211,19 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            };
         }else{
             static_list_user_lang_names = {
-               { "0", "Japanese" },
-               { "1", "English US" },
-               { "2", "French" },
-               { "3", "Spanish" },
-               { "4", "German" },
-               { "5", "Italia" },
-               { "6", "French" },
-               { "7", "Dutch" },
-               { "8", "Portugese" },
-               { "9", "Rusian" },
-               { "10", "Korean" },
-               { "11", "Chinese Traditional" },
-               { "12", "Chinese Simplified" },
+               { "\x30", "Japanese" },
+               { "\x31", "English US" },
+               { "\x32", "French" },
+               { "\x33", "Spanish" },
+               { "\x34", "German" },
+               { "\x35", "Italia" },
+               { "\x36", "French" },
+               { "\x37", "Dutch" },
+               { "\x38", "Portugese" },
+               { "\x39", "Rusian" },
+               { "\x31\x30", "Korean" },
+               { "\x31\x31", "Chinese Traditional" },
+               { "\x31\x32", "Chinese Simplified" },
            };
         }
            for (const auto &l : list_user_lang)
