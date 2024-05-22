@@ -789,11 +789,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            ImGui::Text(": Slider");
            ImGui::Spacing();
            ImGui::PushID("Res scal");
-           if (config.resolution_multiplier == 0.25f)
+           if (config.resolution_multiplier <= 0.01f)
                ImGui::BeginDisabled();
            if (ImGui::Button("<", ImVec2(20.f * SCALE.x, 0)))
                config.resolution_multiplier -= 0.25f;
-           if (config.resolution_multiplier == 0.5f)
+           if (config.resolution_multiplier <= 0.5f)
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
            ImGui::PushItemWidth(-100.f * SCALE.x);
@@ -807,7 +807,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if (ImGui::IsItemHovered())
                ImGui::SetTooltip("%s", lang.gpu["internal_resolution_upscaling_description"].c_str());
            ImGui::SameLine(0, 5 * SCALE.x);
-           if (config.resolution_multiplier == 8.0f)
+           if (config.resolution_multiplier >= 8.0f)
                ImGui::BeginDisabled();
            if (ImGui::Button(">", ImVec2(20.f * SCALE.x, 0)))
                config.resolution_multiplier += 0.25f;
@@ -822,14 +822,15 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if ((config.resolution_multiplier == 1.0f) && !config.disable_surface_sync)
                ImGui::EndDisabled();
            ImGui::Spacing();
-        
-           
         }else{
           ImGui::Text(": Manual Input");
           ImGui::Spacing();
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
-          ImGui::Text("Insert screen height: ");
-          ImGui::InputInt(" ", &setdph);
+          ImGui::Text("Insert screen height ");
+          ImGui::InputInt(": ", &setdph);
+          if (ImGui::IsItemHovered())
+              ImGui::SetTooltip("Not all games support manual screen size");
+                    
           if(setdph < 144){
              setdph = 144;
           }else if(setdph > 4352){
@@ -838,6 +839,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           
           float tmp =  (float(setdph) / 544);
           config.resolution_multiplier = tmp;
+          ImGui::Spacing();
         }
         const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
@@ -1192,14 +1194,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.gui["info_bar_description"].c_str());
         ImGui::Spacing();
-        static bool syslang;
-
-        if (ImGui::Button("Language type")){
-            syslang = !syslang;
-        }
-        ImGui::Spacing();
-
-      if(syslang==false){
+        
         const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
         std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
         static std::map<std::string, std::string> static_list_user_lang_names = {
@@ -1218,34 +1213,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                
                lang::init_lang(gui.lang, emuenv);
            }
-      }else{
-          const char* langs[] = {
-               "Japanese",
-               "English US",
-               "French",
-               "Spanish",
-               "German",
-               "Italia",
-               "Dutch",
-               "Portugese",
-               "Rusian",
-               "Korean",
-               "Chinese Traditional",
-               "Chinese Simplified",
-               "Finnish",
-               "Swedish",
-               "Danish",
-               "Norwegian",
-               "Polish",
-               "Brazilian Portuguese",
-               "British English",
-               "Turkish",
-           };
-    
-          static int lang_current = emuenv.cfg.sys_lang;
-          ImGui::Combo("System Language", &lang_current, langs, IM_ARRAYSIZE(langs)); 
-             emuenv.cfg.sys_lang = lang_current;       
-      }
           if (ImGui::IsItemHovered())
                ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
         
