@@ -837,7 +837,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           }else if(setdph > 4352){
              setdph = 4352;
           }
-          float tmp =  setdph / 544;
+          
+          float tmp =  (float(setdph) / 544);
           LOG_INFO("Screen size is {}", tmp);
           config.resolution_multiplier = tmp;
         }
@@ -1192,25 +1193,68 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::IsItemHovered())
             ImGui::SetTooltip("%s", lang.gui["info_bar_description"].c_str());
         ImGui::Spacing();
-        const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
-        std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
-        static std::map<std::string, std::string> static_list_user_lang_names = {
-            { "id", "Indonesia" },
-            { "ms", "Malaysia" },
-            { "ua", "Ukraina" },
-        };
-        for (const auto &l : list_user_lang)
-            list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
-        if (ImGui::Combo(lang.gui["user_lang"].c_str(), &current_user_lang, list_user_lang_str.data(), static_cast<int>(list_user_lang_str.size()), 4)) {
-            if (current_user_lang != 0)
-                emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
-            else
-                emuenv.cfg.user_lang.clear();
+        static bool manuallang;
 
-            lang::init_lang(gui.lang, emuenv);
+        if (ImGui::Button("Language type")){
+            manual = !manual;
         }
-        if (ImGui::IsItemHovered())
-            ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
+        ImGui::Spacing();
+
+        if(manuallang==false){
+           const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
+           std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
+           static std::map<std::string, std::string> static_list_user_lang_names = {
+               { "id", "Indonesia" },
+               { "ms", "Malaysia" },
+               { "ua", "Ukraina" },
+           };
+           for (const auto &l : list_user_lang)
+               list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
+           if (ImGui::Combo(lang.gui["user_lang"].c_str(), &current_user_lang, list_user_lang_str.data(), static_cast<int>(list_user_lang_str.size()), 4)) {
+               if (current_user_lang != 0)
+                   emuenv.cfg.user_lang = list_user_lang[current_user_lang - 1];
+               else
+                   emuenv.cfg.user_lang.clear();
+
+               lang::init_lang(gui.lang, emuenv);
+           }
+           if (ImGui::IsItemHovered())
+               ImGui::SetTooltip("%s", lang.gui["select_user_lang"].c_str());
+        }else{
+            title_str = lang["select_language"];
+        ImGui::SetNextWindowPos(ImVec2(198.f * SCALE.x, 126.f * SCALE.y), ImGuiCond_Always);
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0.f);
+        ImGui::BeginChild("##lang_list", ImVec2(WINDOW_SIZE.x - (200.f * SCALE.x), WINDOW_SIZE.y - (108.f * SCALE.y)), false, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoSavedSettings);
+        ImGui::Columns(3, nullptr, false);
+        ImGui::SetColumnWidth(0, 96.f * SCALE.x);
+        ImGui::SetColumnWidth(1, 30.f * SCALE.x);
+        ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.f, 0.5f));
+        ImGui::PushStyleColor(ImGuiCol_Header, SELECT_COLOR);
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, SELECT_COLOR_HOVERED);
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, SELECT_COLOR_ACTIVE);
+        for (const auto &sys_lang : LIST_SYS_LANG) {
+            ImGui::PushID(sys_lang.first);
+            // Empty Padding
+            ImGui::NextColumn();
+            const auto is_current_lang = emuenv.cfg.sys_lang == sys_lang.first;
+            if (ImGui::Selectable(is_current_lang ? "V" : "##lang_list", false, ImGuiSelectableFlags_SpanAllColumns, ImVec2(WINDOW_SIZE.x, SELECT_SIZE))) {
+                emuenv.cfg.sys_lang = sys_lang.first;
+                lang::init_lang(gui.lang, emuenv);
+            }
+            ImGui::NextColumn();
+            ImGui::Selectable(sys_lang.second.c_str(), false, ImGuiSelectableFlags_None, ImVec2(WINDOW_SIZE.x, SELECT_SIZE));
+            ImGui::Separator();
+            ImGui::NextColumn();
+            ImGui::PopID();
+        }
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(3);
+        ImGui::Columns(1);
+        ImGui::ScrollWhenDragging();
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+        }
+        
         ImGui::Spacing();
         ImGui::Checkbox(lang.gui["display_info_message"].c_str(), &emuenv.cfg.display_info_message);
         if (ImGui::IsItemHovered())
