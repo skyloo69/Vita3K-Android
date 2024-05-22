@@ -1202,15 +1202,16 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         const std::string system_lang_name = fmt::format("System: {}", get_sys_lang_name(emuenv.cfg.sys_lang));
         std::vector<const char *> list_user_lang_str{ system_lang_name.c_str() };
-
+        static std::map<std::string, std::string> static_list_user_lang_names;
+               
         if(syslang==false){
-           static std::map<std::string, std::string> static_list_user_lang_names = {
+           static_list_user_lang_names = {
                { "id", "Indonesia" },
                { "ms", "Malaysia" },
                { "ua", "Ukraina" },
            };
         }else{
-            static std::map<std::string, std::string> static_list_user_lang_names = {
+            static_list_user_lang_names = {
                { "0", "Japanese" },
                { "1", "English US" },
                { "2", "French" },
