@@ -1233,6 +1233,13 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                "Chinese Traditional",
                "Chinese Simplified",
                "Finnish",
+               "Swedish",
+               "Danish",
+               "Norwegian",
+               "Polish",
+               "Brazilian Portuguese",
+               "British English",
+               "Turkish",
            };
     
           static int lang_current = emuenv.cfg.sys_lang;
