@@ -836,7 +836,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           ImGui::InputInt("Set", &setdph);
           if(setdph < 144){
              setdph = 144;
-          }else if(setdph > 4352)
+          }else if(setdph > 4352){
              setdph = 4352;
           }
           config.resolution_multiplier = static_cast<float>(setdph / 544);
