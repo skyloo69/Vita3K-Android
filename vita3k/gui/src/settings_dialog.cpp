@@ -810,7 +810,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if (config.resolution_multiplier == 8.0f)
                ImGui::BeginDisabled();
            if (ImGui::Button(">", ImVec2(20.f * SCALE.x, 0)))
-               config.resolution_multiplier += 0.05f;
+               config.resolution_multiplier += 0.25f;
            if (config.resolution_multiplier == 8.0f)
                ImGui::EndDisabled();
            ImGui::SameLine();
@@ -823,19 +823,13 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                ImGui::EndDisabled();
            ImGui::Spacing();
         
-           const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
-           ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
-           ImGui::Text("%s", res_scal.c_str());
+           
         }else{
           ImGui::Text(": Manual Input");
           ImGui::Spacing();
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
-          const auto res_scal = fmt::format("{} x ", static_cast<int>(960 * config.resolution_multiplier));
           ImGui::Text("Insert screen height: ");
-          ImGui::SameLine();
-          ImGui::Text("%s", res_scal.c_str());
-          ImGui::SameLine();
-          ImGui::InputInt("", &setdph);
+          ImGui::InputInt(" ", &setdph);
           if(setdph < 144){
              setdph = 144;
           }else if(setdph > 4352){
@@ -843,10 +837,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           }
           
           float tmp =  (float(setdph) / 544);
-          LOG_INFO("Screen size is {}", tmp);
           config.resolution_multiplier = tmp;
         }
-
+        const auto res_scal = fmt::format("{}x{}", static_cast<int>(960 * config.resolution_multiplier), static_cast<int>(544 * config.resolution_multiplier));
+        ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
+        ImGui::Text("%s", res_scal.c_str());
         ImGui::Spacing();
         ImGui::PopID();
         ImGui::Spacing();
@@ -1241,7 +1236,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                       emuenv.cfg.user_lang.clear();
                }else{
                    if (current_user_lang != 0)
-                      emuenv.cfg.sys_lang = current_user_lang;       
+                      emuenv.cfg.sys_lang = std::to_string(list_user_lang[current_user_lang - 1]);       
                    else
                        emuenv.cfg.sys_lang = 1; // English US (as default)
                }
