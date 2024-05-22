@@ -839,7 +839,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           }
           float tmp =  static_cast<float>(setdph / 544);
           LOG_INFO("Screen size is {}", tmp);
-          config.resolution_multiplier = tmp);
+          config.resolution_multiplier = tmp;
         }
 
         ImGui::Spacing();
@@ -1197,7 +1197,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         static std::map<std::string, std::string> static_list_user_lang_names = {
             { "id", "Indonesia" },
             { "ms", "Malaysia" },
-            { "ua", reinterpret_cast<const char *>(u8"Українська") },
+            { "ua", "Ukraina" },
         };
         for (const auto &l : list_user_lang)
             list_user_lang_str.push_back(static_list_user_lang_names.contains(l) ? static_list_user_lang_names[l].c_str() : l.c_str());
