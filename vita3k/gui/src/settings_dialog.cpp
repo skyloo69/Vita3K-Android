@@ -783,9 +783,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::Button("Screen Size mode")){
             manual = !manual;
         }
-        ImGui::Spacing();
+        ImGui::SameLine();
 
         if(manual==false){
+           ImGui::Text(": Slider");
+           ImGui::Spacing();
            ImGui::PushID("Res scal");
            if (config.resolution_multiplier == 0.25f)
                ImGui::BeginDisabled();
@@ -825,6 +827,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(res_scal.c_str()).x / 2.f) - (35.f * SCALE.x));
            ImGui::Text("%s", res_scal.c_str());
         }else{
+          ImGui::Text(": Manual Input");
+          ImGui::Spacing();
           static int setdph = static_cast<int>(544 * config.resolution_multiplier);
           const auto res_scal = fmt::format("{} x ", static_cast<int>(960 * config.resolution_multiplier));
           ImGui::Text("Insert screen height: ");
@@ -1237,7 +1241,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                       emuenv.cfg.user_lang.clear();
                }else{
                    if (current_user_lang != 0)
-                      emuenv.cfg.sys_lang = Int(list_user_lang[current_user_lang - 1]);
+                      emuenv.cfg.sys_lang = int(list_user_lang[current_user_lang - 1]);
                    else
                        emuenv.cfg.sys_lang = 1; // English US (as default)
                }
