@@ -837,8 +837,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           }else if(setdph > 4352){
              setdph = 4352;
           }
-          float tmp = std::setprecision(10);
-                tmp =  static_cast<float>(setdph / 544);
+            float tmp =  static_cast<float>(setdph / 544);
+            tmp = tmp.setprecision(10);
           LOG_INFO(fmt::format("Screen size is {}", tmp));
           config.resolution_multiplier = tmp;
         }
