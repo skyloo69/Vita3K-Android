@@ -1236,7 +1236,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                       emuenv.cfg.user_lang.clear();
                }else{
                    if (current_user_lang != 0)
-                      emuenv.cfg.sys_lang = std::to_string(list_user_lang[current_user_lang - 1]);       
+                      emuenv.cfg.sys_lang = list_user_lang[current_user_lang - 1];       
                    else
                        emuenv.cfg.sys_lang = 1; // English US (as default)
                }
