@@ -655,13 +655,13 @@ void get_sys_apps_title(GuiState &gui, EmuEnvState &emuenv) {
             emuenv.app_info.app_version = "1.00";
             emuenv.app_info.app_category = "gda";
             emuenv.app_info.app_title_id = app;
-            if (app == "NPXS10003") {
+            if (strcmp(app, "NPXS10003") == 0) {
                 emuenv.app_info.app_short_title = lang["browser"].c_str();
                 emuenv.app_info.app_title = lang["internet_browser"].c_str();
-            } else if (app == "NPXS10008") {
+            } else if (strcmp(app, "NPXS10008") == 0) {
                 emuenv.app_info.app_short_title = lang["trophies"].c_str();
                 emuenv.app_info.app_title = lang["trophy_collection"].c_str();
-            } else if (app == "NPXS10015")
+            } else if (strcmp(app, "NPXS10015") == 0)
                 emuenv.app_info.app_short_title = emuenv.app_info.app_title = lang["settings"].c_str();
             else
                 emuenv.app_info.app_short_title = emuenv.app_info.app_title = lang["content_manager"].c_str();
