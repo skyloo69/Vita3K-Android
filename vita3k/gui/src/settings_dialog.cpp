@@ -1159,9 +1159,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (!emuenv.cfg.tiltsens){
             ImGui::Spacing();
             ImGui::Text("%s", lang.emulator["sensor_emu_pos"].c_str());
-            ImGui::RadioButton("0 %s", lang.emulator["sensor_degrees"].c_str(), &emuenv.cfg.tiltpos, 0);
-            ImGui::RadioButton("90 %s", lang.emulator["sensor_degrees"].c_str(), &emuenv.cfg.tiltpos, 1);
-            ImGui::RadioButton("-90 %s", lang.emulator["sensor_degrees"].c_str(), &emuenv.cfg.tiltpos, -1);
+            ImGui::RadioButton("0 degrees", &emuenv.cfg.tiltpos, 0);
+            ImGui::RadioButton("90 degrees", &emuenv.cfg.tiltpos, 1);
+            ImGui::RadioButton("-90 degrees", &emuenv.cfg.tiltpos, -1);
             config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         }
         ImGui::Spacing();
