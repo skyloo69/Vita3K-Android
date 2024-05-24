@@ -259,6 +259,7 @@ struct LangState {
         { "name", "Name" },
         { "num", "Num" },
         { "not_connected", "No compatible controllers connected.\nPlease connect a controller that is compatible with SDL2." },
+        { "motion_disable", "Built-in device motion sensors are disabled!, to enable it goto configuration > settings > emulator" },
         { "motion_support", "Gamepad has motion support" },
         { "rebind_controls", "Rebind Controls" },
         { "led_color", "LED Color" },
@@ -644,9 +645,11 @@ struct LangState {
             { "change_emu_path_description", "Change Vita3K emulator folder path.\nYou will need to move your old folder to the new location manually." },
             { "reset_emu_path", "Reset Emulator Path" },
             { "reset_emu_path_description", "Reset Vita3K emulator path to the default.\nYou will need to move your old folder to the new location manually." },
+            { "sensor_settings", "Built-In Sensor settings" },
+            { "sensor_enable", "Enable HW acceleration and gyroscope" },
+            { "sensor_emu_pos", "Emulate acceleration position sensor" },
             { "custom_config_settings", "Custom Config Settings" },
-            { "clear_custom_config", "Clear Custom Config" },
-            { "sensor_settings", "Buildin Sensor settings" }
+            { "clear_custom_config", "Clear Custom Config" }
         };
         std::map<std::string, std::string> gui = {
             { "title", "GUI" },

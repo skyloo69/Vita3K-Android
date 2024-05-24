@@ -100,7 +100,7 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
     bool found_accel = false;
     for (ControllerList::iterator controller = state.controllers.begin(); controller != state.controllers.end();) {
         if (SDL_GameControllerGetAttached(controller->second.controller.get())) {
-            if(emuenv.cfg.tiltsens){
+            if(emuenv.cfg.tilt_sensor){
                found_accel |= controller->second.has_accel;
                found_gyro |= controller->second.has_gyro;
             }
@@ -136,7 +136,7 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                 new_controller.controller = controller;
                 new_controller.port = reserve_port(state);
 
-                if(emuenv.cfg.tiltsens){
+                if(emuenv.cfg.tilt_sensor){
                    new_controller.has_gyro = SDL_GameControllerHasSensor(controller.get(), SDL_SENSOR_GYRO);
                    if (new_controller.has_gyro)
                       SDL_GameControllerSetSensorEnabled(controller.get(), SDL_SENSOR_GYRO, SDL_TRUE);
@@ -154,7 +154,7 @@ void refresh_controllers(CtrlState &state, EmuEnvState &emuenv) {
                     }
                 }
 
-                if(emuenv.cfg.tiltsens){
+                if(emuenv.cfg.tilt_sensor){
                    found_gyro |= new_controller.has_gyro;
                    found_accel |= new_controller.has_accel;
                 }else{

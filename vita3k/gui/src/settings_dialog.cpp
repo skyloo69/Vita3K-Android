@@ -1117,15 +1117,15 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["sensor_settings"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["sensor_settings"].c_str());
         ImGui::Spacing();
-        if (ImGui::Checkbox("Enable HW acceleration and gyroscope", &emuenv.cfg.tiltsens))
-        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+        if (ImGui::Checkbox(lang.emulator["sensor_enable"].c_str(), &emuenv.cfg.tilt_sensor))
+            config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
-        if (!emuenv.cfg.tiltsens){
+        if (!emuenv.cfg.tilt_sensor){
             ImGui::Spacing();
-            ImGui::Text("Emulate acceleration position");
-            ImGui::RadioButton("0 degree", &emuenv.cfg.tiltpos, 0);
-            ImGui::RadioButton("90 degree", &emuenv.cfg.tiltpos, 1);
-            ImGui::RadioButton("-90 degree", &emuenv.cfg.tiltpos, -1);
+            ImGui::Text("%s", lang.emulator["sensor_emu_pos"].c_str());
+            ImGui::RadioButton("0 degrees", &emuenv.cfg.tilt_pos, 0);
+            ImGui::RadioButton("90 degrees", &emuenv.cfg.tilt_pos, 1);
+            ImGui::RadioButton("-90 degrees", &emuenv.cfg.tilt_pos, -1);
             config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         }
         ImGui::Spacing();
