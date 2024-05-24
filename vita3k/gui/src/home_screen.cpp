@@ -115,7 +115,7 @@ void update_live_area_current_open_apps_list(GuiState &gui, EmuEnvState &emuenv,
         gui.live_area_current_open_apps_list.insert(gui.live_area_current_open_apps_list.begin(), app_path);
     gui.live_area_app_current_open = 0;
     if (gui.live_area_current_open_apps_list.size() > 6) {
-        const auto last_app = gui.live_area_current_open_apps_list.back() == emuenv.io.app_path ? gui.live_area_current_open_apps_list[gui.live_area_current_open_apps_list.size() - 2] : gui.live_area_current_open_apps_list.back();
+        const auto &last_app = gui.live_area_current_open_apps_list.back() == emuenv.io.app_path ? gui.live_area_current_open_apps_list[gui.live_area_current_open_apps_list.size() - 2] : gui.live_area_current_open_apps_list.back();
         gui.live_area_contents.erase(last_app);
         gui.live_items.erase(last_app);
         gui.live_area_current_open_apps_list.erase(get_live_area_current_open_apps_list_index(gui, last_app));
@@ -231,7 +231,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
     const auto WINDOW_SIZE = ImVec2(756.0f * SCALE.x, 436.0f * SCALE.y);
     const auto BUTTON_SIZE = ImVec2(320.f * SCALE.x, 46.f * SCALE.y);
 
-    auto common = emuenv.common_dialog.lang.common;
+    auto &common = emuenv.common_dialog.lang.common;
 
     ImGui::SetNextWindowPos(ImVec2(emuenv.viewport_pos.x, emuenv.viewport_pos.y), ImGuiCond_Always);
     ImGui::SetNextWindowSize(display_size, ImGuiCond_Always);
@@ -259,7 +259,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
         gui.vita_area.app_close = false;
     ImGui::SameLine(0, 20.f * SCALE.x);
     if (ImGui::Button(common["ok"].c_str(), BUTTON_SIZE)) {
-        const auto app_path = gui.vita_area.live_area_screen ? gui.live_area_current_open_apps_list[gui.live_area_app_current_open] : emuenv.app_path;
+        const auto &app_path = gui.vita_area.live_area_screen ? gui.live_area_current_open_apps_list[gui.live_area_app_current_open] : emuenv.app_path;
         close_and_run_new_app(gui, emuenv, app_path);
     }
     ImGui::PopStyleVar();
@@ -352,6 +352,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return lhs.app_ver < rhs.app_ver;
             case DESCENDANT:
                 return lhs.app_ver > rhs.app_ver;
+            case default:
+                break;
             }
         case CATEGORY:
             switch (sorted) {
@@ -359,6 +361,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return lhs.category < rhs.category;
             case DESCENDANT:
                 return lhs.category > rhs.category;
+            case default:
+                break;
             }
         case COMPAT:
             switch (sorted) {
@@ -366,6 +370,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return lhs.compat < rhs.compat;
             case DESCENDANT:
                 return lhs.compat > rhs.compat;
+            case default:
+                break;
             }
         case LAST_TIME:
             switch (sorted) {
@@ -373,6 +379,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return lhs.last_time > rhs.last_time;
             case DESCENDANT:
                 return lhs.last_time < rhs.last_time;
+            case default:
+                break;
             }
         case TITLE:
             switch (sorted) {
@@ -380,6 +388,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return string_utils::toupper(lhs.title) < string_utils::toupper(rhs.title);
             case DESCENDANT:
                 return string_utils::toupper(lhs.title) > string_utils::toupper(rhs.title);
+            case default:
+                break;
             }
         case TITLE_ID:
             switch (sorted) {
@@ -387,6 +397,8 @@ static void sort_app_list(GuiState &gui, EmuEnvState &emuenv, const SortType &ty
                 return lhs.title_id < rhs.title_id;
             case DESCENDANT:
                 return lhs.title_id > rhs.title_id;
+            case default:
+                break;
             }
         }
         return false;
@@ -502,7 +514,7 @@ void browse_home_apps_list(GuiState &gui, EmuEnvState &emuenv, const uint32_t bu
     }
 }
 
-static const ImU32 ARROW_COLOR = 0xFFFFFFFF; // White
+static constexpr ImU32 ARROW_COLOR = 0xFFFFFFFF; // White
 static float scroll_type, current_scroll_pos, max_scroll_pos;
 
 void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
@@ -678,7 +690,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::SetWindowFontScale(1.1f * VIEWPORT_RES_SCALE.x);
             if (ImGui::MenuItem(lang["all"].c_str(), nullptr, app_compat_state == ALL_COMPAT_STATE))
                 app_compat_state = ALL_COMPAT_STATE;
-            auto lang_compat = gui.lang.compatibility.states;
+            auto &lang_compat = gui.lang.compatibility.states;
             for (int32_t i = compat::UNKNOWN; i <= compat::PLAYABLE; i++) {
                 const auto compat_state = static_cast<compat::CompatibilityState>(i);
                 ImGui::PushStyleColor(ImGuiCol_Text, gui.compat.compat_color[compat_state]);
@@ -863,7 +875,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
             // Draw the compatibility badge for commercial apps when they are within the visible area.
             if (element_is_within_visible_area && (app.title_id.starts_with("PCS") || (app.title_id == "NPXS10007"))) {
                 const auto compat_state = (gui.compat.compat_db_loaded ? gui.compat.app_compat_db.contains(app.title_id) : false) ? gui.compat.app_compat_db[app.title_id].state : compat::UNKNOWN;
-                const auto compat_state_vec4 = gui.compat.compat_color[compat_state];
+                const auto &compat_state_vec4 = gui.compat.compat_color[compat_state];
                 const ImU32 compat_state_color = IM_COL32((int)(compat_state_vec4.x * 255.0f), (int)(compat_state_vec4.y * 255.0f), (int)(compat_state_vec4.z * 255.0f), (int)(compat_state_vec4.w * 255.0f));
                 const auto current_pos = ImGui::GetCursorPos();
                 const auto grid_compat_padding = 4.f * VIEWPORT_SCALE.x;
