@@ -1,28 +1,33 @@
 package org.vita3k.emulator;
 
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
-import android.provider.OpenableColumns;
+import android.provider.Settings;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.view.Surface;
 import android.view.ViewGroup;
 
 import androidx.annotation.Keep;
 import androidx.core.content.pm.ShortcutInfoCompat;
 import androidx.core.content.pm.ShortcutManagerCompat;
 import androidx.core.graphics.drawable.IconCompat;
+import androidx.documentfile.provider.DocumentFile;
 
 import com.jakewharton.processphoenix.ProcessPhoenix;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -32,11 +37,11 @@ import org.vita3k.emulator.overlay.InputOverlay;
 
 public class Emulator extends SDLActivity
 {
-    private InputOverlay mOverlay;
     private String currentGameId = "";
+    private EmuSurface mSurface;
 
-    public InputOverlay getInputOverlay(){
-        return mOverlay;
+    public InputOverlay getmOverlay() {
+        return mSurface.getmOverlay();
     }
 
     @Keep
@@ -69,17 +74,17 @@ public class Emulator extends SDLActivity
     @Override
     protected SDLSurface createSDLSurface(Context context) {
         // Create the input overlay in the same time
-        mOverlay = new InputOverlay(this);
-        return new EmuSurface(context);
+        mSurface = new EmuSurface(context);
+        return mSurface;
     }
 
     @Override
     protected void setupLayout(ViewGroup layout){
         super.setupLayout(layout);
-        layout.addView(mOverlay);
+        layout.addView(getmOverlay());
     }
 
-    static private String APP_RESTART_PARAMETERS = "AppStartParameters";
+    static private final String APP_RESTART_PARAMETERS = "AppStartParameters";
 
     @Override
     protected String[] getArguments() {
@@ -107,7 +112,7 @@ public class Emulator extends SDLActivity
 
     @Keep
     public void restartApp(String app_path, String exec_path, String exec_args){
-        ArrayList<String> args = new ArrayList<String>();
+        ArrayList<String> args = new ArrayList<>();
 
         // first build the args given to Vita3K when it restarts
         // this is similar to run_execv in main.cpp
@@ -134,15 +139,41 @@ public class Emulator extends SDLActivity
     }
 
     static final int FILE_DIALOG_CODE = 545;
+    static final int FOLDER_DIALOG_CODE = 546;
+    static final int STORAGE_MANAGER_DIALOG_CODE = 547;
 
     @Keep
-    public void showFileDialog(){
+    public void showFileDialog() {
         Intent intent = new Intent()
                 .setType("*/*")
-                .setAction(Intent.ACTION_GET_CONTENT);
+                .setAction(Intent.ACTION_GET_CONTENT)
+                .putExtra(Intent.EXTRA_LOCAL_ONLY, true);
 
         intent = Intent.createChooser(intent, "Choose a file");
         startActivityForResult(intent, FILE_DIALOG_CODE);
+    }
+
+    private boolean isStorageManagerEnabled(){
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) && Environment.isExternalStorageManager();
+    }
+
+    @Keep
+    public void showFolderDialog() {
+        // If running Android 10-, SDL should have already asked for read and write permissions
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || isStorageManagerEnabled()) {
+            Intent intent = new Intent()
+                    .setAction(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                    .putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+
+            intent = Intent.createChooser(intent, "Choose a folder");
+            startActivityForResult(intent, FOLDER_DIALOG_CODE);
+        } else {
+            Intent intent = new Intent()
+                    .setAction(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                    .setData(Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+
+            startActivityForResult(intent, STORAGE_MANAGER_DIALOG_CODE);
+        }
     }
 
     private File getFileFromUri(Uri uri){
@@ -166,75 +197,76 @@ public class Emulator extends SDLActivity
         }
     }
 
-    // from https://stackoverflow.com/questions/5568874/how-to-extract-the-file-name-from-uri-returned-from-intent-action-get-content
-    private String getFileName(Uri uri){
-        String result = null;
-        if(uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)){
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            try {
-                if(cursor != null && cursor.moveToFirst()){
-                    int name_index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if(name_index >= 0)
-                        result = cursor.getString(name_index);
-                }
-            } finally {
-                cursor.close();
-            }
-        }
-
-        if(result == null){
-            result = uri.getLastPathSegment();
-        }
-
-        return result;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == FILE_DIALOG_CODE){
+            String result_path = "";
+            int result_fd = -1;
             if(resultCode == RESULT_OK){
                 Uri result_uri = data.getData();
-                String filename = getFileName(result_uri);
-                String result_uri_string = result_uri.toString();
-                int result_fd = -1;
-                try {
-                    AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r");
-                    // if the file is less than 64 KB, make a temporary copy
-                    if(asset_fd.getLength() >= 64*1024) {
-                        ParcelFileDescriptor file_descr = getContentResolver().openFileDescriptor(result_uri, "r");
-                        result_fd = file_descr.detachFd();
+                try (AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r")){
+                    // if the file is less than 4 KB, make a temporary copy
+                    if(asset_fd.getLength() >= 4*1024) {
+                        try (ParcelFileDescriptor file_descr = getContentResolver().openFileDescriptor(result_uri, "r")) {
+                            result_fd = file_descr.detachFd();
+                            // in case the last call returns a ErrnoException
+                            result_path = result_uri.toString();
+                            result_path = Os.readlink("/proc/self/fd/" + result_fd);
+                        }
                     } else {
                         File f = getFileFromUri(result_uri);
-                        result_uri_string = f.getAbsolutePath();
+                        result_path = f.getAbsolutePath();
                     }
-                } catch (FileNotFoundException e) {
+                } catch (ErrnoException | IOException e) {
                 }
-                filedialogReturn(result_uri_string, result_fd, filename);
-            } else if(resultCode == RESULT_CANCELED){
-                filedialogReturn("", -1, "");
+            }
+            filedialogReturn(result_path, result_fd);
+        } else if(requestCode == FOLDER_DIALOG_CODE){
+            String result_path = "";
+            if(resultCode == RESULT_OK){
+                Uri result_uri = data.getData();
+                DocumentFile tree = DocumentFile.fromTreeUri(getApplicationContext(), result_uri);
+                try(ParcelFileDescriptor file_descr = getContentResolver().openFileDescriptor(tree.getUri(), "r")) {
+                    int result_fd = file_descr.getFd();
+
+                    result_path = Os.readlink("/proc/self/fd/" + result_fd);
+                    // replace /mnt/user/{id} with /storage
+                    if(result_path.startsWith("/mnt/user/")){
+                        result_path = result_path.substring("/mnt/user/".length());
+                        result_path = "/storage" + result_path.substring(result_path.indexOf('/'));
+                    }
+                } catch (ErrnoException | IOException e) {
+                }
+            }
+            filedialogReturn(result_path, 0);
+        } else if (requestCode == STORAGE_MANAGER_DIALOG_CODE) {
+            if (isStorageManagerEnabled()) {
+                showFolderDialog();
+            } else {
+                filedialogReturn("", -1);
             }
         }
     }
 
     @Keep
     public void setControllerOverlayState(int overlay_mask, boolean edit, boolean reset){
-        mOverlay.setState(overlay_mask);
-        mOverlay.setIsInEditMode(edit);
+        getmOverlay().setState(overlay_mask);
+        getmOverlay().setIsInEditMode(edit);
 
         if(reset)
-            mOverlay.resetButtonPlacement();
+            getmOverlay().resetButtonPlacement();
     }
 
     @Keep
     public void setControllerOverlayScale(float scale){
-        mOverlay.setScale(scale);
+        getmOverlay().setScale(scale);
     }
 
     @Keep
     public void setControllerOverlayOpacity(int opacity){
-        mOverlay.setOpacity(opacity);
+        getmOverlay().setOpacity(opacity);
     }
 
     @Keep
@@ -270,5 +302,13 @@ public class Emulator extends SDLActivity
         return true;
     }
 
-    public native void filedialogReturn(String result_uri, int result_fd, String filename);
+    @Keep
+    public boolean isDefaultOrientationLandscape() {
+        // we know the current device orientation is landscape
+        // so the default one is also landscape if and only if the rotation is 0 or 180
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180;
+    }
+
+    public native void filedialogReturn(String result_path, int result_fd);
 }

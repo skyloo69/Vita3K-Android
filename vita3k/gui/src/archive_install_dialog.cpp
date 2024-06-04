@@ -209,7 +209,7 @@ void draw_archive_install_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 ImGui::Spacing();
                 ImGui::Separator();
                 for (const auto &archive : contents_archives) {
-                    ImGui::TextWrapped("%s", host::dialog::filesystem::resolve_filename(archive.first).c_str());
+                    ImGui::TextWrapped("%s", archive.first.filename().string().c_str());
                     ImGui::Spacing();
                     const auto count_contents_successed = count_content_state(archive.first, true);
                     if (count_contents_successed) {

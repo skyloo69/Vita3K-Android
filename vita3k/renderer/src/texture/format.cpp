@@ -241,8 +241,8 @@ void convert_f32m_to_f32(void *dest, const void *data, const uint32_t width, con
 
     for (uint32_t row = 0; row < height; ++row) {
         for (uint32_t col = 0; col < width; ++col) {
-            const uint32_t src_value = src[row * width + height];
-            dst[row * width + height] = src_value & 0x7FFFFFFF;
+            const uint32_t src_value = src[row * width + col];
+            dst[row * width + col] = src_value & 0x7FFFFFFF;
         }
     }
 }

@@ -111,7 +111,7 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
 
     if (result == host::dialog::filesystem::Result::SUCCESS && emulator_path.native() != emuenv.pref_path.native()) {
         // Refresh the working paths
-        emuenv.pref_path = fs::path(emulator_path.native()) / "";
+        emuenv.pref_path = emulator_path / "";
 
         // TODO: Move app old to new path
         reset_emulator(gui, emuenv);
@@ -1081,7 +1081,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::SetTooltip("%s", lang.emulator["case_insensitive_description"].c_str());
 #endif
         ImGui::Separator();
-#ifndef ANDROID
+
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["emu_storage_folder"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["emu_storage_folder"].c_str());
         ImGui::Spacing();
@@ -1107,8 +1107,12 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.emulator["reset_emu_path_description"].c_str());
         }
-#endif
+
         ImGui::Spacing();
+#ifdef ANDROID
+        ImGui::TextColored(GUI_COLOR_TEXT, "%s", "Using a different path requires additional permissions");
+        ImGui::Spacing();
+#endif
         ImGui::Separator();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["custom_config_settings"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["custom_config_settings"].c_str());

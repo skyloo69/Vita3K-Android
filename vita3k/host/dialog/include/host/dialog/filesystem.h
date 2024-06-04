@@ -109,13 +109,6 @@ Result pick_folder(fs::path &resulting_path, const fs::path& default_path = "");
 FILE *resolve_host_handle(const fs::path &path);
 
 /**
- * @brief Return a print-friendly path
- */
-std::string resolve_path_string(const fs::path &path);
-
-std::string resolve_filename(const fs::path &path);
-
-/**
  * @brief Get a string describing the last dialog error
  *
  * @return A string in English describing the last dialog error

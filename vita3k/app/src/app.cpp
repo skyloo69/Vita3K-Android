@@ -88,9 +88,8 @@ void add_custom_driver(EmuEnvState &emuenv) {
     if (result != host::dialog::filesystem::SUCCESS)
         return;
 
-    std::string driver = host::dialog::filesystem::resolve_filename(file_path);
     // remove the .zip extension
-    driver = fs::path(driver).stem().string();
+    std::string driver = file_path.filename().stem().string();
 
     fs::path driver_path = fs::path(SDL_AndroidGetInternalStoragePath()) / "driver" / driver;
 

@@ -4,14 +4,16 @@ android {
 	namespace "org.vita3k.emulator"
 	compileSdk 34
 	ndkVersion "26.3.11579264"
-	buildToolsVersion "34.0.0"
+	buildFeatures {
+		buildConfig true
+	}
 
 	defaultConfig {
 		applicationId "org.vita3k.emulator"
 		minSdk 24
 		targetSdk 34
-		versionCode 11
-		versionName "0.2.0-11"
+		versionCode 12
+		versionName "0.2.0-12"
 
 		externalNativeBuild {
 			cmake {

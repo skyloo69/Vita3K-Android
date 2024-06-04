@@ -106,7 +106,9 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
       defaultOverlay();
 
     // Set the on touch listener.
-    setOnTouchListener(this);
+    // Do not register the overlay as a touch listener
+    // Instead let EmuSurface forward touch events
+    // setOnTouchListener(this);
 
     // Force draw
     setWillNotDraw(false);
@@ -126,7 +128,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
       @Override
       public void run() {
         Emulator emu = (Emulator) SDL.getContext();
-        emu.getInputOverlay().tick();
+        emu.getmOverlay().tick();
       }
     }, 1000, 1000);
 
