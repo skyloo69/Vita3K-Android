@@ -696,8 +696,6 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
             || legacyId == ButtonType.TRIGGER_R
             || legacyId == ButtonType.TRIGGER_L2
             || legacyId == ButtonType.TRIGGER_R2
-            || legacyId == ButtonType.TRIGGER_L3
-            || legacyId == ButtonType.TRIGGER_R3
             || legacyId == ButtonType.BUTTON_START
             || legacyId == ButtonType.BUTTON_SELECT)
       scale = 0.25f;
