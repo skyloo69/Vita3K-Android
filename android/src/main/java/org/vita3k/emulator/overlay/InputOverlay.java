@@ -996,8 +996,8 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     public static final int TRIGGER_R = 21;
     public static final int TRIGGER_L2 = 22;
     public static final int TRIGGER_R2 = 23;
-    public static final int TRIGGER_L2 = 24;
-    public static final int TRIGGER_R2 = 25;
+    public static final int TRIGGER_L3 = 24;
+    public static final int TRIGGER_R3 = 25;
     public static final int BUTTON_TOUCH_SWITCH = 1024;
   }
 
