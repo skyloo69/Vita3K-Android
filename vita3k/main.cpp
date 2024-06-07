@@ -113,31 +113,6 @@ static void run_execv(char *argv[], EmuEnvState &emuenv) {
 };
 #else
 static void run_execv(char *argv[], EmuEnvState &emuenv) {
-    // retrieve the JNI environment.
-    JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
-
-    // retrieve the Java instance of the SDLActivity
-    jobject activity = reinterpret_cast<jobject>(SDL_AndroidGetActivity());
-
-    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
-    jclass clazz(env->GetObjectClass(activity));
-
-    // find the identifier of the method to call
-    jmethodID method_id = env->GetMethodID(clazz, "restartApp", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-
-    // create the java string for the different parameters
-    jstring app_path = env->NewStringUTF(emuenv.load_app_path.c_str());
-    jstring exec_path = env->NewStringUTF(emuenv.load_exec_path.c_str());
-    jstring exec_args = env->NewStringUTF(emuenv.load_exec_argv.c_str());
-
-    env->CallVoidMethod(activity, method_id, app_path, exec_path, exec_args);
-
-    // The function call above will exit with some delay
-    // Exit now to match the behavior on PC
-    exit(0);
-};
-#else
-static void run_execv(char *argv[], EmuEnvState &emuenv) {
     char const *args[10];
     args[0] = argv[0];
     args[1] = "-a";
