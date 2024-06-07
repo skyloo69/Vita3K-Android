@@ -14,9 +14,6 @@
 [submodule "external/dlmalloc"]
 	path = external/dlmalloc
 	url = https://github.com/Vita3K/dlmalloc
-[submodule "external/ffmpeg"]
-	path = external/ffmpeg
-	url = https://github.com/Macdu/ffmpeg-core.git
 [submodule "external/glslang"]
 	path = external/glslang
 	url = https://github.com/KhronosGroup/glslang
@@ -103,3 +100,7 @@
 [submodule "external/SPIRV-Tools"]
 	path = external/SPIRV-Tools
 	url = https://github.com/KhronosGroup/SPIRV-Tools.git
+[submodule "external/ffmpeg-core"]
+	path = external/ffmpeg
+	url = https://github.com/Macdu/ffmpeg-core.git
+	branch = android
