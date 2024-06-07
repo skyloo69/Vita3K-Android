@@ -116,7 +116,7 @@ static void change_emulator_path(GuiState &gui, EmuEnvState &emuenv) {
 
     if (result == host::dialog::filesystem::Result::SUCCESS && emulator_path.native() != emuenv.pref_path.native()) {
         // Refresh the working paths
-        emuenv.pref_path = fs::path(emulator_path.native()) / "";
+        emuenv.pref_path = emulator_path / "";
         auto tmp = fs::path(emuenv.pref_path / ".nomedia");
         if(!fs::exists(tmp)){
             fs::ofstream( emuenv.pref_path / "tmp.txt" );
@@ -1147,7 +1147,10 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("%s", lang.emulator["reset_emu_path_description"].c_str());
         }
-
+#ifdef ANDROID
+        ImGui::TextColored(GUI_COLOR_TEXT, "%s", "Using a different path requires additional permissions");
+        ImGui::Spacing();
+#endif
         ImGui::Separator();
         ImGui::Spacing();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["sensor_settings"].c_str()).x / 2.f));
