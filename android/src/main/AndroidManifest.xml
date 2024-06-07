@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
-    <!-- Vulkan 1.1 -->
+    <!-- Vulkan 1.0 -->
     <uses-feature
         android:name="android.hardware.vulkan.version"
-        android:version="0x400001"
-        android:required="false" />
+        android:version="0x400000"
+        android:required="true" />
 
     <!-- OpenGL ES 3.2 -->
     <uses-feature
@@ -23,13 +23,14 @@
     <!-- Game controller support -->
     <uses-feature
         android:name="android.hardware.bluetooth"
-        android:required="false" /> 
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.gamepad"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.usb.host"
         android:required="false" />
+
     <!-- External mouse input events -->
     <uses-feature
         android:name="android.hardware.type.pc"
@@ -42,6 +43,8 @@
         android:name="android.hardware.microphone"
         android:required="false" /> -->
 
+    <!-- Allow downloading to the external storage on Android 5.1 and older -->
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="22" /> -->
     <!-- For android API <= 29 (Up to Android 10), use Legacy storage, otherwise use the MANAGE_EXTERNAL_STORAGE permission -->
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -74,9 +77,9 @@
          then replace "SDLActivity" with the name of your class (e.g. "MyGame")
          in the XML below.
          An example Java class can be found in README-android.md
+
          The requestLegacyExternalStorage parameter only has an effect when running on Android <= 10
     -->
-
     <application android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="true"
@@ -84,7 +87,6 @@
         android:hardwareAccelerated="true"
         android:appCategory="game"
         android:isGame="true"
-        android:requestLegacyExternalStorage="true"
         android:hasFragileUserData="true"
         android:requestLegacyExternalStorage="true"
         tools:targetApi="q">
@@ -92,6 +94,7 @@
         <!-- Example of setting SDL hints from AndroidManifest.xml:
         <meta-data android:name="SDL_ENV.SDL_ACCELEROMETER_AS_JOYSTICK" android:value="0"/>
          -->
+
         <activity android:name="Emulator"
             android:alwaysRetainTaskState="true"
             android:launchMode="singleInstance"
@@ -104,12 +107,11 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
-
-                <!-- Let Android know that we can handle some USB devices and should receive this event -->
-                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
-                <action android:name="android.hardware.usb.action.USB_ACCESSORY_ATTACHED" />
             </intent-filter>
-
+            <!-- Let Android know that we can handle some USB devices and should receive this event -->
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+            </intent-filter>
             <!-- Drop file event -->
             <!--
             <intent-filter>
