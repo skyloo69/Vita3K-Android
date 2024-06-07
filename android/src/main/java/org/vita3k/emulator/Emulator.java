@@ -88,10 +88,7 @@ public class Emulator extends SDLActivity
 
     @Override
     protected String[] getArguments() {
-        Intent intent = getIntent()
-                .addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION) //must declare because without this emulator will trow boostfs::file permission denial
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        Intent intent = getIntent();
 
         String[] args = intent.getStringArrayExtra(APP_RESTART_PARAMETERS);
         if(args == null)
