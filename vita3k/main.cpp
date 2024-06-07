@@ -24,6 +24,8 @@
 #include <emuenv/state.h>
 #include <gui/functions.h>
 #include <gui/state.h>
+#include <include/cpu.h>
+#include <include/environment.h>
 #include <io/state.h>
 #include <kernel/state.h>
 #include <modules/module_parent.h>
@@ -85,6 +87,29 @@ static void set_current_game_id(const std::string_view game_id) {
     env->DeleteLocalRef(clazz);
 }
 
+#ifdef ANDROID
+
+static void set_current_game_id(const std::string_view game_id) {
+    // retrieve the JNI environment.
+    JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
+
+    // retrieve the Java instance of the SDLActivity
+    jobject activity = reinterpret_cast<jobject>(SDL_AndroidGetActivity());
+
+    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
+    jclass clazz(env->GetObjectClass(activity));
+
+    // find the identifier of the method to call
+    jmethodID method_id = env->GetMethodID(clazz, "setCurrentGameId", "(Ljava/lang/String;)V");
+    jstring j_game_id = env->NewStringUTF(game_id.data());
+    env->CallVoidMethod(activity, method_id, j_game_id);
+
+    // clean up the local references.
+    env->DeleteLocalRef(j_game_id);
+    env->DeleteLocalRef(activity);
+    env->DeleteLocalRef(clazz);
+}
+
 static void run_execv(char *argv[], EmuEnvState &emuenv) {
     // retrieve the JNI environment.
     JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
@@ -111,33 +136,58 @@ static void run_execv(char *argv[], EmuEnvState &emuenv) {
 };
 #else
 static void run_execv(char *argv[], EmuEnvState &emuenv) {
-    char *args[10];
+    // retrieve the JNI environment.
+    JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
+
+    // retrieve the Java instance of the SDLActivity
+    jobject activity = reinterpret_cast<jobject>(SDL_AndroidGetActivity());
+
+    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
+    jclass clazz(env->GetObjectClass(activity));
+
+    // find the identifier of the method to call
+    jmethodID method_id = env->GetMethodID(clazz, "restartApp", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+
+    // create the java string for the different parameters
+    jstring app_path = env->NewStringUTF(emuenv.load_app_path.c_str());
+    jstring exec_path = env->NewStringUTF(emuenv.load_exec_path.c_str());
+    jstring exec_args = env->NewStringUTF(emuenv.load_exec_argv.c_str());
+
+    env->CallVoidMethod(activity, method_id, app_path, exec_path, exec_args);
+
+    // The function call above will exit with some delay
+    // Exit now to match the behavior on PC
+    exit(0);
+};
+#else
+static void run_execv(char *argv[], EmuEnvState &emuenv) {
+    char const *args[10];
     args[0] = argv[0];
-    args[1] = (char *)"-a";
-    args[2] = (char *)"true";
+    args[1] = "-a";
+    args[2] = "true";
     if (!emuenv.load_app_path.empty()) {
-        args[3] = (char *)"-r";
+        args[3] = "-r";
         args[4] = emuenv.load_app_path.data();
         if (!emuenv.load_exec_path.empty()) {
-            args[5] = (char *)"--self";
+            args[5] = "--self";
             args[6] = emuenv.load_exec_path.data();
             if (!emuenv.load_exec_argv.empty()) {
-                args[7] = (char *)"--app-args";
+                args[7] = "--app-args";
                 args[8] = emuenv.load_exec_argv.data();
-                args[9] = NULL;
+                args[9] = nullptr;
             } else
-                args[7] = NULL;
+                args[7] = nullptr;
         } else
-            args[5] = NULL;
+            args[5] = nullptr;
     } else
-        args[3] = NULL;
+        args[3] = nullptr;
 
         // Execute the emulator again with some arguments
 #ifdef WIN32
     FreeConsole();
     _execv(argv[0], args);
 #elif defined(__unix__) || defined(__APPLE__) && defined(__MACH__)
-    execv(argv[0], args);
+    execv(argv[0], const_cast<char *const *>(args));
 #endif
 };
 #endif
@@ -240,12 +290,15 @@ int main(int argc, char *argv[]) {
             }
             return Success;
         }
+        LOG_ERROR("Failed to initialise config");
         return InitConfigFailed;
     }
 
 #ifdef WIN32
-    auto res = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-    LOG_ERROR_IF(res == S_FALSE, "Failed to initialize COM Library");
+    {
+        auto res = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        LOG_ERROR_IF(res == S_FALSE, "Failed to initialize COM Library");
+    }
 #endif
 
     if (cfg.console) {
@@ -285,7 +338,8 @@ int main(int argc, char *argv[]) {
     }
 
     LOG_INFO("{}", window_title);
-    LOG_INFO("Number of logical CPU cores: {}", SDL_GetCPUCount());
+    LOG_INFO("OS: {}", CppCommon::Environment::OSVersion());
+    LOG_INFO("CPU: {} | {} Threads | {} GHz", CppCommon::CPU::Architecture(), CppCommon::CPU::LogicalCores(), static_cast<float>(CppCommon::CPU::ClockSpeed()) / 1000.f);
     LOG_INFO("Available ram memory: {} MiB", SDL_GetSystemRAM());
 
     app::AppRunType run_type = app::AppRunType::Unknown;
@@ -313,7 +367,7 @@ int main(int argc, char *argv[]) {
                 if (handle_events(emuenv, gui)) {
                     gui::draw_begin(gui, emuenv);
                     gui::draw_initial_setup(gui, emuenv);
-                    gui::draw_end(gui, emuenv.window.get());
+                    gui::draw_end(gui);
                     emuenv.renderer->swap_window(emuenv.window.get());
                 } else
                     return QuitRequested;
@@ -349,7 +403,7 @@ int main(int argc, char *argv[]) {
             if (is_rif)
                 copy_license(emuenv, *cfg.content_path);
             else if (!is_archive && !is_directory)
-                LOG_ERROR("File dropped: [{}] is not supported.", cfg.content_path->string());
+                LOG_ERROR("File dropped: [{}] is not supported.", *cfg.content_path);
 
             emuenv.cfg.content_path.reset();
             if (!cfg.console)
@@ -407,7 +461,7 @@ int main(int argc, char *argv[]) {
                 gui::draw_vita_area(gui, emuenv);
                 gui::draw_ui(gui, emuenv);
 
-                gui::draw_end(gui, emuenv.window.get());
+                gui::draw_end(gui);
                 emuenv.renderer->swap_window(emuenv.window.get());
 #ifdef TRACY_ENABLE
                 FrameMark; // Tracy - Frame end mark for UI rendering loop
@@ -503,7 +557,7 @@ int main(int argc, char *argv[]) {
             emuenv.renderer->precompile_shader(hash);
             gui::draw_pre_compiling_shaders_progress(gui, emuenv, uint32_t(emuenv.renderer->shaders_cache_hashs.size()));
 
-            gui::draw_end(gui, emuenv.window.get());
+            gui::draw_end(gui);
             emuenv.renderer->swap_window(emuenv.window.get());
         }
     }
@@ -534,7 +588,7 @@ int main(int argc, char *argv[]) {
         gui::draw_common_dialog(gui, emuenv);
         draw_app_background(gui, emuenv);
 
-        gui::draw_end(gui, emuenv.window.get());
+        gui::draw_end(gui);
         emuenv.renderer->swap_window(emuenv.window.get());
 
 #ifdef TRACY_ENABLE
@@ -577,7 +631,7 @@ int main(int argc, char *argv[]) {
             gui::draw_ui(gui, emuenv);
         }
 
-        gui::draw_end(gui, emuenv.window.get());
+        gui::draw_end(gui);
         emuenv.renderer->swap_window(emuenv.window.get());
 #ifdef TRACY_ENABLE
         FrameMark; // Tracy - Frame end mark for game rendering loop

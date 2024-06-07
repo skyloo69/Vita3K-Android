@@ -162,7 +162,7 @@ bool install_archive_content(EmuEnvState &emuenv, GuiState *gui, const ZipPtr &z
                 if(emuenv.renderer->current_backend == renderer::Backend::OpenGL)
                     glViewport(0, 0, static_cast<int>(ImGui::GetIO().DisplaySize.x), static_cast<int>(ImGui::GetIO().DisplaySize.y));
                 ImGui::Render();
-                gui::draw_end(*gui, emuenv.window.get());
+                gui::draw_end(*gui);
                 emuenv.renderer->swap_window(emuenv.window.get());
             }
             switch (status) {
@@ -276,7 +276,6 @@ std::vector<ContentInfo> install_archive(EmuEnvState &emuenv, GuiState *gui, con
     }
     const ZipPtr zip(new mz_zip_archive, delete_zip);
     std::memset(zip.get(), 0, sizeof(*zip));
-
 
     if (!mz_zip_reader_init_cfile(zip.get(), vpk_fp, 0, 0)) {
         LOG_CRITICAL("miniz error reading archive: {}", miniz_get_error(zip));
@@ -710,9 +709,11 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
                 sce_ctrl_btn = SCE_CTRL_PSBUTTON;
 #else
 
+#ifdef ANDROID
+            if(event.key.keysym.sym == SDLK_AC_BACK)
+                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
+#else
             // toggle gui state
-            if (allow_switch_state && (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_gui))
-                emuenv.display.imgui_render = !emuenv.display.imgui_render;
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_touch && !gui.is_key_capture_dropped)
                 toggle_touchscreen();
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_fullscreen && !gui.is_key_capture_dropped)
@@ -725,9 +726,10 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
                 take_screenshot(emuenv);
 #endif
             bool was_in_livearea = gui.vita_area.live_area_screen;
-            
+
             if (sce_ctrl_btn != 0)
                 ui_navigation(sce_ctrl_btn);
+
 #ifdef ANDROID
             if(!was_in_livearea && gui.vita_area.live_area_screen){
                 emuenv.display.imgui_render = true;

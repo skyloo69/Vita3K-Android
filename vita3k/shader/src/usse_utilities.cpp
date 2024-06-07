@@ -271,7 +271,6 @@ static spv::Function *make_unpack_func(spv::Builder &b, const FeatureState &feat
     spv::Id comp_bits_val = b.makeUintConstant(comp_bits);
 
     std::vector<spv::Id> comps;
-
     for (int i = 0; i < comp_count; ++i) {
         const spv::Op op = is_signed ? spv::OpBitFieldSExtract : spv::OpBitFieldUExtract;
         spv::Id comp = b.createTriOp(op, result_type, extracted, b.makeUintConstant(comp_bits * i), comp_bits_val);
