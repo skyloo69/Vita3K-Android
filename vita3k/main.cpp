@@ -87,29 +87,6 @@ static void set_current_game_id(const std::string_view game_id) {
     env->DeleteLocalRef(clazz);
 }
 
-#ifdef ANDROID
-
-static void set_current_game_id(const std::string_view game_id) {
-    // retrieve the JNI environment.
-    JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
-
-    // retrieve the Java instance of the SDLActivity
-    jobject activity = reinterpret_cast<jobject>(SDL_AndroidGetActivity());
-
-    // find the Java class of the activity. It should be SDLActivity or a subclass of it.
-    jclass clazz(env->GetObjectClass(activity));
-
-    // find the identifier of the method to call
-    jmethodID method_id = env->GetMethodID(clazz, "setCurrentGameId", "(Ljava/lang/String;)V");
-    jstring j_game_id = env->NewStringUTF(game_id.data());
-    env->CallVoidMethod(activity, method_id, j_game_id);
-
-    // clean up the local references.
-    env->DeleteLocalRef(j_game_id);
-    env->DeleteLocalRef(activity);
-    env->DeleteLocalRef(clazz);
-}
-
 static void run_execv(char *argv[], EmuEnvState &emuenv) {
     // retrieve the JNI environment.
     JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
