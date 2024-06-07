@@ -47,8 +47,8 @@ Java_org_vita3k_emulator_Emulator_filedialogReturn(JNIEnv *env, jobject thiz, js
     const char *result_ptr = env->GetStringUTFChars(result_path, nullptr);
     dialog_result_path = fs::path(result_ptr);
     env->ReleaseStringUTFChars(result_path, result_ptr);
-
     dialog_result_fd = result_fd;
+
     file_dialog_running.store(false, std::memory_order_release);
 }
 
@@ -59,7 +59,7 @@ Java_org_vita3k_emulator_Emulator_filedialogReturn(JNIEnv *env, jobject thiz, js
  * @param file_extensions_list File extensions list
  * @return std::string A string containing the properly formatted file extension list
  */
-std::string format_file_filter_extension_list(std::vector<std::string> &file_extensions_list) {
+std::string format_file_filter_extension_list(const std::vector<std::string> &file_extensions_list) {
     // Formatted string containing the properly formatted file extension list
     //
     // In the case of nativefiledialog, the expected file extension is a single
@@ -113,7 +113,7 @@ static void call_dialog_java_function(const char* name, bool need_write){
 
     while (file_dialog_running.load(std::memory_order_acquire))
         SDL_Delay(10);
-    }
+}
 
 namespace host {
 namespace dialog {
@@ -132,14 +132,13 @@ Result open_file(fs::path &resulting_path, const std::vector<FileFilter>& file_f
     return Result::SUCCESS;
 };
 
-Result pick_folder(fs::path &resulting_path, const fs::path &default_path) {
+Result pick_folder(fs::path &resulting_path, const fs::path& default_path) {
     call_dialog_java_function("showFolderDialog", true);
 
     if(dialog_result_path.empty())
         return Result::CANCEL;
 
     resulting_path = std::move(dialog_result_path);
-
     return Result::SUCCESS;
 };
 
@@ -156,7 +155,6 @@ std::string get_error() {
 
 FILE *resolve_host_handle(const fs::path &path) {
     auto it = path_mapping.find(path);
-
     if (it != path_mapping.end()) {
         int fd = it->second;
         return fdopen(fd, "rb");

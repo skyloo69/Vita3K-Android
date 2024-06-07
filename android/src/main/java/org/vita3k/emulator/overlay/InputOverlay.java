@@ -965,7 +965,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
             (((float) res.getInteger(R.integer.TRIGGER_R3_X) / 1000) * maxX));
     sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-Y",
             (((float) res.getInteger(R.integer.TRIGGER_R3_Y) / 1000) * maxY));
-	  
+
     sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-X",
             (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_X) / 1000) * maxX));
     sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-Y",
@@ -1032,4 +1032,4 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     public static final int axis_right_x = 2;
     public static final int axis_right_y = 3;
   }
-	}
+}

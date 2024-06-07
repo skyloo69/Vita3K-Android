@@ -193,18 +193,18 @@ struct PostSurfaceSyncRequest {
     ColorSurfaceCacheInfo *cache_info;
 };
 
-// only used with the DoubleBuffer Method
-// copy the range [location, location+size] from the GPU buffer to the CPU buffer
-struct BufferSyncRequest {
-    Address location;
-    uint32_t size;
-};
-
 using CallbackRequestFunction = std::function<void()>;
 struct CallbackRequest {
     // use a pointer so the size is similar to other elements of WaitThreadRequest
     // and not to have to mess with move semantics
     CallbackRequestFunction *callback;
+};
+
+// only used with the DoubleBuffer Method
+// copy the range [location, location+size] from the GPU buffer to the CPU buffer
+struct BufferSyncRequest {
+    Address location;
+    uint32_t size;
 };
 
 // A parallel thread is handling these request and telling other waiting threads

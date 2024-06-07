@@ -63,6 +63,9 @@ target_include_directories(stb INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 add_library(ddspp INTERFACE)
 target_include_directories(ddspp INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/ddspp")
 
+add_library(cppcommon STATIC CppCommon/source/cpu.cpp CppCommon/source/environment.cpp)
+target_include_directories(cppcommon PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/CppCommon")
+
 add_library(glad STATIC "${CMAKE_CURRENT_SOURCE_DIR}/glad/src/glad.c")
 target_include_directories(glad PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/glad/include")
 
@@ -175,7 +178,7 @@ if(USE_DISCORD_RICH_PRESENCE)
 		file(DOWNLOAD https://dl-game-sdk.discordapp.net/latest/discord_game_sdk.zip
 			"${CMAKE_BINARY_DIR}/external/discord_game_sdk.zip" SHOW_PROGRESS)
 	endif()
-	
+
   if(NOT EXISTS "${CMAKE_BINARY_DIR}/external/discord_game_sdk")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external/discord_game_sdk")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xf "${CMAKE_BINARY_DIR}/external/discord_game_sdk.zip"
@@ -370,7 +373,7 @@ target_include_directories(libatrac9 PUBLIC LibAtrac9/C/src)
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
 option(XXHASH_BUILD_XXHSUM "Build the xxhsum binary" OFF)
 option(XXH_X86DISPATCH_ALLOW_AVX "Allow building XXH3 with AVX even if it crashes on SSE2-Only CPUs" OFF)
-if (ARCHITECTURE STREQUAL "x86_64")
+if((NOT APPLE) AND (ARCHITECTURE STREQUAL "x86_64"))
 	set(DISPATCH 1)
 endif()
 add_subdirectory(xxHash/cmake_unofficial EXCLUDE_FROM_ALL)
