@@ -708,11 +708,6 @@ bool handle_events(EmuEnvState &emuenv, GuiState &gui) {
             if(event.key.keysym.sym == SDLK_AC_BACK)
                 sce_ctrl_btn = SCE_CTRL_PSBUTTON;
 #else
-
-#ifdef ANDROID
-            if(event.key.keysym.sym == SDLK_AC_BACK)
-                sce_ctrl_btn = SCE_CTRL_PSBUTTON;
-#else
             // toggle gui state
             if (event.key.keysym.scancode == emuenv.cfg.keyboard_gui_toggle_touch && !gui.is_key_capture_dropped)
                 toggle_touchscreen();
