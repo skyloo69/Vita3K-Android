@@ -261,12 +261,21 @@ int main(int argc, char *argv[]) {
         std::atexit(SDL_Quit);
 
         // Enable HIDAPI rumble for DS4/DS
+        SDL_SetHint(SDL_HINT_TV_REMOTE_AS_JOYSTICK, "0");    	
+    	SDL_SetHint(SDL_HINT_JOYSTICK_ROG_CHAKRAM, "1");
+    	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "1");
+    	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_STEAM, "1");
+    	SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_WII, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS3, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS4_RUMBLE, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_PS5_RUMBLE, "1");
-
+        
         // Enable Switch controller
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_SWITCH, "1");
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_JOY_CONS, "1");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS, "0");
 
 #ifdef ANDROID
         // The AAudio driver (used by default) is really really bad
