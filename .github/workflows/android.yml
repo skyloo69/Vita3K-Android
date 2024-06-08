@@ -11,7 +11,11 @@ jobs:
       VCPKG_ROOT: /usr/local/share/vcpkg
 
     steps:
+<<<<<<< HEAD
       - uses: actions/checkout@v4
+=======
+      - uses: actions/checkout@v3
+>>>>>>> v12_merge
         with:
           fetch-depth: 0
           submodules: recursive
@@ -19,7 +23,11 @@ jobs:
       - uses: hendrikmuhs/ccache-action@v1.2
 
       - name: Restore Gradle Cache
+<<<<<<< HEAD
         uses: actions/cache@v4
+=======
+        uses: actions/cache@v3
+>>>>>>> v12_merge
         with:
           path: |
             ~/.gradle/
@@ -41,9 +49,12 @@ jobs:
           KEYSTORE_ENCODED: ${{ secrets.KEYSTORE }}
         run: echo $KEYSTORE_ENCODED | base64 --decode > "/home/runner/keystore.jks"
 
+<<<<<<< HEAD
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
   
+=======
+>>>>>>> v12_merge
       - name: Gradle build
         env:
           SIGNING_STORE_PATH: "/home/runner/keystore.jks"
@@ -55,6 +66,7 @@ jobs:
           cp -r lang android/assets
           cp -r vita3k/shaders-builtin android/assets
           export JAVA_HOME=$(echo $JAVA_HOME_17_X64)
+<<<<<<< HEAD
           ./gradlew --info --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease  assembleDebug
           
       - if : failure()
@@ -63,10 +75,15 @@ jobs:
           name: vita3k-${{ env.git_short_sha }}-build-report.zip
           path: /home/runner/work/Vita3K-Android/Vita3K-Android/build/reports/*
         
+=======
+          ./gradlew --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease
+
+>>>>>>> v12_merge
       - name: Compute git short sha
         shell: bash
         run: echo "git_short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+<<<<<<< HEAD
       - name: List all files in output folder
         run: |
           ls -l android/build/outputs/apk/
@@ -82,3 +99,9 @@ jobs:
         with:
           name: vita3k-${{ env.git_short_sha }}-debug.apk
           path: android/build/outputs/apk/debug/android-debug.apk
+=======
+      - uses: actions/upload-artifact@v3
+        with:
+          name: vita3k-${{ env.git_short_sha }}-release.apk
+          path: android/build/outputs/apk/release/android-release.apk
+>>>>>>> v12_merge
