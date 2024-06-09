@@ -122,11 +122,11 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glAttachShader(program->get(), frag_shader->get());
-    LOG_INFO("glAttachShader : FRAG");
-    glAttachShader(program->get(), vert_shader->get());
-    LOG_INFO("glAttachShader : VERT");
+    LOG_TRACE("glAttachShader : FRAG");
+//    glAttachShader(program->get(), vert_shader->get());
+//    LOG_TRACE("glAttachShader : VERT");
     glLinkProgram(program->get());
-
+    LOG_TRACE("glAttachShader : VERT");
     GLint log_length = 0;
     glGetProgramiv(program->get(), GL_INFO_LOG_LENGTH, &log_length);
 
@@ -147,9 +147,9 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glDetachShader(program->get(), frag_shader->get());
-    LOG_INFO("glDetachShader : FRAG");
-    glDetachShader(program->get(), vert_shader->get());
-    LOG_INFO("glDetachShader : VERT");
+    LOG_TRACE("glDetachShader : FRAG");
+  //  glDetachShader(program->get(), vert_shader->get());
+  //  LOG_TRACE("glDetachShader : VERT");
 
     program_cache.emplace(hashes, program);
 
