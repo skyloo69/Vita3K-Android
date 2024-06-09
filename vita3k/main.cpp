@@ -294,8 +294,8 @@ int main(int argc, char *argv[]) {
     LOG_INFO("OS: {}", CppCommon::Environment::OSVersion());
     LOG_INFO("CPU: {} | {} Threads | {} GHz", CppCommon::CPU::Architecture(), CppCommon::CPU::LogicalCores(), static_cast<float>(CppCommon::CPU::ClockSpeed()) / 1000.f);
 #else
-    LOG_INFO("OS: {}", SDL_GetPlatform());
-    LOG_INFO("CPU: {}", SDL_GetCPUCount());
+    LOG_INFO("OS: {} {}", SDL_GetPlatform(), SDL_GetAndroidSDKVersion());
+    LOG_INFO("CPU: {} | {} Cores", SDL_GetCPUName(), SDL_GetCPUCount());
 #endif
     LOG_INFO("Available ram memory: {} MiB", SDL_GetSystemRAM());
 
