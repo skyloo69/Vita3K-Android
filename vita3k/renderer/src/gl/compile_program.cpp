@@ -126,7 +126,7 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     glLinkProgram(program->get());
 
     GLint log_length = 0;
- //   glGetProgramiv(program->get(), GL_INFO_LOG_LENGTH, &log_length);
+    glGetProgramiv(program->get(), GL_INFO_LOG_LENGTH, &log_length);
 
     // Intel driver returns an info log length of at least 1 even if it is empty.
     if (log_length > 1) {
