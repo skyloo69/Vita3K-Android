@@ -60,8 +60,8 @@ import java.util.Locale;
 public class SDLActivity extends Activity implements View.OnSystemUiVisibilityChangeListener {
     private static final String TAG = "SDL";
     private static final int SDL_MAJOR_VERSION = 2;
-    private static final int SDL_MINOR_VERSION = 28;
-    private static final int SDL_MICRO_VERSION = 3;
+    private static final int SDL_MINOR_VERSION = 31;
+    private static final int SDL_MICRO_VERSION = 0;
 /*
     // Display InputType.SOURCE/CLASS of events and devices
     //
@@ -351,6 +351,8 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             errorMsgBrokenLib = e.getMessage();
         }
 
+        /*
+        * disable detect wrong version SDL since i need test and update frequenly
         if (!mBrokenLibraries) {
             String expected_version = String.valueOf(SDL_MAJOR_VERSION) + "." +
                                       String.valueOf(SDL_MINOR_VERSION) + "." +
@@ -359,8 +361,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             if (!version.equals(expected_version)) {
                 mBrokenLibraries = true;
                 errorMsgBrokenLib = "SDL C/Java version mismatch (expected " + expected_version + ", got " + version + ")";
-            }
+            } 
         }
+        */ 
 
         if (mBrokenLibraries) {
             mSingleton = this;
