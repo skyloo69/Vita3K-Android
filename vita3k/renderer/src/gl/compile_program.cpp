@@ -85,7 +85,7 @@ static SharedGLObject compile_spirv(GLenum type, const std::vector<std::uint32_t
 
     GLint log_length = 0;
     glGetShaderiv(shader->get(), GL_INFO_LOG_LENGTH, &log_length);
-    LOG_TRACE("SharedGLObject compile_spirv");
+
     // Intel driver returns an info log length of at least 1 even if it is empty.
     if (log_length > 1) {
         std::vector<GLchar> log;
@@ -122,14 +122,12 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glAttachShader(program->get(), frag_shader->get());
-    LOG_TRACE("glAttachShader : FRAG");
     glAttachShader(program->get(), vert_shader->get());
-    LOG_TRACE("glAttachShader : VERT");
-//    glLinkProgram(program->get());
-//    LOG_TRACE("glLinkProgram");
+    glLinkProgram(program->get());
+
     GLint log_length = 0;
     glGetProgramiv(program->get(), GL_INFO_LOG_LENGTH, &log_length);
-    LOG_TRACE("glGetProgramiv");
+
     // Intel driver returns an info log length of at least 1 even if it is empty.
     if (log_length > 1) {
         std::vector<GLchar> log;
@@ -147,9 +145,7 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glDetachShader(program->get(), frag_shader->get());
-    LOG_TRACE("glDetachShader : FRAG");
     glDetachShader(program->get(), vert_shader->get());
-    LOG_TRACE("glDetachShader : VERT");
 
     program_cache.emplace(hashes, program);
 
@@ -204,7 +200,6 @@ void pre_compile_program(GLState &renderer, const ShadersHash &hash) {
         const auto vert_hash_hex = convert_hash_to_hex(hash.vert);
         const SharedGLObject vert_shader = compile_shader(renderer.shaders_path, renderer.shader_version,
             vert_hash_hex, "vert", GL_VERTEX_SHADER, renderer.vertex_shader_cache, hash.vert);
-        LOG_TRACE("Compile Vertex Shader");
         if (!vert_shader) {
             return;
         }
@@ -246,10 +241,8 @@ SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmR
 
     assert(state.fragment_program);
     assert(state.vertex_program);
-    LOG_TRACE("compile_program : assert state.vertex_program");
 
     const SceGxmVertexProgram &vertex_program_gxm = *state.vertex_program.get(mem);
-         LOG_TRACE("compile_program : const SceGxmVertexProgram &vertex_program_gxm");
     const SceGxmFragmentProgram &fragment_program_gxm = *state.fragment_program.get(mem);
 
     const GLFragmentProgram &fragment_program = *reinterpret_cast<GLFragmentProgram *>(
@@ -257,7 +250,7 @@ SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmR
 
     const GLVertexProgram &vertex_program = *reinterpret_cast<GLVertexProgram *>(
         vertex_program_gxm.renderer_data.get());
-        LOG_TRACE("compile_program :  vertex_program_gxm.renderer_data.get");
+
     const ProgramHashes hashes(fragment_program.hash, vertex_program.hash);
 
     // First pass, trying to find the program, since link is costly
@@ -283,22 +276,19 @@ SharedGLObject compile_program(GLState &renderer, GLContext &context, const GxmR
 
     const SharedGLObject vertex_shader = get_or_compile_shader(vertex_program_gxm.program.get(mem), features, vertex_program.hash, renderer.vertex_shader_cache,
         GL_VERTEX_SHADER, context.shader_hints, shader_cache, spirv, maskupdate, renderer.shaders_path, renderer.shaders_log_path, renderer.shader_version, renderer.shaders_count_compiled);
-        LOG_TRACE("const SharedGLObject vertex_shader : get_or_compile_shader");
+
     if (!vertex_shader) {
         LOG_CRITICAL("Error in get/compiled vertex shader:\n{}", hex_string(vertex_program.hash));
         return SharedGLObject();
     }
 
     SharedGLObject program = compile_program(renderer.program_cache, fragment_shader, vertex_shader, hashes);
-    LOG_TRACE("program = compile_program");
-    
+
     // Save shader cache haches
     const auto shader_cache_hash_index = get_shaders_hash_index(renderer.shaders_cache_hashs, fragment_program.hash, vertex_program.hash);
-    LOG_TRACE("shader_cache_hash_index : get_shaders_hash_index");
     if (shader_cache_hash_index == renderer.shaders_cache_hashs.end()) {
         renderer.shaders_cache_hashs.push_back({ fragment_program.hash, vertex_program.hash });
         save_shaders_cache_hashs(renderer, renderer.shaders_cache_hashs);
-        LOG_TRACE("shader_cache_hash_index : renderer.shaders_cache_hashs.end()");
     }
 
     return program;
