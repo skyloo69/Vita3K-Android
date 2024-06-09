@@ -123,13 +123,13 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
 
     glAttachShader(program->get(), frag_shader->get());
     LOG_TRACE("glAttachShader : FRAG");
-//    glAttachShader(program->get(), vert_shader->get());
-//    LOG_TRACE("glAttachShader : VERT");
-    glLinkProgram(program->get());
+    glAttachShader(program->get(), vert_shader->get());
     LOG_TRACE("glAttachShader : VERT");
+//    glLinkProgram(program->get());
+//    LOG_TRACE("glLinkProgram");
     GLint log_length = 0;
     glGetProgramiv(program->get(), GL_INFO_LOG_LENGTH, &log_length);
-
+    LOG_TRACE("glGetProgramiv");
     // Intel driver returns an info log length of at least 1 even if it is empty.
     if (log_length > 1) {
         std::vector<GLchar> log;
@@ -148,8 +148,8 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
 
     glDetachShader(program->get(), frag_shader->get());
     LOG_TRACE("glDetachShader : FRAG");
-  //  glDetachShader(program->get(), vert_shader->get());
-  //  LOG_TRACE("glDetachShader : VERT");
+    glDetachShader(program->get(), vert_shader->get());
+    LOG_TRACE("glDetachShader : VERT");
 
     program_cache.emplace(hashes, program);
 
