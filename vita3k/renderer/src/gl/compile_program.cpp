@@ -122,7 +122,9 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glAttachShader(program->get(), frag_shader->get());
+    LOG_INFO("glAttachShader : FRAG");
     glAttachShader(program->get(), vert_shader->get());
+    LOG_INFO("glAttachShader : VERT");
     glLinkProgram(program->get());
 
     GLint log_length = 0;
@@ -145,7 +147,9 @@ static SharedGLObject compile_program(ProgramCache &program_cache, const SharedG
     }
 
     glDetachShader(program->get(), frag_shader->get());
+    LOG_INFO("glDetachShader : FRAG");
     glDetachShader(program->get(), vert_shader->get());
+    LOG_INFO("glDetachShader : VERT");
 
     program_cache.emplace(hashes, program);
 
@@ -200,6 +204,7 @@ void pre_compile_program(GLState &renderer, const ShadersHash &hash) {
         const auto vert_hash_hex = convert_hash_to_hex(hash.vert);
         const SharedGLObject vert_shader = compile_shader(renderer.shaders_path, renderer.shader_version,
             vert_hash_hex, "vert", GL_VERTEX_SHADER, renderer.vertex_shader_cache, hash.vert);
+        LOG_INFO("Compile Vertex Shader");
         if (!vert_shader) {
             return;
         }
