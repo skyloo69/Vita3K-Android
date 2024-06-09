@@ -41,8 +41,20 @@ public class SDLControllerManager
     private static final String TAG = "SDLControllerManager";
 
     public static void initialize() {
+        if (mJoystickHandler == null) {
+            if (Build.VERSION.SDK_INT >= 19 /* Android 4.4 (KITKAT) */) {
+                mJoystickHandler = new SDLJoystickHandler_API19();
+            } else {
+                mJoystickHandler = new SDLJoystickHandler_API16();
+            }
+        }
+
         if (mHapticHandler == null) {
-            mHapticHandler = new SDLHapticHandler_API26();
+            if (Build.VERSION.SDK_INT >= 26 /* Android 8.0 (O) */) {
+                mHapticHandler = new SDLHapticHandler_API26();
+            } else {
+                mHapticHandler = new SDLHapticHandler();
+            }
         }
     }
 
@@ -797,7 +809,7 @@ class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
 
     @Override
     public boolean supportsRelativeMouse() {
-        return (!SDLActivity.isDeXMode());
+        return (!SDLActivity.isDeXMode() || Build.VERSION.SDK_INT >= 27 /* Android 8.1 (O_MR1) */);
     }
 
     @Override
@@ -807,7 +819,7 @@ class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
 
     @Override
     public boolean setRelativeMouseEnabled(boolean enabled) {
-        if (!SDLActivity.isDeXMode()) {
+        if (!SDLActivity.isDeXMode() || Build.VERSION.SDK_INT >= 27 /* Android 8.1 (O_MR1) */) {
             if (enabled) {
                 SDLActivity.getContentView().requestPointerCapture();
             } else {
@@ -839,4 +851,4 @@ class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
         // Relative mouse in capture mode will only have relative for X/Y
         return event.getY(0);
     }
-}
+        }
