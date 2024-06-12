@@ -294,10 +294,10 @@ int main(int argc, char *argv[]) {
     LOG_INFO("OS: {}", CppCommon::Environment::OSVersion());
     LOG_INFO("CPU: {} | {} Threads | {} GHz", CppCommon::CPU::Architecture(), CppCommon::CPU::LogicalCores(), static_cast<float>(CppCommon::CPU::ClockSpeed()) / 1000.f);
 #else
-    LOG_INFO("System OS: {} {}", SDL_GetPlatform(), SDL_GetAndroidSDKVersion());
-    LOG_INFO("Number of CPU Cores: {}", SDL_GetCPUCount());
+    LOG_INFO("System OS: {}, API: {}", SDL_GetPlatform(), SDL_GetAndroidSDKVersion());
+    LOG_INFO("Total of CPU Cores: {}", SDL_GetCPUCount());
 #endif
-    LOG_INFO("Available ram memory: {} MiB", SDL_GetSystemRAM());
+    LOG_INFO("Available RAM memory: {} MiB", SDL_GetSystemRAM());
 
     app::AppRunType run_type = app::AppRunType::Unknown;
     if (cfg.run_app_path) {
