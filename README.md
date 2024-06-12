@@ -1,6 +1,11 @@
 # THIS IS NOT MAIN REPO VITA3K!
 if you find issue go to main repo, not in here
 
+# Minimum system requirement
+- Android 9, 64 bit CPU for Snapdragon variant
+- Android 11, 64 bit CPU for Mediatek / Exynos / Rockchip (kirin not supported because it's using old gpu)
+- At least 4GB of RAM
+- 6GB Free storage
 
 # Vita3K
 
