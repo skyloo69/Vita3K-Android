@@ -139,7 +139,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
 
     const char *overlay_edit_text = overlay_editing ? "Hide Gamepad Overlay" : "Modify Gamepad Overlay";
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f)
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (gmpd / 2.f));
     if (ImGui::Button(overlay_edit_text)) {
         overlay_editing = !overlay_editing;
         set_controller_overlay_state(overlay_editing ? get_overlay_display_mask(emuenv.cfg) : 0, overlay_editing);
@@ -154,8 +154,8 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         set_controller_overlay_opacity(emuenv.cfg.overlay_opacity);
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
     }
-    ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f)
-    if (overlay_editing && ImGui::Button("Reset Gamepad")) {
+    ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (gmpd / 2.f));
+     if (overlay_editing && ImGui::Button("Reset Gamepad")) {
         set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), true, true);
         emuenv.cfg.overlay_scale = 1.0f;
         emuenv.cfg.overlay_opacity = 100;
