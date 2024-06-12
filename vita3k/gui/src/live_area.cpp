@@ -1128,20 +1128,6 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::Selectable("##manual", gui.is_nav_button && (live_area_type_selected == MANUAL), ImGuiSelectableFlags_None, widget_scal_size))
                 open_manual(gui, emuenv, app_path);
         }
-
-        const auto update_pos = ImVec2((manual_exist ? 408.f : 463.f) * SCALE.x, 505.0f * SCALE.y);
-        const auto pos_scal_update = ImVec2(WINDOW_SIZE.x - update_pos.x, WINDOW_SIZE.y - update_pos.y);
-
-        const auto UPDATE_STR = "Update";
-        const auto UPDATE_STR_SCAL_SIZE = ImVec2((ImGui::CalcTextSize(UPDATE_STR).x * scal_widget_font_size) * SCALE.x, (ImGui::CalcTextSize(UPDATE_STR).y * scal_widget_font_size) * SCALE.y);
-        const ImVec2 UPDATE_WIDGET_POS_MIN(WINDOW_POS.x + pos_scal_update.x, WINDOW_POS.y + pos_scal_update.y);
-        const auto UPDATE_STR_POS = ImVec2(UPDATE_WIDGET_POS_MIN.x + ((widget_scal_size.x / 2.f) - (UPDATE_STR_SCAL_SIZE.x / 2.f)),
-            UPDATE_WIDGET_POS_MIN.y + ((widget_scal_size.x / 2.f) - (UPDATE_STR_SCAL_SIZE.y / 2.f)));
-        window_draw_list->AddRectFilled(UPDATE_WIDGET_POS_MIN, ImVec2(UPDATE_WIDGET_POS_MIN.x + widget_scal_size.x, UPDATE_WIDGET_POS_MIN.y + widget_scal_size.y), IM_COL32(3, 187, 250, 255), 12.0f * SCALE.x, ImDrawFlags_RoundCornersAll);
-        window_draw_list->AddText(gui.vita_font, 23.0f * SCALE.x, UPDATE_STR_POS, IM_COL32(255, 255, 255, 255), UPDATE_STR);
-        ImGui::SetCursorPos(pos_scal_update);
-        if (ImGui::Selectable("##update", ImGuiSelectableFlags_None, false, widget_scal_size))
-            update_app(gui, emuenv, app_path);
     }
 
     auto &lang = gui.lang.live_area.help;
