@@ -28,7 +28,6 @@ import java.util.List;
 public class HIDDeviceManager {
     private static final String TAG = "hidapi";
     private static final String ACTION_USB_PERMISSION = "org.libsdl.app.USB_PERMISSION";
-    static final String INTENT_ACTION_GRANT_USB = BuildConfig.APPLICATION_ID + ".GRANT_USB";
 
     private static HIDDeviceManager sManager;
     private static int sManagerRefCount = 0;
@@ -583,8 +582,8 @@ public class HIDDeviceManager {
             try {
                 final int FLAG_MUTABLE = 0x02000000; // PendingIntent.FLAG_MUTABLE, but don't require SDK 31
                 int flags;
-                if (Build.VERSION.SDK_INT >= 33 /* Android 12.0 (S) */) {
-                    Intent intent = new Intent(HIDDeviceManager.INTENT_ACTION_GRANT_USB);
+                if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
+                    Intent intent = new Intent(HIDDeviceManager.ACTION_USB_PERMISSION);
                     intent.setPackage(getActivity().getPackageName());
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, intent, PendingIntent.FLAG_MUTABLE));
                     return false;
