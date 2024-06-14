@@ -22,6 +22,7 @@
 #include <touch/functions.h>
 #include <touch/state.h>
 #include <touch/touch.h>
+
 #include <SDL_events.h>
 
 #include <cstring>
