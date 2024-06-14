@@ -301,6 +301,7 @@ int touch_get(const SceUID thread_id, EmuEnvState &emuenv, const SceUInt32 &port
         else
             nb_returned_data = 0;
     } else {
+        const Config& cfg;
         uint64_t vblank_count;
         if (emuenv.display.vblank_count <= last_vcount[port_idx]) {
             // sceTouchRead is blocking, wait for the next vsync for the buffer to be updated
