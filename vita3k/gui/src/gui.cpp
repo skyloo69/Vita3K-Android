@@ -926,4 +926,15 @@ void ScrollWhenDragging() {
     }
 }
 
+void SetTooltipEx(const char *tooltip) {
+    if (ImGui::IsItemHovered()) {
+        if (!ImGui::BeginTooltip())
+            return;
+        ImGui::PushTextWrapPos(ImGui::GetIO().DisplaySize.x - ImGui::GetStyle().WindowPadding.x * 2);
+        ImGui::Text("%s", tooltip);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 } // namespace ImGui
