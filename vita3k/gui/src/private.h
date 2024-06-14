@@ -76,5 +76,6 @@ void draw_trophy_collection(GuiState &gui, EmuEnvState &emuenv);
 void draw_user_management(GuiState &gui, EmuEnvState &emuenv);
 
 void reevaluate_code(GuiState &gui, EmuEnvState &emuenv);
+void SetTooltipEx(const char *tooltip);
 
 } // namespace gui
