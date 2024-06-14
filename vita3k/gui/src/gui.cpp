@@ -912,6 +912,17 @@ void draw_ui(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::PopFont();
 }
 
+void SetTooltipEx(const char *tooltip) {
+    if (ImGui::IsItemHovered()) {
+        if (!ImGui::BeginTooltip())
+            return;
+        ImGui::PushTextWrapPos(ImGui::GetIO().DisplaySize.x - ImGui::GetStyle().WindowPadding.x * 2);
+        ImGui::Text("%s", tooltip);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
 } // namespace gui
 
 namespace ImGui {
@@ -923,17 +934,6 @@ void ScrollWhenDragging() {
     if (g.HoveredWindow == window && ImGui::IsMouseDragging(0)) {
         ImGui::SetScrollY(window, window->Scroll.y - io.MouseDelta.y);
         ImGui::SetActiveID(0, window);
-    }
-}
-
-void SetTooltipEx(const char *tooltip) {
-    if (ImGui::IsItemHovered()) {
-        if (!ImGui::BeginTooltip())
-            return;
-        ImGui::PushTextWrapPos(ImGui::GetIO().DisplaySize.x - ImGui::GetStyle().WindowPadding.x * 2);
-        ImGui::Text("%s", tooltip);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
     }
 }
 
