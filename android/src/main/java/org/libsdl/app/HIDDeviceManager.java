@@ -66,13 +66,13 @@ public class HIDDeviceManager {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)) {
-                UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice usbDevice = intent.arcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceAttached(usbDevice);
             } else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)) {
-                UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice usbDevice = intent.arcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDeviceDetached(usbDevice);
             } else if (action.equals(HIDDeviceManager.ACTION_USB_PERMISSION)) {
-                UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice usbDevice = intent.arcelableExtra(UsbManager.EXTRA_DEVICE);
                 handleUsbDevicePermission(usbDevice, intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false));
             }
         }
@@ -84,7 +84,7 @@ public class HIDDeviceManager {
             String action = intent.getAction();
             // Bluetooth device was connected. If it was a Steam Controller, handle it
             if (action.equals(BluetoothDevice.ACTION_ACL_CONNECTED)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                BluetoothDevice device = intent.arcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.d(TAG, "Bluetooth device connected: " + device);
 
                 if (isSteamController(device)) {
@@ -94,7 +94,7 @@ public class HIDDeviceManager {
 
             // Bluetooth device was disconnected, remove from controller manager (if any)
             if (action.equals(BluetoothDevice.ACTION_ACL_DISCONNECTED)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                BluetoothDevice device = intent.arcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 Log.d(TAG, "Bluetooth device disconnected: " + device);
 
                 disconnectBluetoothDevice(device);
@@ -590,7 +590,7 @@ public class HIDDeviceManager {
 
                 if (Build.VERSION.SDK_INT >= 33 /* Android 14.0 (U) */) {
                     Intent intent = new Intent(HIDDeviceManager.ACTION_USB_PERMISSION);
-                    intent.setPackage(getPackageName());
+                    intent.setPackage(mContext.getPackageName());
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, intent, flags));
                 } else {
                     mUsbManager.requestPermission(usbDevice, PendingIntent.getBroadcast(mContext, 0, new Intent(HIDDeviceManager.ACTION_USB_PERMISSION), flags));
