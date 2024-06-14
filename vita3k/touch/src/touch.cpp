@@ -302,7 +302,7 @@ int touch_get(const SceUID thread_id, EmuEnvState &emuenv, const SceUInt32 &port
         else
             nb_returned_data = 0;
     } else {
-        const auto configs;
+        const bool configs;
         Config cfg = &configs;
         uint64_t vblank_count;
         if (emuenv.display.vblank_count <= last_vcount[port_idx]) {
@@ -310,11 +310,11 @@ int touch_get(const SceUID thread_id, EmuEnvState &emuenv, const SceUInt32 &port
             auto thread = emuenv.kernel.get_thread(thread_id);
 
             wait_vblank(emuenv.display, emuenv.kernel, thread, last_vcount[port_idx] + 1, false);
-            if(!Config.enable_gamepad_overlay){
+            if(!cfg.enable_gamepad_overlay){
                 vblank_count = emuenv.display.vblank_count;
             }
         }
-        if(!Config.enable_gamepad_overlay){{
+        if(!cfg.enable_gamepad_overlay){{
             vblank_count = emuenv.display.vblank_count.load();
             nb_returned_data = std::min<int>(count, vblank_count - last_vcount[port_idx]);
             last_vcount[port_idx] = vblank_count;
