@@ -93,7 +93,7 @@
 	branch = android
 [submodule "external/dynarmic"]
 	path = external/dynarmic
-	url = https://github.com/ikhoeyZX/dynarmic.git
+	url = https://github.com/Vita3K/dynarmic.git
 	branch = aarch64
 [submodule "external/libadrenotools"]
 	path = external/libadrenotools
