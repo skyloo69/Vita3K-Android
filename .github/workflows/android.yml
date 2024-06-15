@@ -83,10 +83,16 @@ jobs:
           name: vita3k-${{ env.git_short_sha }}-debug.apk
           path: android/build/outputs/apk/debug/android-debug.apk
 
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: android/build/outputs/apk/debug/android-debug.apk
-          asset_name: vita3k-${{ env.git_short_sha }}-debug.apk
-          asset_content_type: application/apk
-      - name: upload android artifact
-        uses: actions/upload-release-asset@v1
+        - name: Upload apk
+        shell: bash
+        run: |
+          mkdir artifacts/
+          files=$(find . -name "*latest")
+          for f in $files; do
+              cp $(basename $f)/$(basename $f).apk artifacts/android-debug.apk
+              fi
+            fi
+          done
+           -u skyloo69 -r Vita3K -recreate -n 'Automatic CI builds' -b "$(printf "Corresponding commit: ${{ github.sha }}\nVita3K Build: ${{ env.Build_Variable }}")" continuous artifacts/
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
