@@ -38,7 +38,7 @@ jobs:
 
       - name: Decode Keystore
         env:
-          KEYSTORE_ENCODED: ${{ github.workspace }}
+          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE }}
         run: echo $KEYSTORE_ENCODED | base64 --decode > "/home/runner/keystore.jks"
 
       - name: Setup Android SDK
