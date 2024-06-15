@@ -76,7 +76,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: vita3k-${{ env.git_short_sha }}-release.apk
-          path: android/build/outputs/apk/release/android-debug.apk
+          path: android/build/outputs/apk/debug/android-debug.apk
 
       - uses: actions/upload-artifact@v4
         with:
