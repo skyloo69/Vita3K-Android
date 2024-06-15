@@ -82,4 +82,3 @@ jobs:
         with:
           name: vita3k-${{ env.git_short_sha }}-debug.apk
           path: android/build/outputs/apk/debug/android-debug.apk
-          -u skyloo69 -r Vita3K -recreate -n 'Automatic CI builds' -b "$(printf "Corresponding commit: ${{ github.sha }}\nVita3K Build: ${{ env.Build_Variable }}")" continuous artifacts/
