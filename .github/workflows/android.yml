@@ -83,8 +83,6 @@ jobs:
           name: vita3k-${{ env.git_short_sha }}-debug.apk
           path: android/build/outputs/apk/debug/android-debug.apk
 
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: android/build/outputs/apk/debug/android-debug.apk
