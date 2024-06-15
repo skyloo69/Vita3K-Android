@@ -38,18 +38,18 @@ jobs:
 
       - name: Decode Keystore
         env:
-          KEYSTORE_ENCODED: ${{ secrets.KEYSTORE }}
-        run: echo $KEYSTORE_ENCODED | base64 --decode > "/home/runner/keystore.jks"
+          KEYSTORE_ENCODED: ${{ github.workspace }}
+        run: echo $KEYSTORE_ENCODED | base64 --decode > "keystore.jks"
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v2
   
       - name: Gradle build
         env:
-          SIGNING_STORE_PATH: "/home/runner/keystore.jks"
-          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PATH: "keystore.jks"
+          SIGNING_STORE_PASSWORD: ${{ github.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ github.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ github.SIGNING_KEY_PASSWORD }}
         run: |
           cp -r data android/assets
           cp -r lang android/assets
