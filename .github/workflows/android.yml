@@ -90,9 +90,6 @@ jobs:
           files=$(find . -name "*latest")
           for f in $files; do
               cp $(basename $f)/$(basename $f).apk artifacts/android-debug.apk
-              fi
-            fi
-          done
            -u skyloo69 -r Vita3K -recreate -n 'Automatic CI builds' -b "$(printf "Corresponding commit: ${{ github.sha }}\nVita3K Build: ${{ env.Build_Variable }}")" continuous artifacts/
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
