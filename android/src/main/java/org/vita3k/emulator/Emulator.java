@@ -206,11 +206,11 @@ public class Emulator extends SDLActivity
             int result_fd = -1;
             if(resultCode == RESULT_OK){
                 Uri result_uri = data.getData();
-                try (AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r")){
-                    asset_fd = asset_fd.normalize();
-                    if (asset_fd.startsWith("/data"))
+                result_uri = result_uri.normalize();
+                if (result_uri.startsWith("/data"))
                         throw new SecurityException();
-                    
+                
+                try (AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r")){
                     // if the file is less than 4 KB, make a temporary copy
                     if(asset_fd.getLength() >= 4*1024) {
                         try (ParcelFileDescriptor file_descr = getContentResolver().openFileDescriptor(result_uri, "r")) {
