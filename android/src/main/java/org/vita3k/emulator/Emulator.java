@@ -206,9 +206,10 @@ public class Emulator extends SDLActivity
             int result_fd = -1;
             if(resultCode == RESULT_OK){
                 Uri result_uri = data.getData();
-                result_uri = result_uri.normalize();
-                if (result_uri.startsWith("/data"))
-                        throw new SecurityException();
+                java.nio.file.Path normalized =
+                    java.nio.file.FileSystems.getDefault().getPath(result_uri).normalize();
+                if (normalized.startsWith("/data"))
+                   throw new SecurityException();
                 
                 try (AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r")){
                     // if the file is less than 4 KB, make a temporary copy
