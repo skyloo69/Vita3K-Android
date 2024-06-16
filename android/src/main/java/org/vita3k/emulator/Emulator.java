@@ -207,6 +207,10 @@ public class Emulator extends SDLActivity
             if(resultCode == RESULT_OK){
                 Uri result_uri = data.getData();
                 try (AssetFileDescriptor asset_fd = getContentResolver().openAssetFileDescriptor(result_uri, "r")){
+                    asset_fd = asset_fd.normalize();
+                    if (asset_fd.startsWith("/data"))
+                        throw new SecurityException();
+                    
                     // if the file is less than 4 KB, make a temporary copy
                     if(asset_fd.getLength() >= 4*1024) {
                         try (ParcelFileDescriptor file_descr = getContentResolver().openFileDescriptor(result_uri, "r")) {
