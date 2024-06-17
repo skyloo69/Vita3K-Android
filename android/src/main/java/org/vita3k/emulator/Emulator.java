@@ -206,9 +206,9 @@ public class Emulator extends SDLActivity
             int result_fd = -1;
             if(resultCode == RESULT_OK){
                 Uri result_uri = data.getData();
-                String resutltst = result_uri.toString();
+                result_path = result_uri.toString();
                 java.nio.file.Path normalized =
-                    java.nio.file.FileSystems.getDefault().getPath(resutltst).normalize();
+                    java.nio.file.FileSystems.getDefault().getPath(result_path).normalize();
                 if (normalized.startsWith("/data"))
                    throw new SecurityException();
                 
