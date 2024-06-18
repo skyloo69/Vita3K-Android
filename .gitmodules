@@ -94,7 +94,6 @@
 [submodule "external/dynarmic"]
 	path = external/dynarmic
 	url = https://github.com/ikhoeyZX/dynarmic.git
-	branch = aarch64
 [submodule "external/libadrenotools"]
 	path = external/libadrenotools
 	url = https://github.com/bylaws/libadrenotools.git
