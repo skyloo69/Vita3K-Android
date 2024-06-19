@@ -648,7 +648,7 @@ struct LangState {
             { "sensor_settings", "Built-In Sensor settings" },
             { "sensor_enable", "Enable HW acceleration and gyroscope" },
             { "sensor_emu_pos", "Emulate acceleration position sensor" },
-            { "sensor_degrees", "degrees" },
+            { "sensors_description", "Enable built in sensor or disable sensor and lock specific sensor position" },
             { "custom_config_settings", "Custom Config Settings" },
             { "clear_custom_config", "Clear Custom Config" }
         };
