@@ -6,8 +6,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
 	# this file must be included before everything else
 	include("cmake/vcpkg_android.cmake")
 endif()
-set(CMAKE_PROJECT_NAME Vita3K)
-project(${CMAKE_PROJECT_NAME})
+
+project(Vita3K)
 
 set(USE_UNICORN FALSE)
 set(USE_DYNARMIC TRUE)
