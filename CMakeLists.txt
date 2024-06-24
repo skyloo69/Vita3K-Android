@@ -6,8 +6,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
 	# this file must be included before everything else
 	include("cmake/vcpkg_android.cmake")
 endif()
-
-project(Vita3K)
+set(CMAKE_PROJECT_NAME Vita3K)
+project(${CMAKE_PROJECT_NAME})
 
 set(USE_UNICORN FALSE)
 set(USE_DYNARMIC TRUE)
@@ -24,7 +24,6 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 12.0)
 if(ANDROID)
     set(CMAKE_SYSROOT "")
     set(CMAKE_OSX_SYSROOT "")
-    target_link_options(Vita3K PRIVATE "-Wl,-z,max-page-size=16384")
     set_property(GLOBAL
     PROPERTY
     NO_SYSTEM_FROM_IMPORTED ON
