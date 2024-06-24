@@ -140,7 +140,7 @@ add_subdirectory(vkutil)
 if(ANDROID)
 	add_library(vita3k SHARED main.cpp interface.cpp performance.cpp)
 	target_link_libraries(vita3k PRIVATE sdl2 android)
-
+        target_link_options(vita3k PRIVATE "-Wl,-z,max-page-size=16384")
 	if(CMAKE_BUILD_TYPE STREQUAL "Release")
 		# we need to exclude all symbols except SDL
 		set(LIBS_TO_EXCLUDE
