@@ -444,7 +444,7 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
         switch (base_format) {
         case SCE_GXM_TEXTURE_BASE_FORMAT_P4:
         case SCE_GXM_TEXTURE_BASE_FORMAT_P8:
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             if (base_format == SCE_GXM_TEXTURE_BASE_FORMAT_P8) {
                 palette_texture_to_rgba_8(reinterpret_cast<uint32_t *>(texture_data_decompressed.data()),
                     static_cast<const uint8_t *>(pixels), pixels_per_stride, memory_height, get_texture_palette(gxm_texture, mem));
@@ -464,7 +464,7 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
             if (!is_swizzled)
                 LOG_ERROR_ONCE("Unhandled non-swizzled PVRT format, please report it to the developers");
 
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             // this actually also unswizzles the texture
             decompress_compressed_texture(base_format, texture_data_decompressed.data(), pixels, pixels_per_stride, memory_height);
             bytes_per_pixel = 4;
@@ -474,7 +474,7 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
             break;
         case SCE_GXM_TEXTURE_BASE_FORMAT_U8U3U3U2:
             // Convert U8U3U3U2 to U8U8U8U8
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             convert_U8U3U3U2_to_U8U8U8U8(texture_data_decompressed.data(), pixels, pixels_per_stride, memory_height);
             pixels = texture_data_decompressed.data();
             upload_format = SCE_GXM_TEXTURE_BASE_FORMAT_U8U8U8U8;
@@ -484,7 +484,7 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
             // this format is supported on all GPUs with vulkan
             if (is_vulkan)
                 break;
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 6);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 6));
             decompress_packed_float_e5m9m9m9(base_format, texture_data_decompressed.data(), pixels, width, memory_height);
             pixels = texture_data_decompressed.data();
             break;
@@ -492,13 +492,13 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
             // don't change what openGL is doing (which is completely wrong)
             if (!is_vulkan)
                 break;
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 8);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 8));
             convert_u2f10f10f10_to_f16f16f16f16(texture_data_decompressed.data(), pixels, pixels_per_stride, memory_height, fmt);
             pixels = texture_data_decompressed.data();
             upload_format = SCE_GXM_TEXTURE_BASE_FORMAT_F16F16F16F16;
             break;
         case SCE_GXM_TEXTURE_BASE_FORMAT_X8U24:
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             if (is_vulkan) {
                 // d24_u8 or x8_d24 is not supported on all GPUs (thanks AMD)
                 convert_x8u24_to_f32(texture_data_decompressed.data(), pixels, pixels_per_stride, memory_height, fmt);
@@ -513,14 +513,14 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
             break;
         case SCE_GXM_TEXTURE_BASE_FORMAT_F32M:
             // Convert F32M to F32
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             convert_f32m_to_f32(texture_data_decompressed.data(), pixels, pixels_per_stride, memory_height);
             pixels = texture_data_decompressed.data();
             upload_format = SCE_GXM_TEXTURE_BASE_FORMAT_F32;
             break;
         case SCE_GXM_TEXTURE_BASE_FORMAT_YUV420P2:
         case SCE_GXM_TEXTURE_BASE_FORMAT_YUV420P3:
-            texture_data_decompressed.resize(pixels_per_stride * memory_height * 4);
+            texture_data_decompressed.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * 4));
             yuv420_texture_to_rgb(texture_data_decompressed.data(),
                 static_cast<const uint8_t *>(pixels), pixels_per_stride, memory_height, layout_width, layout_height,
                 base_format == SCE_GXM_TEXTURE_BASE_FORMAT_YUV420P3);
@@ -534,7 +534,7 @@ void TextureCache::upload_texture(const SceGxmTexture &gxm_texture, MemState &me
 
         if (texture_type != SCE_GXM_TEXTURE_LINEAR && texture_type != SCE_GXM_TEXTURE_LINEAR_STRIDED && !gxm::is_pvrt_format(base_format)) {
             // Convert data to linear layout
-            texture_pixels_lineared.resize(pixels_per_stride * memory_height * bytes_per_pixel);
+            texture_pixels_lineared.resize(static_cast<unsigned long>(pixels_per_stride * memory_height * bytes_per_pixel));
 
             if (is_swizzled && gxm::is_bcn_format(base_format))
                 // just unswizzle the blocks
