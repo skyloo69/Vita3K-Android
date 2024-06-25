@@ -799,7 +799,7 @@ uint32_t PVRTDecompressPVRTC(const void *pCompressedData, uint32_t Do2bitMode, u
 
     // If the dimensions aren't correct, we need to create a new buffer instead of just using the provided one, as the buffer will overrun otherwise.
     if ((XTrueDim != XDim) || (YTrueDim != YDim)) {
-        pTempDataVector.resize(XTrueDim * YTrueDim);
+        pTempDataVector.resize(static_cast<unsigned long>(XTrueDim * YTrueDim));
         pDecompressedData = pTempDataVector.data();
     }
 
@@ -942,7 +942,7 @@ uint32_t PVRTDecompressETC(const void *pSrcData, uint32_t x, uint32_t y, void *p
 
     if (x < ETC_MIN_TEXWIDTH || y < ETC_MIN_TEXHEIGHT) {
         // decompress into a buffer big enough to take the minimum size
-        char *pTempBuffer = static_cast<char *>(malloc(std::max<uint32_t>(x, ETC_MIN_TEXWIDTH) * std::max<uint32_t>(y, ETC_MIN_TEXHEIGHT) * 4));
+        char *pTempBuffer = static_cast<char *>(malloc(std::max<unsigned long>(x, ETC_MIN_TEXWIDTH) * std::max<unsigned long>(y, ETC_MIN_TEXHEIGHT) * 4));
         i32read = ETCTextureDecompress(pSrcData, std::max<uint32_t>(x, ETC_MIN_TEXWIDTH), std::max<uint32_t>(y, ETC_MIN_TEXHEIGHT), pTempBuffer, nMode);
 
         for (uint32_t i = 0; i < y; i++) {
