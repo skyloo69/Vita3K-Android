@@ -170,10 +170,10 @@ std::vector<int16_t> PlayerState::receive_audio() {
         last_sample_count = frame->nb_samples;
         last_sample_rate = frame->sample_rate;
 
-        data.resize(frame->nb_samples * frame->ch_layout.nb_channels);
+        data.resize(static_cast<uint32_t>(frame->nb_samples * frame->ch_layout.nb_channels));
 
-        for (int a = 0; a < frame->nb_samples; a++) {
-            for (int b = 0; b < frame->ch_layout.nb_channels; b++) {
+        for (uint32_t a = 0; a < frame->nb_samples; a++) {
+            for (uint32_t b = 0; b < frame->ch_layout.nb_channels; b++) {
                 auto *frame_data = reinterpret_cast<float *>(frame->data[b]);
                 float current_sample = frame_data[a];
                 int16_t pcm_sample = current_sample * INT16_MAX;
@@ -220,7 +220,7 @@ std::vector<uint8_t> PlayerState::receive_video() {
         last_timestamp = frame->best_effort_timestamp;
 
         data.resize(H264DecoderState::buffer_size(
-            { { static_cast<uint32_t>(video_context->width), static_cast<uint32_t>(video_context->height) } }));
+            { { static_cast<uint16_t>(video_context->width), static_cast<uint16_t>(video_context->height) } }));
         copy_yuv_data_from_frame(frame, data.data(), frame->width, frame->height, false);
 
         break;
