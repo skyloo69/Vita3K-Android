@@ -4052,8 +4052,8 @@ EXPORT(int, sceGxmSetUniformDataF, void *uniformBuffer, const SceGxmProgramParam
             comp_size = 4;
         }
 
-        size = componentCount * comp_size;
-        offset = parameter->resource_index * sizeof(float) + componentOffset * comp_size;
+        size = static_cast<uint32_t>(componentCount * comp_size);
+        offset = parameter->resource_index * sizeof(float) + static_cast<uint32_t>(componentOffset * comp_size);
 
         memcpy(static_cast<uint8_t *>(uniformBuffer) + offset, source, size);
     } else {
@@ -4084,7 +4084,7 @@ EXPORT(int, sceGxmSetUniformDataF, void *uniformBuffer, const SceGxmProgramParam
         int component_left_to_copy = componentCount;
 
         while (component_left_to_copy > 0) {
-            memcpy(dest, source, component_to_copy_remain_per_elem * comp_size);
+            memcpy(dest, source, static_cast<uint32_t>(component_to_copy_remain_per_elem * comp_size));
 
             // Add and align destination
             dest += comp_size * component_to_copy_remain_per_elem + align_bytes;
