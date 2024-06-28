@@ -42,7 +42,7 @@ static long impl_cubeb_audio_callback(cubeb_stream *stream, void *user_data, con
 
         AudioBuffer &audio_buffer = port->audio_buffers[port->next_audio_buffer];
         // compute the number of bytes we can copy from this buffer to the output
-        const int32_t bytes_to_copy = std::min(bytes_to_give - bytes_given, port->len_bytes - audio_buffer.buffer_position);
+        const int bytes_to_copy = std::min(bytes_to_give - bytes_given, port->len_bytes - audio_buffer.buffer_position);
         memcpy(&output_buffer[bytes_given], &audio_buffer.buffer[audio_buffer.buffer_position], bytes_to_copy);
         audio_buffer.buffer_position += bytes_to_copy;
 
