@@ -348,7 +348,7 @@ uint32_t Rack::get_required_memspace_size(MemState &mem, SceNgsRackDescription *
         // multiply by 2 because there are 2 copies of each buffer
         buffer_size = 2 * get_voice_definition_size(description->definition.get(mem));
 
-    return sizeof(ngs::Rack) + description->voice_count * (sizeof(ngs::Voice) + buffer_size + description->patches_per_output * description->definition.get(mem)->output_count * sizeof(ngs::Patch));
+    return sizeof(ngs::Rack) + description->voice_count * (sizeof(ngs::Voice) + buffer_size + static_cast<uint32_t>(description->patches_per_output * description->definition.get(mem)->output_count) * sizeof(ngs::Patch));
 }
 
 bool init(State &ngs, MemState &mem) {
