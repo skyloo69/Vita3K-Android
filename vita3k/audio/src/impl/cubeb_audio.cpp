@@ -31,8 +31,8 @@ static long impl_cubeb_audio_callback(cubeb_stream *stream, void *user_data, con
     CubebAudioOutPort *port = static_cast<CubebAudioOutPort *>(user_data);
     uint8_t *output_buffer = static_cast<uint8_t *>(output);
 
-    int bytes_given = 0;
-    const int bytes_to_give = nframes * port->spec.channels * sizeof(uint16_t);
+    uint32_t bytes_given = 0;
+    const int32_t bytes_to_give = nframes * port->spec.channels * sizeof(uint16_t);
     while (bytes_given < bytes_to_give) {
         if (port->nb_buffers_ready == 0) {
             // no data available, should we wait for it or return nothing?
@@ -42,7 +42,7 @@ static long impl_cubeb_audio_callback(cubeb_stream *stream, void *user_data, con
 
         AudioBuffer &audio_buffer = port->audio_buffers[port->next_audio_buffer];
         // compute the number of bytes we can copy from this buffer to the output
-        const int bytes_to_copy = std::min(bytes_to_give - bytes_given, port->len_bytes - audio_buffer.buffer_position);
+        const int32_t bytes_to_copy = std::min(bytes_to_give - bytes_given, port->len_bytes - audio_buffer.buffer_position);
         memcpy(&output_buffer[bytes_given], &audio_buffer.buffer[audio_buffer.buffer_position], bytes_to_copy);
         audio_buffer.buffer_position += bytes_to_copy;
 
@@ -115,7 +115,7 @@ AudioOutPortPtr CubebAudioAdapter::open_port(int nb_channels, int freq, int nb_s
         return nullptr;
     }
 
-    port->len_bytes = nb_sample * nb_channels * sizeof(uint16_t);
+    port->len_bytes = static_cast<uint32_t>(nb_sample * nb_channels) * sizeof(uint16_t);
 
     // allocate enough buffers to be able to satisfy a callback (+1 to make sure one buffer can be ready)
     const int nb_buffers = (latency + nb_sample - 1) / nb_sample + 1;
