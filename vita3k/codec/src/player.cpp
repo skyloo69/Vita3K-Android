@@ -35,7 +35,7 @@ uint64_t PlayerState::get_framerate_microseconds() {
 
 DecoderSize PlayerState::get_size() {
     if (video_context)
-        return { { static_cast<uint32_t>(video_context->width), static_cast<uint32_t>(video_context->height) } };
+        return { { static_cast<uint16_t>(video_context->width), static_cast<uint16_t>(video_context->height) } };
 
     return {};
 }
