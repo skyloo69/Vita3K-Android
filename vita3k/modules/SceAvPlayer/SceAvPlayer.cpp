@@ -346,7 +346,7 @@ EXPORT(bool, sceAvPlayerGetAudioData, SceUID player_handle, SceAvPlayerFrameInfo
     frame_info->timestamp = player_info->player.last_timestamp;
     frame_info->stream_details.audio.channels = player_info->player.last_channels;
     frame_info->stream_details.audio.sample_rate = player_info->player.last_sample_rate;
-    frame_info->stream_details.audio.size = player_info->player.last_channels * player_info->player.last_sample_count * sizeof(int16_t);
+    frame_info->stream_details.audio.size = static_cast<uint32_t>(player_info->player.last_channels * player_info->player.last_sample_count) * sizeof(int16_t);
     frame_info->data = buffer;
 
     strcpy(frame_info->stream_details.audio.language, "ENG");
@@ -375,7 +375,7 @@ EXPORT(uint32_t, sceAvPlayerGetStreamInfo, SceUID player_handle, SceUInt32 strea
         stream_info->stream_type = MediaType::AUDIO;
         stream_info->stream_details.audio.channels = player_info->player.last_channels;
         stream_info->stream_details.audio.sample_rate = player_info->player.last_sample_rate;
-        stream_info->stream_details.audio.size = player_info->player.last_channels * player_info->player.last_sample_count * sizeof(int16_t);
+        stream_info->stream_details.audio.size = static_cast<uint32_t>(player_info->player.last_channels * player_info->player.last_sample_count) * sizeof(int16_t);
         strcpy(stream_info->stream_details.audio.language, "ENG");
     } else {
         return SCE_AVPLAYER_ERROR_INVALID_ARGUMENT;
