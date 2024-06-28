@@ -137,7 +137,7 @@ AudioOutPortPtr AudioState::open_port(int nb_channels, int freq, int nb_sample) 
 
         AudioOutPortPtr port = std::make_shared<AudioOutPort>();
         port->len_microseconds = (nb_sample * 1'000'000ULL) / freq;
-        port->len_bytes = nb_sample * nb_channels * sizeof(int16_t);
+        port->len_bytes = static_cast<uint32_t>(nb_sample * nb_channels) * sizeof(uint16_t);
         port->stream = stream;
 
         return port;
