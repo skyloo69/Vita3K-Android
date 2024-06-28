@@ -544,7 +544,7 @@ static void take_screenshot(EmuEnvState &emuenv) {
     uint32_t width, height;
     std::vector<uint32_t> frame = emuenv.renderer->dump_frame(emuenv.display, width, height);
 
-    if (frame.empty() || frame.size() != width * height) {
+    if (frame.empty() || frame.size() != static_cast<uint32_t>(width * height)) {
         LOG_ERROR("Failed to take screenshot");
         return;
     }
