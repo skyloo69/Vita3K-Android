@@ -89,7 +89,7 @@ void Atrac9DecoderState::load_state(const Atrac9DecoderSavedState *src) {
 bool Atrac9DecoderState::send(const uint8_t *data, uint32_t size) {
     Atrac9CodecInfo *info = static_cast<Atrac9CodecInfo *>(atrac9_info);
 
-    uint32_t decode_used = 0;
+    int decode_used = 0;
 
     const int res = Atrac9Decode(decoder_handle, data, reinterpret_cast<short *>(result.data()), &decode_used);
     if (res != At9Status::ERR_SUCCESS) {
