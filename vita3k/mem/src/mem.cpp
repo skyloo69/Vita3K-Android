@@ -39,7 +39,7 @@
 #endif
 
 constexpr uint32_t STANDARD_PAGE_SIZE = KiB(4);
-constexpr size_t TOTAL_MEM_SIZE = GiB(4);
+constexpr size_t TOTAL_MEM_SIZE = GiB(3);
 constexpr bool LOG_PROTECT = false;
 constexpr bool PAGE_NAME_TRACKING = false;
 
@@ -66,7 +66,7 @@ bool init(MemState &state, const bool use_page_table) {
     GetSystemInfo(&system_info);
     state.page_size = system_info.dwPageSize;
 #else
-    state.page_size = static_cast<int>(sysconf(_SC_PAGESIZE));
+    state.page_size = static_cast<uint32_t>(sysconf(_SC_PAGESIZE));
 #endif
     state.page_size = std::max(STANDARD_PAGE_SIZE, state.page_size);
 
@@ -174,7 +174,7 @@ static Address alloc_inner(MemState &state, uint32_t start_page, int page_count,
             return 0;
     }
 
-    const int size = page_count * state.page_size;
+    const uint32_t size = page_count * state.page_size;
     const Address addr = page_num * state.page_size;
     uint8_t *const memory = &state.memory[addr];
 
@@ -497,12 +497,12 @@ void free(MemState &state, Address address) {
     uint8_t *const memory = &state.memory[page_num * state.page_size];
 
 #ifdef WIN32
-    const BOOL ret = VirtualFree(memory, page.size * state.page_size, MEM_DECOMMIT);
+    const BOOL ret = VirtualFree(memory, static_cast<size_t>(page.size * state.page_size), MEM_DECOMMIT);
     LOG_CRITICAL_IF(!ret, "VirtualFree failed: {}", get_error_msg());
 #else
-    int ret = mprotect(memory, page.size * state.page_size, PROT_NONE);
+    int ret = mprotect(memory, static_cast<size_t>(page.size * state.page_size), PROT_NONE);
     LOG_CRITICAL_IF(ret == -1, "mprotect failed: {}", get_error_msg());
-    ret = madvise(memory, page.size * state.page_size, MADV_DONTNEED);
+    ret = madvise(memory, static_cast<size_t>(page.size * state.page_size), MADV_DONTNEED);
     LOG_CRITICAL_IF(ret == -1, "madvise failed: {}", get_error_msg());
 #endif
 }
