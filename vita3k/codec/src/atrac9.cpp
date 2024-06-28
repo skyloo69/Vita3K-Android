@@ -89,7 +89,7 @@ void Atrac9DecoderState::load_state(const Atrac9DecoderSavedState *src) {
 bool Atrac9DecoderState::send(const uint8_t *data, uint32_t size) {
     Atrac9CodecInfo *info = static_cast<Atrac9CodecInfo *>(atrac9_info);
 
-    int decode_used = 0;
+    uint32_t decode_used = 0;
 
     const int res = Atrac9Decode(decoder_handle, data, reinterpret_cast<short *>(result.data()), &decode_used);
     if (res != At9Status::ERR_SUCCESS) {
@@ -114,7 +114,7 @@ bool Atrac9DecoderState::receive(uint8_t *data, DecoderSize *size) {
     Atrac9CodecInfo *info = static_cast<Atrac9CodecInfo *>(atrac9_info);
 
     if (data) {
-        memcpy(data, result.data(), info->frameSamples * info->channels * sizeof(uint16_t));
+        memcpy(data, result.data(), static_cast<uint32_t>(info->frameSamples * info->channels) * sizeof(uint16_t));
     }
 
     if (size) {
@@ -137,7 +137,7 @@ Atrac9DecoderState::Atrac9DecoderState(uint32_t config_data)
     atrac9_info = info;
     Atrac9GetCodecInfo(decoder_handle, info);
 
-    result.resize(info->frameSamples * info->channels * sizeof(uint16_t));
+    result.resize(static_cast<uint32_t>(info->frameSamples * info->channels) * sizeof(uint16_t));
 
     superframe_frame_idx = 0;
     superframe_data_left = info->superframeSize;
