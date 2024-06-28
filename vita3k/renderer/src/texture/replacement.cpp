@@ -227,7 +227,7 @@ void TextureCache::export_texture_impl(SceGxmTextureBaseFormat base_format, uint
             && base_format != SCE_GXM_TEXTURE_BASE_FORMAT_U8U8
             && base_format != SCE_GXM_TEXTURE_BASE_FORMAT_U8U8U8
             && base_format != SCE_GXM_TEXTURE_BASE_FORMAT_U8U8U8U8)
-            converted_data.resize(pixels_per_stride * align(height, 4) * nb_comp);
+            converted_data.resize(static_cast<uint32_t>(pixels_per_stride * align(height, 4) * nb_comp));
 
         std::array<uint8_t, 4> *data_dst4 = reinterpret_cast<std::array<uint8_t, 4> *>(converted_data.data());
         std::array<uint8_t, 3> *data_dst3 = reinterpret_cast<std::array<uint8_t, 3> *>(converted_data.data());
@@ -359,8 +359,9 @@ void TextureCache::export_texture_impl(SceGxmTextureBaseFormat base_format, uint
             // we need to convert srgb to linear
             bool cant_overwrite_data = data_unswizzled.empty() && converted_data.empty() && data_comp3.empty();
             if (cant_overwrite_data) {
-                converted_data.resize(nb_pixels * nb_comp);
-                memcpy(converted_data.data(), data, nb_pixels * nb_comp);
+                uint32_t nbpix = static_cast<uint32_t>(nb_pixels * nb_comp);
+                converted_data.resize(nbpix);
+                memcpy(converted_data.data(), data, nbpix);
                 data = converted_data.data();
             }
             uint8_t *pixels = const_cast<uint8_t *>(data);
@@ -399,7 +400,7 @@ void TextureCache::export_texture_impl(SceGxmTextureBaseFormat base_format, uint
     std::vector<uint8_t> expanded_data;
     if (base_format == SCE_GXM_TEXTURE_BASE_FORMAT_U8U8U8 || base_format == SCE_GXM_TEXTURE_BASE_FORMAT_S8S8S8) {
         // 24bpp textures are not supported nby dds files, convert them to rgba8
-        expanded_data.resize(width * height * 4);
+        expanded_data.resize(static_cast<uint32_t>(width * height * 4));
         const uint8_t *data = static_cast<const uint8_t *>(pixels);
         for (uint32_t i = 0; i < width * height; i++) {
             expanded_data[4 * i + 0] = data[3 * i + 0];
