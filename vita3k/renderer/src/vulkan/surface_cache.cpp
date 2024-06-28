@@ -530,7 +530,7 @@ std::optional<TextureLookupResult> VKSurfaceCache::retrieve_color_surface_as_tex
         } else {
             LOG_INFO_ONCE("Game is doing typeless copies");
             // We must use a transition buffer
-            vk::DeviceSize buffer_size = stride_bytes * static_cast<size_t>(state.res_multiplier * align(height, 4)) + start_x * bytes_per_pixel_requested;
+            vk::DeviceSize buffer_size = stride_bytes * static_cast<size_t>(state.res_multiplier * align(height, 4)) + static_cast<DeviceSize>(start_x * bytes_per_pixel_requested);
             if (!casted->transition_buffer.buffer || casted->transition_buffer.size < buffer_size) {
                 // create or re-create the buffer
                 state.frame().destroy_queue.add_buffer(casted->transition_buffer);
@@ -555,7 +555,7 @@ std::optional<TextureLookupResult> VKSurfaceCache::retrieve_color_surface_as_tex
             // then the buffer to the image
             const uint32_t dst_pixel_stride = (stride_bytes / bytes_per_pixel_requested) * state.res_multiplier;
             copy_image_buffer
-                .setBufferOffset(start_x * bytes_per_pixel_requested)
+                .setBufferOffset(static_cast<DeviceSize>(start_x * bytes_per_pixel_requested))
                 .setBufferRowLength(dst_pixel_stride)
                 .setImageOffset({ 0, 0, 0 })
                 .setImageExtent({ width, height, 1 });
