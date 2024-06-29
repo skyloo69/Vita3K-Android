@@ -1,4 +1,4 @@
-// Vita3K emulator project
+s// Vita3K emulator project
 // Copyright (C) 2024 Vita3K team
 //
 // This program is free software; you can redistribute it and/or modify
@@ -907,7 +907,7 @@ void VKState::render_frame(const SceFVector2 &viewport_pos, const SceFVector2 &v
         }
 
         // copy surface to staging buffer
-        const vk::DeviceSize texture_data_size = frame.pitch * frame.image_size.y * 4;
+        const vk::DeviceSize texture_data_size = static_cast<size_t>(frame.pitch * frame.image_size.y * 4);
         memcpy(screen_renderer.vita_surface_staging_info.pMappedData, frame.base.get(mem), texture_data_size);
 
         // copy staging buffer to image
