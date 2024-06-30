@@ -309,9 +309,9 @@ std::unique_ptr<Dynarmic::A32::Jit> DynarmicCPU::make_jit() {
     config.coprocessors[15] = cp15;
     config.processor_id = core_id;
     config.optimizations = cpu_opt ? Dynarmic::all_safe_optimizations : Dynarmic::no_optimizations;
-    config.detect_misaligned_access_via_page_table = 8;
+//    config.detect_misaligned_access_via_page_table = 8;
     config.recompile_on_fastmem_failure = false;
-    config.check_halt_on_memory_access = true;
+ //   config.check_halt_on_memory_access = true;
 
     return std::make_unique<Dynarmic::A32::Jit>(config);
 }
