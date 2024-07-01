@@ -563,14 +563,7 @@ int main(int argc, char *argv[]) {
         // Driver acto!
         renderer::process_batches(*emuenv.renderer.get(), emuenv.renderer->features, emuenv.mem, emuenv.cfg);
 
-        SceFVector2 viewport_pos;
-        if(cfg.screenmode_pos == 3){
-           viewport_pos = { 0, 200 };
-            LOG_INFO_ONCE("Portait ui are use!");
-        }else{
-           viewport_pos = { emuenv.viewport_pos.x, emuenv.viewport_pos.y };
-            LOG_INFO_ONCE("Landscape ui are used!");
-        }
+        const viewport_pos = { emuenv.viewport_pos.x, emuenv.viewport_pos.y };
         const SceFVector2 viewport_size = { emuenv.viewport_size.x, emuenv.viewport_size.y };
         emuenv.renderer->render_frame(viewport_pos, viewport_size, emuenv.display, emuenv.gxm, emuenv.mem);
         // Calculate FPS
