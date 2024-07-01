@@ -264,10 +264,9 @@ void delete_app(GuiState &gui, EmuEnvState &emuenv, const std::string &app_path)
         const auto PATCH_PATH{ emuenv.pref_path / "ux0/patch" / title_id };
         if (fs::exists(PATCH_PATH))
             fs::remove_all(PATCH_PATH);
-// dont delete save file when uninstall game
-//        const auto SAVE_DATA_PATH{ emuenv.pref_path / "ux0/user" / emuenv.io.user_id / "savedata" / APP_INDEX->savedata };
-//        if (fs::exists(SAVE_DATA_PATH))
-//            fs::remove_all(SAVE_DATA_PATH);
+        const auto SAVE_DATA_PATH{ emuenv.pref_path / "ux0/user" / emuenv.io.user_id / "savedata" / APP_INDEX->savedata };
+        if (fs::exists(SAVE_DATA_PATH))
+            fs::remove_all(SAVE_DATA_PATH);
         const auto SHADER_CACHE_PATH{ emuenv.cache_path / "shaders" / title_id };
         if (fs::exists(SHADER_CACHE_PATH))
             fs::remove_all(SHADER_CACHE_PATH);
@@ -337,9 +336,9 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
     const auto SAVE_DATA_PATH{ emuenv.pref_path / "ux0/user" / emuenv.io.user_id / "savedata" / APP_INDEX->savedata };
     const auto SHADER_CACHE_PATH{ emuenv.cache_path / "shaders" / title_id };
     const auto SHADER_LOG_PATH{ emuenv.cache_path / "shaderlog" / title_id };
-    const auto EXPORT_TEXTURES_PATH{ emuenv.pref_path / "textures/export" / title_id };
-    const auto IMPORT_TEXTURES_PATH{ emuenv.pref_path / "textures/import" / title_id };
-    const auto ISSUES_URL = "https://github.com/Vita3K-Android/compatibility/issues";
+    const auto EXPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/export" / title_id };
+    const auto IMPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/import" / title_id };
+    const auto ISSUES_URL = "https://github.com/Vita3K/compatibility/issues";
 
     const ImVec2 display_size(emuenv.viewport_size.x, emuenv.viewport_size.y);
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
@@ -393,7 +392,7 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
                     if (has_state_report) {
                         const auto copy_vita3k_summary = [&]() {
                             const auto vita3k_summary = fmt::format(
-                                "# Vita3K summary\n- Version: {}\n- Build number: {}\n- Commit hash: https://github.com/ikhoeyZX/vita3k-Android/commit/{}\n- CPU backend: {}\n- GPU backend: {}",
+                                "# Vita3K summary\n- Version: {}\n- Build number: {}\n- Commit hash: https://github.com/vita3k/vita3k/commit/{}\n- CPU backend: {}\n- GPU backend: {}",
                                 app_version, app_number, app_hash, get_cpu_backend(gui, emuenv, app_path), emuenv.cfg.backend_renderer);
                             ImGui::LogToClipboard();
                             ImGui::LogText("%s", vita3k_summary.c_str());
@@ -530,7 +529,9 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
                     open_search(APP_INDEX->title);
                 if (fs::exists(MANUAL_PATH) && !fs::is_empty(MANUAL_PATH) && ImGui::MenuItem(lang.main["manual"].c_str(), nullptr))
                     open_manual(gui, emuenv, app_path);
-                    ImGui::EndMenu();
+                if (ImGui::MenuItem(lang.main["update"].c_str()))
+                    update_app(gui, emuenv, app_path);
+                ImGui::EndMenu();
             }
             if (ImGui::BeginMenu(common["delete"].c_str())) {
                 if (ImGui::MenuItem(app_str["title"].c_str()))
@@ -621,8 +622,8 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
             ImGui::PushTextWrapPos(WINDOW_SIZE.x - (54.f * SCALE.x));
             ImGui::TextColored(GUI_COLOR_TEXT, "%s", context_dialog.c_str());
             ImGui::PopTextWrapPos();
-            if (context_dialog == lang.deleting["app_delete"])
-                SetTooltipEx(lang.deleting["app_delete_description"].c_str());
+            if ((context_dialog == lang.deleting["app_delete"]) && ImGui::IsItemHovered())
+                ImGui::SetTooltip("%s", lang.deleting["app_delete_description"].c_str());
             ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
             ImGui::SetCursorPos(ImVec2((WINDOW_SIZE.x / 2) - (BUTTON_SIZE.x + (20.f * SCALE.x)), WINDOW_SIZE.y - BUTTON_SIZE.y - (24.0f * SCALE.y)));
             if (ImGui::Button(common["cancel"].c_str(), BUTTON_SIZE) || ImGui::IsKeyPressed(static_cast<ImGuiKey>(emuenv.cfg.keyboard_button_circle))) {
