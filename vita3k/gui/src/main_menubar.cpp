@@ -24,7 +24,7 @@
 namespace gui {
 
 static void draw_file_menu(GuiState &gui, EmuEnvState &emuenv) {
-    const auto textures_path{ emuenv.shared_path / "textures" };
+    const auto textures_path{ emuenv.pref_path / "textures" };
 
     auto &lang = gui.lang.main_menubar.file;
     if (ImGui::BeginMenu(lang["title"].c_str())) {
