@@ -1129,6 +1129,20 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         }
         ImGui::Spacing();
         ImGui::Separator();
+
+        //Screen position
+        ImGui::Spacing();
+        ImGui::Text("%s", lang.emulator["screenmode_pos"].c_str());
+        ImGui::RadioButton("screenmode_auto", &emuenv.cfg.screenmode_pos, 0);
+        ImGui::RadioButton("screenmode_Left", &emuenv.cfg.screenmode_pos, 1);
+        ImGui::RadioButton("screenmode_right", &emuenv.cfg.screenmode_pos, 2);
+        ImGui::RadioButton("screenmode_up", &emuenv.cfg.screenmode_pos, 3);
+        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+        }
+        ImGui::Spacing();
+        ImGui::Separator();
+        
+        ImGui::Separator();
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["custom_config_settings"].c_str()).x / 2.f));
