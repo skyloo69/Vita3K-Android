@@ -1138,7 +1138,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton("screenmode_right", &emuenv.cfg.screenmode_pos, 2);
         ImGui::RadioButton("screenmode_up", &emuenv.cfg.screenmode_pos, 3);
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
-        }
+        
         ImGui::Spacing();
         ImGui::Separator();
         
@@ -1154,9 +1154,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             }
         }
         ImGui::EndTabItem();
-    } else
         ImGui::PopStyleColor();
-
+    }
+    
     // GUI
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_MENUBAR);
     if (ImGui::BeginTabItem(lang.gui["title"].c_str())) {
