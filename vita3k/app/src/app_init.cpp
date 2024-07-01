@@ -186,7 +186,7 @@ void update_viewport(EmuEnvState &state) {
             state.viewport_size.x = static_cast<SceFloat>(w);
             state.viewport_size.y = w / vita_aspect;
             state.viewport_pos.x = 0;
-            state.viewport_pos.y = (h - state.viewport_size.y) / 2;
+            state.viewport_pos.y = state.viewport_size.y / 4;
         }
     } else {
         state.viewport_pos.x = 0;
