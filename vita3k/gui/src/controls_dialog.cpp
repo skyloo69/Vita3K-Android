@@ -120,16 +120,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
     const ImVec2 display_size(emuenv.viewport_size.x, emuenv.viewport_size.y);
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
-    static const auto BUTTON_SIZE = ImVec2(120.f * emuenv.dpi_scale, 0.f);
-
-    float height = emuenv.viewport_size.y / emuenv.dpi_scale;
-    if (ImGui::BeginMainMenuBar()) {
-        height = height - ImGui::GetWindowHeight() * 2;
-        ImGui::EndMainMenuBar();
-    }
-    
-    ImGui::SetNextWindowSize(ImVec2(0, height));
-    ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x / 2.f, ImGui::GetIO().DisplaySize.y / 2.f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+    ImGui::SetNextWindowPos(ImVec2(display_size.x / 2.f, display_size.y / 2.f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     ImGui::Begin("Overlay", &gui.controls_menu.controls_dialog, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::SetWindowFontScale(RES_SCALE.x);
 
@@ -179,7 +170,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), overlay_editing);
     }
     ImGui::Text("L2/R2 triggers will be displayed only if PSTV mode is enabled.");
-
+    
     auto &common = emuenv.common_dialog.lang.common;
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - (BUTTON_SIZE.x / 2.f));
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE)){
