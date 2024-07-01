@@ -1138,7 +1138,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton(lang.emulator["screenmode_Left"].c_str(), &emuenv.cfg.screenmode_pos, 1);
         ImGui::RadioButton(lang.emulator["screenmode_right"].c_str(), &emuenv.cfg.screenmode_pos, 2);
         ImGui::RadioButton(lang.emulator["screenmode_up"].c_str(), &emuenv.cfg.screenmode_pos, 3);
-        SetTooltipEx(lang.emulator["screenmode_description"].c_str());
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         
         ImGui::Spacing();
