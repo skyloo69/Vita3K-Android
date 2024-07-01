@@ -146,7 +146,7 @@ struct State {
     virtual ~State() = default;
 
     fs::path texture_folder() const {
-        return shared_path / "textures";
+        return pref_path / "textures";
     }
 
     void init_paths(const Root &root_paths) {
