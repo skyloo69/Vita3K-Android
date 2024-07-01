@@ -563,10 +563,11 @@ int main(int argc, char *argv[]) {
         // Driver acto!
         renderer::process_batches(*emuenv.renderer.get(), emuenv.renderer->features, emuenv.mem, emuenv.cfg);
 
+        SceFVector2 viewport_pos;
         if(cfg.screenmode_pos == 3){
-           const SceFVector2 viewport_pos = { emuenv.viewport_pos.x, 30 };
+           viewport_pos = { emuenv.viewport_pos.x, 30 };
         }else{
-           const SceFVector2 viewport_pos = { emuenv.viewport_pos.x, emuenv.viewport_pos.y };
+           viewport_pos = { emuenv.viewport_pos.x, emuenv.viewport_pos.y };
         }
         const SceFVector2 viewport_size = { emuenv.viewport_size.x, emuenv.viewport_size.y };
         emuenv.renderer->render_frame(viewport_pos, viewport_size, emuenv.display, emuenv.gxm, emuenv.mem);
