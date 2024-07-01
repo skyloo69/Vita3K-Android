@@ -337,9 +337,9 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
     const auto SAVE_DATA_PATH{ emuenv.pref_path / "ux0/user" / emuenv.io.user_id / "savedata" / APP_INDEX->savedata };
     const auto SHADER_CACHE_PATH{ emuenv.cache_path / "shaders" / title_id };
     const auto SHADER_LOG_PATH{ emuenv.cache_path / "shaderlog" / title_id };
-    const auto EXPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/export" / title_id };
-    const auto IMPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/import" / title_id };
-    const auto ISSUES_URL = "https://github.com/Vita3K/compatibility/issues";
+    const auto EXPORT_TEXTURES_PATH{ emuenv.pref_path / "textures/export" / title_id };
+    const auto IMPORT_TEXTURES_PATH{ emuenv.pref_path / "textures/import" / title_id };
+    const auto ISSUES_URL = "https://github.com/Vita3K-Android/compatibility/issues";
 
     const ImVec2 display_size(emuenv.viewport_size.x, emuenv.viewport_size.y);
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
