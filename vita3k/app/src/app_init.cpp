@@ -372,8 +372,8 @@ bool init(EmuEnvState &state, const Root &root_paths) {
     
         state.log_path = fs::path(state.cfg.get_pref_path() / "logs" / "");
         state.shared_path = fs::path(state.cfg.get_pref_path() / "shared" / "");
-        state.static_assets_path = fs::path(state.cfg.get_pref_path() / "shared" / "");
-    
+
+        fs::create_directories(state.cfg.get_pref_path() / "shared" / "screenshots");
         fs::create_directories(state.cfg.get_pref_path() / "shared" / "textures");
         fs::create_directories(state.cfg.get_pref_path() / "shared" / "textures" / "export");
         fs::create_directories(state.cfg.get_pref_path() / "shared" / "textures" / "import");
