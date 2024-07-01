@@ -24,11 +24,12 @@
 namespace gui {
 
 static void draw_file_menu(GuiState &gui, EmuEnvState &emuenv) {
-    const auto textures_path{ emuenv.pref_path / "textures" };
+    
 
     auto &lang = gui.lang.main_menubar.file;
     if (ImGui::BeginMenu(lang["title"].c_str())) {
 #ifndef ANDROID
+        const auto textures_path{ emuenv.shared_path / "textures" };
         if (ImGui::MenuItem(lang["open_pref_path"].c_str()))
             open_path(emuenv.pref_path.string());
         if (ImGui::MenuItem(lang["open_textures_path"].c_str())) {
