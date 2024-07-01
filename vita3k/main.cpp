@@ -565,9 +565,11 @@ int main(int argc, char *argv[]) {
 
         SceFVector2 viewport_pos;
         if(cfg.screenmode_pos == 3){
-           viewport_pos = { emuenv.viewport_pos.x, 30 };
+           viewport_pos = { 0, 200 };
+            LOG_INFO_ONCE("Portait ui are use!");
         }else{
            viewport_pos = { emuenv.viewport_pos.x, emuenv.viewport_pos.y };
+            LOG_INFO_ONCE("Landscape ui are used!");
         }
         const SceFVector2 viewport_size = { emuenv.viewport_size.x, emuenv.viewport_size.y };
         emuenv.renderer->render_frame(viewport_pos, viewport_size, emuenv.display, emuenv.gxm, emuenv.mem);
