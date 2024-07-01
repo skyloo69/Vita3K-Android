@@ -649,6 +649,11 @@ struct LangState {
             { "sensor_enable", "Enable HW acceleration and gyroscope" },
             { "sensor_emu_pos", "Emulate acceleration position sensor" },
             { "sensors_description", "Enable built in sensor or disable sensor and lock specific sensor position" },
+            { "screenmode_pos", "Change Screen position" },
+            { "screenmode_auto", "Auto landscapes" },
+            { "screenmode_Left", "Lock to landscapes left" },
+            { "screenmode_right", "Lock to Landscapes right" },
+            { "screenmode_up", "Lock to portrait" },
             { "custom_config_settings", "Custom Config Settings" },
             { "clear_custom_config", "Clear Custom Config" }
         };
