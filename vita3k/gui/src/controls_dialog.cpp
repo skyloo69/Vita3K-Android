@@ -172,7 +172,8 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), overlay_editing);
     }
     ImGui::Text("L2/R2 triggers will be displayed only if PSTV mode is enabled.");
-    
+
+    auto &common = emuenv.common_dialog.lang.common;
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
             gui.controls_menu.controls_dialog = false;
     ImGui::End();
