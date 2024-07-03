@@ -899,6 +899,11 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
       float tmp = maxX;
       maxX = maxY;
       maxY = tmp;
+    }else
+    {
+      float tmp = maxY;
+      maxX = tmp;
+      maxY = maxX;
     }
     Resources res = getResources();
 
