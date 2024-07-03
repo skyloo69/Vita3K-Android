@@ -176,6 +176,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - (BUTTON_SIZE.x / 2.f));
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE)){
         overlay_editing = false;
+        set_controller_overlay_state(0);
         gui.controls_menu.controls_dialog = false;
     }
     ImGui::End();
