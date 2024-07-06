@@ -63,7 +63,7 @@ void set_controller_overlay_state(int overlay_mask, bool edit, bool reset, bool 
     jclass clazz(env->GetObjectClass(activity));
 
     // find the identifier of the method to call
-    jmethodID method_id = env->GetMethodID(clazz, "setControllerOverlayState", "(IZZ)V");
+    jmethodID method_id = env->GetMethodID(clazz, "setControllerOverlayState", "(IZZZ)V");
 
     // effectively call the Java method
     env->CallVoidMethod(activity, method_id, overlay_mask, edit, reset, portrait);
