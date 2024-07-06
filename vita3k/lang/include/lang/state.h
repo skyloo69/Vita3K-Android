@@ -654,6 +654,7 @@ struct LangState {
             { "screenmode_Left", "Lock to landscapes left" },
             { "screenmode_right", "Lock to Landscapes right" },
             { "screenmode_up", "Lock to portrait" },
+            { "screenmode_up_description", "WIP, GUI still buggy" },
             { "custom_config_settings", "Custom Config Settings" },
             { "clear_custom_config", "Clear Custom Config" }
         };

@@ -531,12 +531,16 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
     const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
+    // Always center this window when appearing
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
     auto &lang = gui.lang.settings_dialog;
     auto &common = emuenv.common_dialog.lang.common;
     auto &firmware_font = gui.lang.install_dialog.firmware_install;
 
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_MENUBAR);
-    ImGui::SetNextWindowPos(ImVec2(emuenv.viewport_pos.x + (display_size.x / 2.f), emuenv.viewport_pos.y + (display_size.y / 2.f)), ImGuiCond_Always, ImVec2(0.5f, 0.48f));
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.48f));
     const auto is_custom_config = gui.configuration_menu.custom_settings_dialog;
     auto &settings_dialog = is_custom_config ? gui.configuration_menu.custom_settings_dialog : gui.configuration_menu.settings_dialog;
     ImGui::Begin("##settings", &settings_dialog, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
@@ -1138,6 +1142,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton(lang.emulator["screenmode_Left"].c_str(), &emuenv.cfg.screenmode_pos, 1);
         ImGui::RadioButton(lang.emulator["screenmode_right"].c_str(), &emuenv.cfg.screenmode_pos, 2);
         ImGui::RadioButton(lang.emulator["screenmode_up"].c_str(), &emuenv.cfg.screenmode_pos, 3);
+        SetTooltipEx(lang.emulator["screenmode_up_description"].c_str());
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         
         ImGui::Spacing();
