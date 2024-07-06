@@ -489,11 +489,8 @@ bool init(EmuEnvState &state, const Root &root_paths) {
     }
 #endif
 
-    if(state.cfg.screenmode_pos == 3){
-        state.window = WindowPtr(SDL_CreateWindow(window_title, state.viewport_pos.x, state.viewport_pos.y, state.res_width_dpi_scale, state.res_height_dpi_scale, window_type | SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
-    }else{
-        state.window = WindowPtr(SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, state.res_width_dpi_scale, state.res_height_dpi_scale, window_type | SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
-    }
+    state.window = WindowPtr(SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, state.res_width_dpi_scale, state.res_height_dpi_scale, window_type | SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
+
     if (!state.window) {
         LOG_ERROR("SDL failed to create window!");
         return false;
