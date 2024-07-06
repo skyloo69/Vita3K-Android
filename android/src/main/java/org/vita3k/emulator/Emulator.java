@@ -262,7 +262,7 @@ public class Emulator extends SDLActivity
         getmOverlay().setIsInEditMode(edit);
 
         if(reset)
-            getmOverlay().resetButtonPlacement();
+            getmOverlay().resetButtonPlacement(portrait);
     }
 
     @Keep
