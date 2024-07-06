@@ -52,7 +52,7 @@ int get_overlay_display_mask(const Config& cfg){
 }
 
 #ifdef ANDROID
-void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {
+void set_controller_overlay_state(int overlay_mask, bool edit, bool reset, bool portrait) {
     // retrieve the JNI environment.
     JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
 
@@ -66,7 +66,7 @@ void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {
     jmethodID method_id = env->GetMethodID(clazz, "setControllerOverlayState", "(IZZ)V");
 
     // effectively call the Java method
-    env->CallVoidMethod(activity, method_id, overlay_mask, edit, reset);
+    env->CallVoidMethod(activity, method_id, overlay_mask, edit, reset, portrait);
 
     // clean up the local references.
     env->DeleteLocalRef(activity);
@@ -184,7 +184,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
 #else
 
-void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {}
+void set_controller_overlay_state(int overlay_mask, bool edit, bool reset, bool portrait) {}
 void set_controller_overlay_scale(float scale) {}
 void set_controller_overlay_opacity(int opacity) {}
 
