@@ -633,7 +633,7 @@ void browse_live_area_apps_list(GuiState &gui, EmuEnvState &emuenv, const uint32
 void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 VIEWPORT_SIZE = ImGui::GetIO().DisplaySize;
     const ImVec2 VIEWPORT_POS = {0,0};
-    const ImVec2 RES_SCALE;
+    ImVec2 RES_SCALE;
     if(emuenv.cfg.screenmode_pos == 3){
        RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 4);
     }else{
