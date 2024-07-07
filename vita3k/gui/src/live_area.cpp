@@ -1,4 +1,4 @@
-﻿// Vita3K emulator project
+// Vita3K emulator project
 // Copyright (C) 2024 Vita3K team
 //
 // This program is free software; you can redistribute it and/or modify
@@ -633,22 +633,21 @@ void browse_live_area_apps_list(GuiState &gui, EmuEnvState &emuenv, const uint32
 void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 VIEWPORT_SIZE = ImGui::GetIO().DisplaySize;
     const ImVec2 VIEWPORT_POS = {0,0};
-    const auto RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
-    const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
+    const ImVec2 RES_SCALE;
+    if(emuenv.cfg.screenmode_pos == 3){
+       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 4);
+    }else{
+       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
+    }
+    const auto SCALE = SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
     const auto &app_path = gui.live_area_current_open_apps_list[gui.live_area_app_current_open];
     const VitaIoDevice app_device = app_path.starts_with("NPXS") ? VitaIoDevice::vs0 : VitaIoDevice::ux0;
 
     const auto INFO_BAR_HEIGHT = 32.f * SCALE.y;
-    ImVec2 WINDOW_SIZE;
-    if(emuenv.cfg.screenmode_pos == 3){ // if portrait
-       ImVec2 WINDOW_SIZE(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y/4);
-    }else{ // landscape
-      ImVec2 WINDOW_SIZE(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y - INFO_BAR_HEIGHT);
-    }
 
+    const ImVec2 WINDOW_SIZE(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y - INFO_BAR_HEIGHT);
     const ImVec2 WINDOW_POS(VIEWPORT_POS.x, VIEWPORT_POS.y + INFO_BAR_HEIGHT);
-
     ImGui::SetNextWindowPos(WINDOW_POS, ImGuiCond_Always);
     ImGui::SetNextWindowSize(WINDOW_SIZE, ImGuiCond_Always);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
