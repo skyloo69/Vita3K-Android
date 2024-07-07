@@ -635,7 +635,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 VIEWPORT_POS = {0,0};
     ImVec2 RES_SCALE;
     if(emuenv.cfg.screenmode_pos == 3){
-       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 4);
+       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 1.5);
     }else{
        RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
     }
