@@ -703,8 +703,12 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
         const auto FRAME = items_styles[app_type].frames[frame.id];
         const auto FRAME_SIZE = FRAME.size;
 
-        auto FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, FRAME.pos.y * SCALE.y);
-
+        ImVec2 FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, FRAME.pos.y * SCALE.y);
+        if(emuenv.cfg.screenmode_pos == 3){
+	   FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, (FRAME.pos.y * SCALE.y) / 1.5);
+	}else{
+	   FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, FRAME.pos.y * SCALE.y);
+	}
         auto bg_size = items_size[app_path][frame.id]["background"];
 
         // Resize items
@@ -1145,10 +1149,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     if (!gui.vita_area.content_manager && !gui.vita_area.manual) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.f * SCALE.x);
-        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 12.0f * SCALE.y));
+        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 55.0f * SCALE.y));
         if (ImGui::Button("Esc", BUTTON_SIZE))
             close_live_area_app(gui, emuenv, app_path);
-        ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, 12.0f * SCALE.y));
+        ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, 55.0f * SCALE.y));
         if (ImGui::Button("Help", BUTTON_SIZE))
             ImGui::OpenPopup("Live Area Help");
         ImGui::SetNextWindowPos(ImVec2(WINDOW_SIZE.x / 2.f, WINDOW_SIZE.y / 2.f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
