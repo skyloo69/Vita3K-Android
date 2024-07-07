@@ -639,7 +639,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     }else{
        RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
     }
-    const auto SCALE = SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
+    const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
     const auto &app_path = gui.live_area_current_open_apps_list[gui.live_area_app_current_open];
     const VitaIoDevice app_device = app_path.starts_with("NPXS") ? VitaIoDevice::vs0 : VitaIoDevice::ux0;
