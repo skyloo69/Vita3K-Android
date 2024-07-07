@@ -641,15 +641,14 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto INFO_BAR_HEIGHT = 32.f * SCALE.y;
     ImVec2 WINDOW_SIZE;
-    ImVec2 WINDOW_POS;
-
     if(emuenv.cfg.screenmode_pos == 3){ // if portrait
        ImVec2 WINDOW_SIZE(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y/4);
-       ImVec2 WINDOW_POS(VIEWPORT_POS.x, VIEWPORT_POS.y/4);
     }else{ // landscape
        ImVec2 WINDOW_SIZE(VIEWPORT_SIZE.x, VIEWPORT_SIZE.y - INFO_BAR_HEIGHT);
-       ImVec2 WINDOW_POS(VIEWPORT_POS.x, VIEWPORT_POS.y + INFO_BAR_HEIGHT);
     }
+
+    const ImVec2 ImVec2 WINDOW_POS(VIEWPORT_POS.x, VIEWPORT_POS.y + INFO_BAR_HEIGHT);
+
     ImGui::SetNextWindowPos(WINDOW_POS, ImGuiCond_Always);
     ImGui::SetNextWindowSize(WINDOW_SIZE, ImGuiCond_Always);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
