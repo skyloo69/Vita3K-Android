@@ -648,7 +648,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     } else {
         ImGui::Columns(2);
         if(emuenv.cfg.screenmode_pos == 3){
-           ImGui::SetColumnWidth(0, 90 * VIEWPORT_SCALE.y);
+           ImGui::SetColumnWidth(0, 150 * VIEWPORT_SCALE.x);
         }else{
            ImGui::SetColumnWidth(0, 90 * VIEWPORT_SCALE.x);
         }
@@ -752,7 +752,12 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         scroll_type = 0;
     }
 
-    const auto GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
+    float GRID_COLUMN_SIZE;
+    if(emuenv.cfg.screenmode_pos == 3){
+        GRID_COLUMN_SIZE = ICON_SIZE.y + (140.f * VIEWPORT_SCALE.y);
+    }else{
+        GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
+    }
     const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
