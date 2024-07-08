@@ -589,7 +589,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     
     if(emuenv.cfg.screenmode_pos == 3){
         ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(100.f * VIEWPORT_SCALE.x, 100.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
-        column_padding_size = 20.f * VIEWPORT_SCALE.y;
+        column_padding_size = 50.f * VIEWPORT_SCALE.x;
         column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.y);
     }else{
         ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
@@ -624,7 +624,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_TITLE);
     ImGui::SetCursorPosY(4.f * VIEWPORT_SCALE.y);
     if (!emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-        ImGui::Columns(5);
+        ImGui::Columns(4);
         ImGui::SetColumnWidth(0, column_icon_size);
         if (ImGui::Button(lang["filter"].c_str()))
             ImGui::OpenPopup("app_filter");
@@ -777,11 +777,16 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     }
 
     const auto GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
-    const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
+    ImVec2 list_selectable_size;
+    if(emuenv.cfg.screenmode_pos == 3){
+        list_selectable_size(0.f, ICON_SIZE.x + (20.f * VIEWPORT_SCALE.x));
+    }else{
+       list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
+    }
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
     if (!emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-        ImGui::Columns(5, nullptr, true);
+        ImGui::Columns(4, nullptr, true);
         ImGui::SetColumnWidth(0, column_icon_size);
         ImGui::SetColumnWidth(1, compat_size);
         ImGui::SetColumnWidth(2, title_id_size);
