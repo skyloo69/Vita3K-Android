@@ -779,9 +779,9 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const auto GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
     ImVec2 list_selectable_size;
     if(emuenv.cfg.screenmode_pos == 3){
-        list_selectable_size(0.f, ICON_SIZE.x + (20.f * VIEWPORT_SCALE.x));
+       list_selectable_size = ImVec2(0.f, ICON_SIZE.x + (20.f * VIEWPORT_SCALE.x));
     }else{
-       list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
+       list_selectable_size = ImVec2(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     }
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
