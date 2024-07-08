@@ -75,7 +75,10 @@ void draw_archive_install_dialog(GuiState &gui, EmuEnvState &emuenv) {
     const auto BUTTON_SIZE = ImVec2(190.f * SCALE.x, 45.f * SCALE.y);
     const auto WINDOW_SIZE = ImVec2(616.f * SCALE.x, (state.empty() ? 240.f : 340.f) * SCALE.y);
 
-    ImGui::SetNextWindowPos(ImVec2(emuenv.viewport_pos.x, emuenv.viewport_pos.y), ImGuiCond_Always);
+    // Always center this window when appearing
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always);
     ImGui::SetNextWindowSize(display_size);
     ImGui::Begin("archive_install", &gui.file_menu.archive_install_dialog, ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings);
     ImGui::SetNextWindowPos(ImVec2(emuenv.viewport_pos.x + (display_size.x / 2.f) - (WINDOW_SIZE.x / 2.f), emuenv.viewport_pos.y + (display_size.y / 2.f) - (WINDOW_SIZE.y / 2.f)), ImGuiCond_Always);
