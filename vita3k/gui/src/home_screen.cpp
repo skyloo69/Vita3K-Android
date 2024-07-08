@@ -582,19 +582,15 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     ImVec2 ICON_SIZE;
     
     // Size of column padding
-    float column_padding_size;
+    const float column_padding_size = 20.f * VIEWPORT_SCALE.x;
     
     // Size of the icon part
-    float column_icon_size;
+    const float column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.x);
     
     if(emuenv.cfg.screenmode_pos == 3){
         ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(100.f * VIEWPORT_SCALE.x, 100.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
-        column_padding_size = 50.f * VIEWPORT_SCALE.x;
-        column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.y);
     }else{
         ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
-        column_padding_size = 20.f * VIEWPORT_SCALE.x;
-        column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.x);
     }
     
     
@@ -624,7 +620,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_TITLE);
     ImGui::SetCursorPosY(4.f * VIEWPORT_SCALE.y);
     if (!emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-        ImGui::Columns(4);
+        ImGui::Columns(5);
         ImGui::SetColumnWidth(0, column_icon_size);
         if (ImGui::Button(lang["filter"].c_str()))
             ImGui::OpenPopup("app_filter");
@@ -857,12 +853,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
             if (emuenv.app_path == app.path)
                 draw_app_context_menu(gui, emuenv, app.path);
             const auto STITLE_SIZE = ImGui::CalcTextSize(app.stitle.c_str(), 0, false, ICON_SIZE.x + (42.f * VIEWPORT_SCALE.x));
-            float item_rect_max;
-            if(emuenv.cfg.screenmode_pos == 3){
-               item_rect_max = ImGui::GetItemRectMax().x;
-            } else {
-                item_rect_max = ImGui::GetItemRectMax().y;
-            }
+            const auto item_rect_max = ImGui::GetItemRectMax().y;
                     
             // Get the min and full item rect max, depending on the view mode.
             const auto MIN_ITEM_RECT_MAX = emuenv.cfg.apps_list_grid ? item_rect_max : item_rect_max - (5.f * VIEWPORT_SCALE.y);
