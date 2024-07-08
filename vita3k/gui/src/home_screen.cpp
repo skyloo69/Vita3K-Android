@@ -588,7 +588,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     float column_icon_size;
     
     if(emuenv.cfg.screenmode_pos == 3){
-        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
+        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(100.f * VIEWPORT_SCALE.x, 100.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
         column_padding_size = 20.f * VIEWPORT_SCALE.y;
         column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.y);
     }else{
@@ -623,7 +623,28 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const float last_time_size = (ImGui::CalcTextSize(last_time_label.c_str()).x) + (38.f * VIEWPORT_SCALE.x);
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_TITLE);
     ImGui::SetCursorPosY(4.f * VIEWPORT_SCALE.y);
-    if (!emuenv.cfg.apps_list_grid) {
+    if (!emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
+        ImGui::Columns(5);
+        ImGui::SetColumnWidth(0, column_icon_size);
+        if (ImGui::Button(lang["filter"].c_str()))
+            ImGui::OpenPopup("app_filter");
+        ImGui::NextColumn();
+        ImGui::SetColumnWidth(1, compat_size);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() - (column_padding_size / 4.f));
+        if (ImGui::Button(compat_label.c_str()))
+            sort_app_list(gui, emuenv, COMPAT);
+        ImGui::NextColumn();
+        ImGui::SetColumnWidth(2, title_id_size);
+        if (ImGui::Button(title_id_label.c_str()))
+            sort_app_list(gui, emuenv, TITLE_ID);
+        ImGui::NextColumn();
+        ImGui::SetColumnWidth(3, app_ver_size);
+        if (ImGui::Button(app_ver_label.c_str()))
+            sort_app_list(gui, emuenv, APP_VER);
+        ImGui::NextColumn();
+        if (ImGui::Button(title_label.c_str()))
+            sort_app_list(gui, emuenv, TITLE);
+    } else if (!emuenv.cfg.apps_list_grid) {
         ImGui::Columns(7);
         ImGui::SetColumnWidth(0, column_icon_size);
         if (ImGui::Button(lang["filter"].c_str()))
@@ -652,7 +673,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::NextColumn();
         if (ImGui::Button(title_label.c_str()))
             sort_app_list(gui, emuenv, TITLE);
-    } else {
+    }  else {
         ImGui::Columns(2);
         ImGui::SetColumnWidth(0, 90 * VIEWPORT_SCALE.x);
         if (ImGui::Button(lang["filter"].c_str()))
@@ -831,8 +852,13 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
             if (emuenv.app_path == app.path)
                 draw_app_context_menu(gui, emuenv, app.path);
             const auto STITLE_SIZE = ImGui::CalcTextSize(app.stitle.c_str(), 0, false, ICON_SIZE.x + (42.f * VIEWPORT_SCALE.x));
-            const auto item_rect_max = ImGui::GetItemRectMax().y;
-
+            float item_rect_max;
+            if(emuenv.cfg.screenmode_pos == 3){
+               item_rect_max = ImGui::GetItemRectMax().x;
+            } else {
+                item_rect_max = ImGui::GetItemRectMax().y;
+            }
+                    
             // Get the min and full item rect max, depending on the view mode.
             const auto MIN_ITEM_RECT_MAX = emuenv.cfg.apps_list_grid ? item_rect_max : item_rect_max - (5.f * VIEWPORT_SCALE.y);
             const auto FULL_ITEM_RECT_MAX = emuenv.cfg.apps_list_grid ? item_rect_max + ImGui::GetStyle().ItemSpacing.y + STITLE_SIZE.y : item_rect_max;
