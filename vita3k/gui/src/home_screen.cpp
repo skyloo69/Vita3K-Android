@@ -579,14 +579,25 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     draw_background(gui, emuenv);
 
     // Size of the icon depending view mode
-    const ImVec2 ICON_SIZE(emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
-
+    ImVec2 ICON_SIZE;
+    
     // Size of column padding
-    const float column_padding_size = 20.f * VIEWPORT_SCALE.x;
-
+    float column_padding_size;
+    
     // Size of the icon part
-    const float column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.x);
-
+    float column_icon_size;
+    
+    if(emuenv.cfg.screenmode_pos == 3){
+        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
+        column_padding_size = 20.f * VIEWPORT_SCALE.y;
+        column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.y);
+    }else{
+        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
+        column_padding_size = 20.f * VIEWPORT_SCALE.x;
+        column_icon_size = ICON_SIZE.x + column_padding_size + (5.f * VIEWPORT_SCALE.x);
+    }
+    
+    
     // Size of the compatibility part
     const auto compat_radius = 12.f * (emuenv.cfg.apps_list_grid ? VIEWPORT_SCALE.x : VIEWPORT_SCALE.x);
     const auto full_compat_radius = (3.f * (emuenv.cfg.apps_list_grid ? VIEWPORT_SCALE.x : VIEWPORT_SCALE.x)) + compat_radius;
@@ -748,7 +759,13 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
-    if (!emuenv.cfg.apps_list_grid) {
+    if (!emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
+        ImGui::Columns(5, nullptr, true);
+        ImGui::SetColumnWidth(0, column_icon_size);
+        ImGui::SetColumnWidth(1, compat_size);
+        ImGui::SetColumnWidth(2, title_id_size);
+        ImGui::SetColumnWidth(3, app_ver_size);
+    } else if (!emuenv.cfg.apps_list_grid) {
         ImGui::Columns(7, nullptr, true);
         ImGui::SetColumnWidth(0, column_icon_size);
         ImGui::SetColumnWidth(1, compat_size);
