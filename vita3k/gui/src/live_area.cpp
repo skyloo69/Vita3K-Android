@@ -635,7 +635,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 VIEWPORT_POS = {0,0};
     ImVec2 RES_SCALE;
     if(emuenv.cfg.screenmode_pos == 3){
-       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 1.5);
+       RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, (VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale) / 2);
     }else{
        RES_SCALE = ImVec2(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
     }
@@ -705,7 +705,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
         ImVec2 FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, FRAME.pos.y * SCALE.y);
         if(emuenv.cfg.screenmode_pos == 3){
-	   FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, (FRAME.pos.y * SCALE.y) / 1.5);
+	   FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, (FRAME.pos.y * SCALE.y) / 2);
 	}else{
 	   FRAME_POS = ImVec2(FRAME.pos.x * SCALE.x, FRAME.pos.y * SCALE.y);
 	}
@@ -775,9 +775,15 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
             img_pos.y = WINDOW_SIZE.y - FRAME_POS.y;
 
         // Scale size items
-        const auto bg_scal_size = ImVec2(bg_size.x * SCALE.x, bg_size.y * SCALE.y);
-        const auto img_scal_size = ImVec2(img_size.x * SCALE.x, img_size.y * SCALE.y);
-
+	ImVec2 bg_scal_size;
+        ImVec2 img_scal_size;
+	if(emuenv.cfg.screenmode_pos == 3){
+           bg_scal_size = ImVec2(bg_size.x * SCALE.x, bg_size.y * SCALE.x);
+           img_scal_size = ImVec2(img_size.x * SCALE.x, img_size.y * SCALE.x);
+	}else{
+	   bg_scal_size = ImVec2(bg_size.x * SCALE.x, bg_size.y * SCALE.y);
+           img_scal_size = ImVec2(img_size.x * SCALE.x, img_size.y * SCALE.y);
+	}
         const auto pos_frame = ImVec2(WINDOW_SIZE.x - FRAME_POS.x, WINDOW_SIZE.y - FRAME_POS.y);
 
         // Scale size frame
@@ -1061,7 +1067,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 GATE_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-       GATE_SIZE = ImVec2(280.0f * SCALE.x, 50.0f * SCALE.y);
+       GATE_SIZE = ImVec2(280.0f * SCALE.x, 60.0f * SCALE.y);
     }else{
        GATE_SIZE = ImVec2(280.0f * SCALE.x, 158.0f * SCALE.y);
     }
@@ -1078,7 +1084,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 BUTTON_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-	BUTTON_SIZE = ImVec2(144.f * SCALE.x, 60.f * SCALE.y);
+	BUTTON_SIZE = ImVec2(144.f * SCALE.x, 120.f * SCALE.y);
     }else{
 	BUTTON_SIZE = ImVec2(72.f * SCALE.x, 30.f * SCALE.y);
     }
@@ -1235,7 +1241,6 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     }
 
     const auto SELECTABLE_SIZE = ImVec2(50.f * SCALE.x, 60.f * SCALE.y);
-
     const auto ARROW_HEIGHT_POS = WINDOW_SIZE.y - (250.f * SCALE.y);
     const auto ARROW_HEIGHT_DRAW_POS = WINDOW_POS.y + ARROW_HEIGHT_POS;
     const auto ARROW_WIDTH_POS = (30.f * SCALE.x);
