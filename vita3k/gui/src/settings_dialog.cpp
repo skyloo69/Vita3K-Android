@@ -1205,8 +1205,10 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         SetTooltipEx(lang.gui["apps_list_grid_description"].c_str());
         if (!emuenv.cfg.apps_list_grid) {
             ImGui::Spacing();
-            ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
-            SetTooltipEx(lang.gui["select_icon_size"].c_str());
+            if(emuenv.cfg.screenmode_pos != 3){
+               ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
+               SetTooltipEx(lang.gui["select_icon_size"].c_str());
+            }
         }
         ImGui::Spacing();
         ImGui::Separator();
