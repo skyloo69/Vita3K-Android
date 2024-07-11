@@ -631,10 +631,6 @@ void browse_live_area_apps_list(GuiState &gui, EmuEnvState &emuenv, const uint32
 }
 
 void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
-
-    if(emuenv.cfg.screenmode_pos == 3){
-	gui.vita_area.app_information = true;
-    }
     const ImVec2 VIEWPORT_SIZE = ImGui::GetIO().DisplaySize;
     const ImVec2 VIEWPORT_POS = {0,0};
     ImVec2 RES_SCALE;
@@ -1167,6 +1163,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
         }
     }
 
+   if(emuenv.cfg.screenmode_pos == 3){
+	gui.vita_area.app_information = true;
+   }
+	
     auto &lang = gui.lang.live_area.help;
     auto &common = emuenv.common_dialog.lang.common;
     // Always center this window when appearing
