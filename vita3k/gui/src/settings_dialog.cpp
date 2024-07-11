@@ -1201,13 +1201,15 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Checkbox(lang.gui["stretch_the_display_area"].c_str(), &config.stretch_the_display_area);
         SetTooltipEx(lang.gui["stretch_the_display_area_description"].c_str());
         ImGui::Spacing();
-        ImGui::Checkbox(lang.gui["apps_list_grid"].c_str(), &emuenv.cfg.apps_list_grid);
-        SetTooltipEx(lang.gui["apps_list_grid_description"].c_str());
-        if (!emuenv.cfg.apps_list_grid) {
-            ImGui::Spacing();
-            if(emuenv.cfg.screenmode_pos != 3){
-               ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
-               SetTooltipEx(lang.gui["select_icon_size"].c_str());
+        if(!emuenv.cfg.screenmode_pos == 3){
+            ImGui::Checkbox(lang.gui["apps_list_grid"].c_str(), &emuenv.cfg.apps_list_grid);
+            SetTooltipEx(lang.gui["apps_list_grid_description"].c_str());
+            if (!emuenv.cfg.apps_list_grid) {
+                ImGui::Spacing();
+                if(emuenv.cfg.screenmode_pos != 3){
+                   ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
+                   SetTooltipEx(lang.gui["select_icon_size"].c_str());
+                }
             }
         }
         ImGui::Spacing();
