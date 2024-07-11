@@ -1072,7 +1072,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
        GATE_SIZE = ImVec2(280.0f * SCALE.x, 158.0f * SCALE.y);
     }
     const auto GATE_POS = ImVec2(WINDOW_SIZE.x - (gate_pos.x * SCALE.x), WINDOW_SIZE.y - (gate_pos.y * SCALE.y));
-    const auto GATE_POS_MIN(WINDOW_POS.x + GATE_POS.x, WINDOW_POS.y + GATE_POS.y);
+    const auto GATE_POS_MIN = ImVec2(WINDOW_POS.x + GATE_POS.x, WINDOW_POS.y + GATE_POS.y);
     const auto GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y + GATE_SIZE.y);
     const auto START_SIZE = ImVec2((ImGui::CalcTextSize(BUTTON_STR.c_str()).x * font_size_scale), (ImGui::CalcTextSize(BUTTON_STR.c_str()).y * font_size_scale));
     const auto START_BUTTON_SIZE = ImVec2(START_SIZE.x + 26.0f * SCALE.x, START_SIZE.y + 5.0f * SCALE.y);
