@@ -243,11 +243,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto ICON_SIZE = ImVec2(64.f * SCALE.x, 64.f * SCALE.y);
 
-    if(emuenv.cfg.screenmode_pos == 3){
-        ImGui::SetWindowFontScale(2.0f * RES_SCALE.x);
-    }else{
-        ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
-    }
+    ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
     ImGui::SetCursorPos(ImVec2(50.f * SCALE.x, 108.f * SCALE.y));
     ImGui::TextColored(GUI_COLOR_TEXT, "%s", gui.lang.game_data["app_close"].c_str());
     if (gui.app_selector.user_apps_icon.contains(emuenv.io.app_path)) {
@@ -601,11 +597,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     auto &lang = gui.lang.home_screen;
     
-    if(emuenv.cfg.screenmode_pos == 3){
-        ImGui::SetWindowFontScale(1.4f * VIEWPORT_RES_SCALE.x);
-    }else{
-        ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
-    }
+    ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
     
     // Sort Apps list when is not sorted
     if (!gui.app_selector.is_app_list_sorted)
