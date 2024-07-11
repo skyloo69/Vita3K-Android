@@ -1067,19 +1067,13 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 GATE_SIZE;
     if(emuenv.cfg.screenmode_pos == 3) {
-       GATE_SIZE = ImVec2(280.0f * SCALE.x, 60.0f * SCALE.y);
+       GATE_SIZE = ImVec2(280.0f * SCALE.x, 68.0f * SCALE.y);
     } else {
        GATE_SIZE = ImVec2(280.0f * SCALE.x, 158.0f * SCALE.y);
     }
     const auto GATE_POS = ImVec2(WINDOW_SIZE.x - (gate_pos.x * SCALE.x), WINDOW_SIZE.y - (gate_pos.y * SCALE.y));
-    const ImVec2 GATE_POS_MIN(WINDOW_POS.x + GATE_POS.x, WINDOW_POS.y + GATE_POS.y);
-    ImVec2 GATE_POS_MAX;
-    if(emuenv.cfg.screenmode_pos == 3) {
-    	GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y - GATE_SIZE.y);
-    } else {
- 	GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y + GATE_SIZE.y);
-    }
-
+    const auto GATE_POS_MIN(WINDOW_POS.x + GATE_POS.x, WINDOW_POS.y + GATE_POS.y);
+    const auto GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y + GATE_SIZE.y);
     const auto START_SIZE = ImVec2((ImGui::CalcTextSize(BUTTON_STR.c_str()).x * font_size_scale), (ImGui::CalcTextSize(BUTTON_STR.c_str()).y * font_size_scale));
     const auto START_BUTTON_SIZE = ImVec2(START_SIZE.x + 26.0f * SCALE.x, START_SIZE.y + 5.0f * SCALE.y);
     const auto POS_BUTTON = ImVec2((GATE_POS.x + (GATE_SIZE.x - START_BUTTON_SIZE.x) / 2.0f), (GATE_POS.y + (GATE_SIZE.y - START_BUTTON_SIZE.y) / 1.08f));
@@ -1184,7 +1178,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
         if (ImGui::Button("Esc", BUTTON_SIZE))
             close_live_area_app(gui, emuenv, app_path);
       if(emuenv.cfg.screenmode_pos == 3){
-        ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, 155.0f * SCALE.y));
+        ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, center.y));
       }else{
         ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, 55.0f * SCALE.y));
       }
