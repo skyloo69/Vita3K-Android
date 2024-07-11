@@ -754,13 +754,18 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     float GRID_COLUMN_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-        GRID_COLUMN_SIZE = ICON_SIZE.x + (VIEWPORT_SCALE.x);
+        GRID_COLUMN_SIZE = ICON_SIZE.y;
     }else{
         GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
     }
     const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
+    // if still broken just disable grid mode
+    // if(emuenv.cfg.apps_list_grid == 3 && emuenv.cfg.apps_list_grid){
+    //     emuenv.cfg.apps_list_grid = !emuenv.cfg.apps_list_grid;
+    // }
+    
     if (!emuenv.cfg.apps_list_grid) {
         ImGui::Columns(7, nullptr, true);
         ImGui::SetColumnWidth(0, column_icon_size);
@@ -769,11 +774,6 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetColumnWidth(3, app_ver_size);
         ImGui::SetColumnWidth(4, category_size);
         ImGui::SetColumnWidth(5, last_time_size);
-    } else if(emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-        ImGui::Columns(3, nullptr, false);
-        ImGui::SetColumnWidth(0, GRID_COLUMN_SIZE);
-        ImGui::SetColumnWidth(1, GRID_COLUMN_SIZE);
-        ImGui::SetColumnWidth(2, GRID_COLUMN_SIZE);
     } else {
         ImGui::Columns(4, nullptr, false);
         ImGui::SetColumnWidth(0, GRID_COLUMN_SIZE);
@@ -808,12 +808,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
             const auto POS_ICON = ImGui::GetCursorPos();
             const auto GRID_INIT_POS = POS_ICON.x + (GRID_COLUMN_SIZE / 2.f) - (10.f * VIEWPORT_SCALE.x);
-            float GRID_ICON_POS;
-            if(emuenv.cfg.screenmode_pos == 3){
-                GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.y / 2.f);
-            }else{
-                GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.x / 2.f);
-            }
+            const auto GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.x / 2.f);
             
             ImGui::PushID(app.path.c_str());
 
