@@ -339,9 +339,9 @@ void draw_app_context_menu(GuiState &gui, EmuEnvState &emuenv, const std::string
     const auto EXPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/export" / title_id };
     const auto IMPORT_TEXTURES_PATH{ emuenv.shared_path / "textures/import" / title_id };
 #ifdef ANDROID
-    const auto ISSUES_URL = "https://github.com/Vita3K/compatibility/issues";
-#else
     const auto ISSUES_URL = "https://github.com/Vita3K/Vita3K-Android/issues";
+#else
+    const auto ISSUES_URL = "https://github.com/Vita3K/compatibility/issues";
 #endif
     
 
