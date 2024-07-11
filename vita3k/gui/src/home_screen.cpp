@@ -243,7 +243,11 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto ICON_SIZE = ImVec2(64.f * SCALE.x, 64.f * SCALE.y);
 
-    ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
+    if(cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(2.0f * RES_SCALE.x);
+    }else{
+        ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
+    }
     ImGui::SetCursorPos(ImVec2(50.f * SCALE.x, 108.f * SCALE.y));
     ImGui::TextColored(GUI_COLOR_TEXT, "%s", gui.lang.game_data["app_close"].c_str());
     if (gui.app_selector.user_apps_icon.contains(emuenv.io.app_path)) {
@@ -596,9 +600,13 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const auto full_compat_radius = (3.f * (emuenv.cfg.apps_list_grid ? VIEWPORT_SCALE.x : VIEWPORT_SCALE.x)) + compat_radius;
 
     auto &lang = gui.lang.home_screen;
-
-    ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
-
+    
+    if(cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(1.4f * VIEWPORT_RES_SCALE.x);
+    }else{
+        ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
+    }
+    
     // Sort Apps list when is not sorted
     if (!gui.app_selector.is_app_list_sorted)
         sort_app_list(gui, emuenv, gui.users[emuenv.io.user_id].sort_apps_type);
@@ -778,7 +786,11 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetColumnWidth(3, GRID_COLUMN_SIZE);
     }
 
-    ImGui::SetWindowFontScale(1.1f);
+    if(cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(1.6f);
+    }else{
+        ImGui::SetWindowFontScale(1.1f);
+    }
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT);
 
     std::vector<int32_t> visible_apps{};
@@ -957,7 +969,11 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImGui::PopStyleColor();
     ImGui::Columns(1);
-    ImGui::SetWindowFontScale(1.f);
+    if(cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(1.6f);
+    }else{
+        ImGui::SetWindowFontScale(1.f);
+    }
     ImGui::ScrollWhenDragging();
     ImGui::EndChild();
 
