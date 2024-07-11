@@ -647,11 +647,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
             sort_app_list(gui, emuenv, TITLE);
     } else {
         ImGui::Columns(2);
-        if(emuenv.cfg.screenmode_pos == 3){
-           ImGui::SetColumnWidth(0, 150 * VIEWPORT_SCALE.x);
-        }else{
-           ImGui::SetColumnWidth(0, 90 * VIEWPORT_SCALE.x);
-        }
+        ImGui::SetColumnWidth(0, 90 * VIEWPORT_SCALE.x);
         if (ImGui::Button(lang["filter"].c_str()))
             ImGui::OpenPopup("app_filter");
         ImGui::NextColumn();
@@ -761,10 +757,10 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
-    // if still broken just disable grid mode
-    // if(emuenv.cfg.apps_list_grid == 3 && emuenv.cfg.apps_list_grid){
-    //     emuenv.cfg.apps_list_grid = !emuenv.cfg.apps_list_grid;
-    // }
+    // grid mode is broken, just disable it for portrait mode
+    if(emuenv.cfg.apps_list_grid == 3 && emuenv.cfg.apps_list_grid){
+        emuenv.cfg.apps_list_grid = !emuenv.cfg.apps_list_grid;
+    }
     
     if (!emuenv.cfg.apps_list_grid) {
         ImGui::Columns(7, nullptr, true);
