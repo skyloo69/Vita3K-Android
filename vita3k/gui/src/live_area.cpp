@@ -1083,7 +1083,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 BUTTON_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-	BUTTON_SIZE = ImVec2(144.f * SCALE.y, 120.f * SCALE.x);
+	BUTTON_SIZE = ImVec2(144.f * SCALE.y, 100.f * SCALE.x);
     }else{
 	BUTTON_SIZE = ImVec2(72.f * SCALE.x, 30.f * SCALE.y);
     }
