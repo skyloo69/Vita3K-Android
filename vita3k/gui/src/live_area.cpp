@@ -1184,6 +1184,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 	      gui.vita_area.app_information = false;
 	   }
             close_live_area_app(gui, emuenv, app_path);
+	}
       if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, center.y));
       }else{
