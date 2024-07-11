@@ -1066,14 +1066,19 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     const std::string BUTTON_STR = app_path == emuenv.io.title_id ? gui.lang.live_area.main["continue"] : gui.lang.live_area.main["start"];
 
     ImVec2 GATE_SIZE;
-    if(emuenv.cfg.screenmode_pos == 3){
+    if(emuenv.cfg.screenmode_pos == 3) {
        GATE_SIZE = ImVec2(280.0f * SCALE.x, 60.0f * SCALE.y);
-    }else{
+    } else {
        GATE_SIZE = ImVec2(280.0f * SCALE.x, 158.0f * SCALE.y);
     }
     const auto GATE_POS = ImVec2(WINDOW_SIZE.x - (gate_pos.x * SCALE.x), WINDOW_SIZE.y - (gate_pos.y * SCALE.y));
     const ImVec2 GATE_POS_MIN(WINDOW_POS.x + GATE_POS.x, WINDOW_POS.y + GATE_POS.y);
-    const ImVec2 GATE_POS_MAX(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y + GATE_SIZE.y);
+    ImVec2 GATE_POS_MAX;
+    if(emuenv.cfg.screenmode_pos == 3) {
+    	GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y - GATE_SIZE.y);
+    } else {
+ 	GATE_POS_MAX = ImVec2(GATE_POS_MIN.x + GATE_SIZE.x, GATE_POS_MIN.y + GATE_SIZE.y);
+    }
 
     const auto START_SIZE = ImVec2((ImGui::CalcTextSize(BUTTON_STR.c_str()).x * font_size_scale), (ImGui::CalcTextSize(BUTTON_STR.c_str()).y * font_size_scale));
     const auto START_BUTTON_SIZE = ImVec2(START_SIZE.x + 26.0f * SCALE.x, START_SIZE.y + 5.0f * SCALE.y);
@@ -1170,7 +1175,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     if (!gui.vita_area.content_manager && !gui.vita_area.manual) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.f * SCALE.x);
       if(emuenv.cfg.screenmode_pos == 3){
-        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 155.0f * SCALE.y));
+        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 250.0f * SCALE.y));
       }else{
 	ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 55.0f * SCALE.y));
       }
