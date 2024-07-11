@@ -1089,7 +1089,7 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 BUTTON_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-	BUTTON_SIZE = ImVec2(144.f * SCALE.x, 120.f * SCALE.y);
+	BUTTON_SIZE = ImVec2(144.f * SCALE.y, 120.f * SCALE.x);
     }else{
 	BUTTON_SIZE = ImVec2(72.f * SCALE.x, 30.f * SCALE.y);
     }
@@ -1171,11 +1171,13 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     auto &lang = gui.lang.live_area.help;
     auto &common = emuenv.common_dialog.lang.common;
+    // Always center this window when appearing
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 
     if (!gui.vita_area.content_manager && !gui.vita_area.manual) {
         ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 6.f * SCALE.x);
       if(emuenv.cfg.screenmode_pos == 3){
-        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 250.0f * SCALE.y));
+        ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, center.y));
       }else{
 	ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 55.0f * SCALE.y));
       }
