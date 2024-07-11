@@ -631,6 +631,10 @@ void browse_live_area_apps_list(GuiState &gui, EmuEnvState &emuenv, const uint32
 }
 
 void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
+
+    if(emuenv.cfg.screenmode_pos == 3){
+	gui.vita_area.app_information = true;
+    }
     const ImVec2 VIEWPORT_SIZE = ImGui::GetIO().DisplaySize;
     const ImVec2 VIEWPORT_POS = {0,0};
     ImVec2 RES_SCALE;
@@ -1175,7 +1179,10 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
       }else{
 	ImGui::SetCursorPos(ImVec2(WINDOW_SIZE.x - (60.0f * SCALE.x) - BUTTON_SIZE.x, 55.0f * SCALE.y));
       }
-        if (ImGui::Button("Esc", BUTTON_SIZE))
+        if (ImGui::Button("Esc", BUTTON_SIZE)){
+	   if(emuenv.cfg.screenmode_pos == 3){
+	      gui.vita_area.app_information = false;
+	   }
             close_live_area_app(gui, emuenv, app_path);
       if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetCursorPos(ImVec2(60.f * SCALE.x, center.y));
@@ -1256,6 +1263,9 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::SetCursorPos(ImVec2(ARROW_WIDTH_POS - (SELECTABLE_SIZE.x / 2.f), ARROW_SELECT_HEIGHT_POS));
     if (ImGui::Selectable("##left", false, ImGuiSelectableFlags_None, SELECTABLE_SIZE)) {
         if (gui.live_area_app_current_open == 0) {
+	    if(emuenv.cfg.screenmode_pos == 3){
+	       gui.vita_area.app_information = false;
+	    }
             gui.vita_area.live_area_screen = false;
             gui.vita_area.home_screen = true;
         }
