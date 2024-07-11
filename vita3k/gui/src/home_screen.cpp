@@ -243,7 +243,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto ICON_SIZE = ImVec2(64.f * SCALE.x, 64.f * SCALE.y);
 
-    if(cfg.screenmode_pos == 3){
+    if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetWindowFontScale(2.0f * RES_SCALE.x);
     }else{
         ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
@@ -601,7 +601,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     auto &lang = gui.lang.home_screen;
     
-    if(cfg.screenmode_pos == 3){
+    if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetWindowFontScale(1.4f * VIEWPORT_RES_SCALE.x);
     }else{
         ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
@@ -786,7 +786,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetColumnWidth(3, GRID_COLUMN_SIZE);
     }
 
-    if(cfg.screenmode_pos == 3){
+    if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetWindowFontScale(1.6f);
     }else{
         ImGui::SetWindowFontScale(1.1f);
@@ -969,7 +969,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImGui::PopStyleColor();
     ImGui::Columns(1);
-    if(cfg.screenmode_pos == 3){
+    if(emuenv.cfg.screenmode_pos == 3){
         ImGui::SetWindowFontScale(1.6f);
     }else{
         ImGui::SetWindowFontScale(1.f);
