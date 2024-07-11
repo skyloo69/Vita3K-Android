@@ -754,7 +754,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     float GRID_COLUMN_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-        GRID_COLUMN_SIZE = ICON_SIZE.y + (140.f * VIEWPORT_SCALE.x);
+        GRID_COLUMN_SIZE = ICON_SIZE.x + (VIEWPORT_SCALE.x);
     }else{
         GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
     }
@@ -808,15 +808,17 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
             const auto POS_ICON = ImGui::GetCursorPos();
             const auto GRID_INIT_POS = POS_ICON.x + (GRID_COLUMN_SIZE / 2.f) - (10.f * VIEWPORT_SCALE.x);
-
-            const auto GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.x / 2.f);
+            float GRID_ICON_POS;
+            if(emuenv.cfg.screenmode_pos == 3){
+                GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.y / 2.f);
+            }else{
+                GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.x / 2.f);
+            }
+            
             ImGui::PushID(app.path.c_str());
 
-            if(emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-                ImGui::SetCursorPosY(GRID_ICON_POS);
-            }else if (emuenv.cfg.apps_list_grid){
+            if (emuenv.cfg.apps_list_grid)
                 ImGui::SetCursorPosX(GRID_ICON_POS);
-            }
 
             // Get the current app index off the apps list.
             const auto app_index = static_cast<int>(&app - &apps_list[0]);
@@ -873,13 +875,11 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
                 // Draw the app icon
                 if (apps_icon.contains(app.path)) {
-                    if(emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-                        ImGui::SetCursorPosY(GRID_ICON_POS);
-                    }else if (emuenv.cfg.apps_list_grid){
+                    if (emuenv.cfg.apps_list_grid)
                         ImGui::SetCursorPosX(GRID_ICON_POS);
-                    }else{
+                    else
                         ImGui::SetCursorPos(ImVec2(POS_ICON.x + (5.f * VIEWPORT_SCALE.x), POS_ICON.y + (5.f * VIEWPORT_SCALE.y)));
-                    }
+                    
                     const auto POS_MIN = ImGui::GetCursorScreenPos();
                     const ImVec2 POS_MAX(POS_MIN.x + ICON_SIZE.x, POS_MIN.y + ICON_SIZE.y);
                     ImGui::GetWindowDrawList()->AddImageRounded(apps_icon[app.path], POS_MIN, POS_MAX, ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, ICON_SIZE.x * VIEWPORT_SCALE.x, ImDrawFlags_RoundCornersAll);
@@ -888,11 +888,9 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
                 // Draw the custom config button
                 const auto IS_CUSTOM_CONFIG = fs::exists(emuenv.config_path / "config" / fmt::format("config_{}.xml", app.path));
                 if (IS_CUSTOM_CONFIG) {
-                    if(emuenv.cfg.apps_list_grid && emuenv.cfg.screenmode_pos == 3) {
-                        ImGui::SetCursorPosY(GRID_ICON_POS);
-                    }else if (emuenv.cfg.apps_list_grid){
+                    if (emuenv.cfg.apps_list_grid)
                         ImGui::SetCursorPosX(GRID_ICON_POS);
-                    }
+                    
                     ImGui::SetCursorPosY(POS_ICON.y + ICON_SIZE.y - ImGui::GetFontSize() - (7.8f * emuenv.dpi_scale));
                     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_TITLE);
                     ImGui::Button("CC", ImVec2(40.f * VIEWPORT_SCALE.x, 0.f));
