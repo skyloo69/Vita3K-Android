@@ -1132,6 +1132,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::RadioButton("0 degrees", &emuenv.cfg.tiltpos, 0);
             ImGui::RadioButton("90 degrees", &emuenv.cfg.tiltpos, 1);
             ImGui::RadioButton("-90 degrees", &emuenv.cfg.tiltpos, -1);
+            config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         }
 
         ImGui::Spacing();
@@ -1145,7 +1146,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton(lang.emulator["screenmode_right"].c_str(), &emuenv.cfg.screenmode_pos, 2);
         ImGui::RadioButton(lang.emulator["screenmode_up"].c_str(), &emuenv.cfg.screenmode_pos, 3);
         SetTooltipEx(lang.emulator["screenmode_up_description"].c_str());
-      
+        config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+        
         ImGui::Spacing();
         ImGui::Separator();
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["custom_config_settings"].c_str()).x / 2.f));
@@ -1450,7 +1452,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
-    static const auto BUTTON_SIZE = ImVec2(120.f * SCALE.x, 1.4f);
+    static const auto BUTTON_SIZE = ImVec2(120.f * SCALE.x, 0.f);
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - BUTTON_SIZE.x - (10.f * SCALE.x));
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
         settings_dialog = false;
