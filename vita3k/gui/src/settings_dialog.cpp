@@ -545,7 +545,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     auto &settings_dialog = is_custom_config ? gui.configuration_menu.custom_settings_dialog : gui.configuration_menu.settings_dialog;
     ImGui::Begin("##settings", &settings_dialog, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
     if(emuenv.cfg.screenmode_pos == 3){
-       ImGui::SetWindowFontScale(1.4f * RES_SCALE.y);
+       ImGui::SetWindowFontScale(1.2f * RES_SCALE.y);
     }else{
        ImGui::SetWindowFontScale(1.0f * RES_SCALE.x);
     }
@@ -1450,7 +1450,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     ImGui::Spacing();
     ImGui::Separator();
     ImGui::Spacing();
-    static const auto BUTTON_SIZE = ImVec2(120.f * SCALE.x, 0.4f);
+    static const auto BUTTON_SIZE = ImVec2(120.f * SCALE.x, 1.4f);
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - BUTTON_SIZE.x - (10.f * SCALE.x));
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
         settings_dialog = false;
