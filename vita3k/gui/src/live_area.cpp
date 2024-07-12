@@ -1162,11 +1162,6 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
                 open_manual(gui, emuenv, app_path);
         }
     }
-
-   if(emuenv.cfg.screenmode_pos == 3){
-	gui.vita_area.app_information = true;
-	get_app_info(gui, emuenv, app_path);
-   }
 	
     auto &lang = gui.lang.live_area.help;
     auto &common = emuenv.common_dialog.lang.common;
