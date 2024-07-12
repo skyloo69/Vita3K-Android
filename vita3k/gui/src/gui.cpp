@@ -803,7 +803,7 @@ void draw_touchpad_cursor(EmuEnvState &emuenv) {
 }
 
 void draw_vita_area(GuiState &gui, EmuEnvState &emuenv) {
-    if (gui.vita_area.start_screen &&  emuenv.cfg.screenmode_pos != 3)
+    if (gui.vita_area.start_screen)
         draw_start_screen(gui, emuenv);
 
     ImGui::PushFont(gui.vita_font);
