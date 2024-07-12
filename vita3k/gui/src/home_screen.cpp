@@ -243,7 +243,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto ICON_SIZE = ImVec2(64.f * SCALE.x, 64.f * SCALE.y);
 
-    ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
+    ImGui::SetWindowFontScale(1.2f * RES_SCALE.x);
     ImGui::SetCursorPos(ImVec2(50.f * SCALE.x, 108.f * SCALE.y));
     ImGui::TextColored(GUI_COLOR_TEXT, "%s", gui.lang.game_data["app_close"].c_str());
     if (gui.app_selector.user_apps_icon.contains(emuenv.io.app_path)) {
