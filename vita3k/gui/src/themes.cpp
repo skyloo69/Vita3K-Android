@@ -419,6 +419,14 @@ void draw_background(GuiState &gui, EmuEnvState &emuenv) {
 }
 
 void draw_start_screen(GuiState &gui, EmuEnvState &emuenv) {
+   if(emuenv.cfg.screenmode_pos == 3){ // bypass lockscreen
+        gui.vita_area.start_screen = false;
+        gui.vita_area.home_screen = true;
+        if (emuenv.cfg.show_info_bar)
+            gui.vita_area.information_bar = true;
+        
+   }else{
+    
     const ImVec2 VIEWPORT_SIZE = ImGui::GetIO().DisplaySize;
     const ImVec2 VIEWPORT_POS = {0,0};
     const ImVec2 RES_SCALE(VIEWPORT_SIZE.x / emuenv.res_width_dpi_scale, VIEWPORT_SIZE.y / emuenv.res_height_dpi_scale);
@@ -512,6 +520,7 @@ void draw_start_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImGui::End();
     ImGui::PopStyleVar(3);
+   }
 }
 
 } // namespace gui
