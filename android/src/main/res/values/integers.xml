@@ -67,6 +67,6 @@
     <integer name="TRIGGER_R3_Y_PORTRAIT">1730</integer>
     <integer name="BUTTON_TOUCH_SWITCH_X_PORTRAIT">445</integer>
     <integer name="BUTTON_TOUCH_SWITCH_Y_PORTRAIT">1850</integer>
-    <integer name="BUTTON_HIDE_X_PORTRAIT">445/integer>
+    <integer name="BUTTON_HIDE_X_PORTRAIT">445</integer>
     <integer name="BUTTON_HIDE_Y_PORTRAIT">1900</integer>
 </resources>
