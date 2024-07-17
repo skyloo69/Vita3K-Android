@@ -53,20 +53,20 @@
     <integer name="STICK_LEFT_Y_PORTRAIT">1550</integer>
     <integer name="STICK_RIGHT_X_PORTRAIT">640</integer>
     <integer name="STICK_RIGHT_Y_PORTRAIT">1550</integer>
-    <integer name="TRIGGER_L_X_PORTRAIT">40</integer>
+    <integer name="TRIGGER_L_X_PORTRAIT">20</integer>
     <integer name="TRIGGER_L_Y_PORTRAIT">750</integer>
-    <integer name="TRIGGER_R_X_PORTRAIT">660</integer>
+    <integer name="TRIGGER_R_X_PORTRAIT">690</integer>
     <integer name="TRIGGER_R_Y_PORTRAIT">750</integer>
-    <integer name="TRIGGER_L2_X_PORTRAIT">445</integer>
+    <integer name="TRIGGER_L2_X_PORTRAIT">435</integer>
     <integer name="TRIGGER_L2_Y_PORTRAIT">750</integer>
     <integer name="TRIGGER_L3_X_PORTRAIT">445</integer>
     <integer name="TRIGGER_L3_Y_PORTRAIT">1500</integer>
-    <integer name="TRIGGER_R2_X_PORTRAIT">445</integer>
-    <integer name="TRIGGER_R2_Y_PORTRAIT">750</integer>
+    <integer name="TRIGGER_R2_X_PORTRAIT">435</integer>
+    <integer name="TRIGGER_R2_Y_PORTRAIT">800</integer>
     <integer name="TRIGGER_R3_X_PORTRAIT">445</integer>
     <integer name="TRIGGER_R3_Y_PORTRAIT">1730</integer>
     <integer name="BUTTON_TOUCH_SWITCH_X_PORTRAIT">445</integer>
-    <integer name="BUTTON_TOUCH_SWITCH_Y_PORTRAIT">1850</integer>
-    <integer name="BUTTON_HIDE_X_PORTRAIT">445</integer>
+    <integer name="BUTTON_TOUCH_SWITCH_Y_PORTRAIT">1900</integer>
+    <integer name="BUTTON_HIDE_X_PORTRAIT">10</integer>
     <integer name="BUTTON_HIDE_Y_PORTRAIT">1900</integer>
 </resources>
