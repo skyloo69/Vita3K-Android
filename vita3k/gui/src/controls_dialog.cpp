@@ -52,7 +52,7 @@ int get_overlay_display_mask(const Config& cfg){
 }
 
 #ifdef ANDROID
-void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {
+void set_controller_overlay_state(int overlay_mask, bool edit, bool reset, bool portrait) {
     // retrieve the JNI environment.
     JNIEnv *env = reinterpret_cast<JNIEnv *>(SDL_AndroidGetJNIEnv());
 
@@ -63,10 +63,10 @@ void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {
     jclass clazz(env->GetObjectClass(activity));
 
     // find the identifier of the method to call
-    jmethodID method_id = env->GetMethodID(clazz, "setControllerOverlayState", "(IZZ)V");
+    jmethodID method_id = env->GetMethodID(clazz, "setControllerOverlayState", "(IZZZ)V");
 
     // effectively call the Java method
-    env->CallVoidMethod(activity, method_id, overlay_mask, edit, reset);
+    env->CallVoidMethod(activity, method_id, overlay_mask, edit, reset, portrait);
 
     // clean up the local references.
     env->DeleteLocalRef(activity);
@@ -121,7 +121,11 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
     const ImVec2 display_size(emuenv.viewport_size.x, emuenv.viewport_size.y);
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
-    ImGui::SetNextWindowPos(ImVec2(display_size.x / 2.f, display_size.y / 2.f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+    // Always center this window when appearing
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     ImGui::Begin("Overlay", &gui.controls_menu.controls_dialog, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::SetWindowFontScale(RES_SCALE.x);
 
@@ -157,9 +161,13 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     }
     ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (gmpd / 2.f));
      if (overlay_editing && ImGui::Button("Reset Gamepad")) {
-        set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), true, true);
+        if(emuenv.cfg.screenmode_pos == 3){
+            set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), true, true, true);
+        }else{
+            set_controller_overlay_state(get_overlay_display_mask(emuenv.cfg), true, true, false);
+        }
         emuenv.cfg.overlay_scale = 1.0f;
-        emuenv.cfg.overlay_opacity = 100;
+        emuenv.cfg.overlay_opacity = 80;
         set_controller_overlay_scale(emuenv.cfg.overlay_scale);
         set_controller_overlay_opacity(emuenv.cfg.overlay_opacity);
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
@@ -184,7 +192,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
 #else
 
-void set_controller_overlay_state(int overlay_mask, bool edit, bool reset) {}
+void set_controller_overlay_state(int overlay_mask, bool edit, bool reset, bool portrait) {}
 void set_controller_overlay_scale(float scale) {}
 void set_controller_overlay_opacity(int opacity) {}
 

@@ -240,6 +240,7 @@ public class HIDDeviceManager {
             0x06a3, // Saitek
             0x0738, // Mad Catz
             0x07ff, // Mad Catz
+            0x0b05, // ASUS
             0x0e6f, // PDP
             0x0f0d, // Hori
             0x1038, // SteelSeries

@@ -555,25 +555,25 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
               R.drawable.button_r_pressed, ButtonType.TRIGGER_R,
               ControlId.r1, orientation, OVERLAY_MASK_BASIC));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l2,
-            R.drawable.button_l2_pressed, ButtonType.TRIGGER_L2,
-            ControlId.l2, orientation, OVERLAY_MASK_L2R2));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l2,
+              R.drawable.button_l2_pressed, ButtonType.TRIGGER_L2,
+              ControlId.l2, orientation, OVERLAY_MASK_L2R2));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r2,
-            R.drawable.button_r2_pressed, ButtonType.TRIGGER_R2,
-            ControlId.r2, orientation, OVERLAY_MASK_L2R2));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r2,
+              R.drawable.button_r2_pressed, ButtonType.TRIGGER_R2,
+              ControlId.r2, orientation, OVERLAY_MASK_L2R2));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l3,
-            R.drawable.button_l3_pressed, ButtonType.TRIGGER_L3,
-            ControlId.l3, orientation, OVERLAY_MASK_L2R2));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_l3,
+              R.drawable.button_l3_pressed, ButtonType.TRIGGER_L3,
+              ControlId.l3, orientation, OVERLAY_MASK_L2R2));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r3,
-            R.drawable.button_r3_pressed, ButtonType.TRIGGER_R3,
-            ControlId.r3, orientation, OVERLAY_MASK_L2R2));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_r3,
+              R.drawable.button_r3_pressed, ButtonType.TRIGGER_R3,
+              ControlId.r3, orientation, OVERLAY_MASK_L2R2));
 
-    overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_touch_f,
-            R.drawable.button_touch_b, ButtonType.BUTTON_TOUCH_SWITCH,
-            ControlId.touch, orientation, OVERLAY_MASK_TOUCH_SCREEN_SWITCH));
+      overlayButtons.add(initializeOverlayButton(getContext(), R.drawable.button_touch_f,
+              R.drawable.button_touch_b, ButtonType.BUTTON_TOUCH_SWITCH,
+              ControlId.touch, orientation, OVERLAY_MASK_TOUCH_SCREEN_SWITCH));
     
       overlayDpads.add(initializeOverlayDpad(getContext(), R.drawable.dpad_idle,
               R.drawable.dpad_up,
@@ -606,9 +606,9 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     invalidate();
   }
 
-  public void resetButtonPlacement()
+  public void resetButtonPlacement(boolean portrait)
   {
-    vitaDefaultOverlay();
+    vitaDefaultOverlay(portrait);
     refreshControls();
   }
 
@@ -875,7 +875,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
   {
     if (!mPreferences.getBoolean("OverlayInit", false))
     {
-        vitaDefaultOverlay();
+        vitaDefaultOverlay(false);
     }
 
     SharedPreferences.Editor sPrefsEditor = mPreferences.edit();
@@ -883,7 +883,7 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
     sPrefsEditor.apply();
   }
 
-  private void vitaDefaultOverlay()
+  private void vitaDefaultOverlay(boolean portrait)
   {
     SharedPreferences.Editor sPrefsEditor = mPreferences.edit();
 
@@ -909,75 +909,150 @@ public final class InputOverlay extends SurfaceView implements OnTouchListener
 
     // Each value is a percent from max X/Y stored as an int. Have to bring that value down
     // to a decimal before multiplying by MAX X/Y.
-    sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_CROSS_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_CROSS_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_CIRCLE_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_CIRCLE_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_SQUARE_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_SQUARE_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_SELECT_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_SELECT_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_START_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_START_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-X",
-            (((float) res.getInteger(R.integer.DPAD_UP_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-Y",
-            (((float) res.getInteger(R.integer.DPAD_UP_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-X",
-            (((float) res.getInteger(R.integer.STICK_LEFT_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-Y",
-            (((float) res.getInteger(R.integer.STICK_LEFT_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-X",
-            (((float) res.getInteger(R.integer.STICK_RIGHT_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-Y",
-            (((float) res.getInteger(R.integer.STICK_RIGHT_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_L_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_L_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_R_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_R_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_L2_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_L2_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_R2_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_R2_Y) / 1000) * maxY));
 
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_L3_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_L3_Y) / 1000) * maxY));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-X",
-            (((float) res.getInteger(R.integer.TRIGGER_R3_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-Y",
-            (((float) res.getInteger(R.integer.TRIGGER_R3_Y) / 1000) * maxY));
+    if(portrait){
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_CROSS_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_CROSS_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_CIRCLE_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_CIRCLE_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_SQUARE_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_SQUARE_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_SELECT_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_SELECT_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_START_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_START_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-X",
+                (((float) res.getInteger(R.integer.DPAD_UP_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-Y",
+                (((float) res.getInteger(R.integer.DPAD_UP_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-X",
+                (((float) res.getInteger(R.integer.STICK_LEFT_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-Y",
+                (((float) res.getInteger(R.integer.STICK_LEFT_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-X",
+                (((float) res.getInteger(R.integer.STICK_RIGHT_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-Y",
+                (((float) res.getInteger(R.integer.STICK_RIGHT_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L2_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L2_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R2_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R2_Y_PORTRAIT) / 1000) * maxY));
 
-    sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-X",
-            (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_X) / 1000) * maxX));
-    sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-Y",
-            (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L3_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L3_Y_PORTRAIT) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R3_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R3_Y_PORTRAIT) / 1000) * maxY));
 
-    // We want to commit right away, otherwise the overlay could load before this is saved.
-    sPrefsEditor.commit();
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_X_PORTRAIT) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_Y_PORTRAIT) / 1000) * maxY));
+
+        // We want to commit right away, otherwise the overlay could load before this is saved.
+        sPrefsEditor.commit();
+
+    }else{
+
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_CROSS_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CROSS + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_CROSS_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_CIRCLE_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_CIRCLE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_CIRCLE_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_SQUARE_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SQUARE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_SQUARE_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TRIANGLE + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_TRIANGLE_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_SELECT_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_SELECT + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_SELECT_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_START_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_START + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_START_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-X",
+                (((float) res.getInteger(R.integer.DPAD_UP_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.DPAD_UP + "-Y",
+                (((float) res.getInteger(R.integer.DPAD_UP_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-X",
+                (((float) res.getInteger(R.integer.STICK_LEFT_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.STICK_LEFT + "-Y",
+                (((float) res.getInteger(R.integer.STICK_LEFT_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-X",
+                (((float) res.getInteger(R.integer.STICK_RIGHT_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.STICK_RIGHT + "-Y",
+                (((float) res.getInteger(R.integer.STICK_RIGHT_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L2_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L2 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L2_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R2_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R2 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R2_Y) / 1000) * maxY));
+
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_L3_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_L3 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_L3_Y) / 1000) * maxY));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-X",
+                (((float) res.getInteger(R.integer.TRIGGER_R3_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.TRIGGER_R3 + "-Y",
+                (((float) res.getInteger(R.integer.TRIGGER_R3_Y) / 1000) * maxY));
+
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-X",
+                (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_X) / 1000) * maxX));
+        sPrefsEditor.putFloat(ButtonType.BUTTON_TOUCH_SWITCH + "-Y",
+                (((float) res.getInteger(R.integer.BUTTON_TOUCH_SWITCH_Y) / 1000) * maxY));
+
+        // We want to commit right away, otherwise the overlay could load before this is saved.
+        sPrefsEditor.commit();
+        }
   }
 
   public native void attachController();

@@ -654,6 +654,7 @@ struct LangState {
             { "screenmode_Left", "Lock to landscapes left" },
             { "screenmode_right", "Lock to Landscapes right" },
             { "screenmode_up", "Lock to portrait" },
+            { "screenmode_up_description", "WIP, GUI still buggy" },
             { "custom_config_settings", "Custom Config Settings" },
             { "clear_custom_config", "Clear Custom Config" }
         };
@@ -725,6 +726,7 @@ struct LangState {
             { "dump_elfs_description", "Dump loaded code as ELFs." },
             { "validation_layer", "Validation Layer (Reboot required)" },
             { "validation_layer_description", "Enable Vulkan validation layer." },
+            { "debug_menu", "Enable debug menu in menubar" },
             { "unwatch_code", "Unwatch Code" },
             { "watch_code", "Watch Code" },
             { "unwatch_memory", "Unwatch Memory" },

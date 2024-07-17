@@ -243,7 +243,7 @@ void draw_app_close(GuiState &gui, EmuEnvState &emuenv) {
 
     const auto ICON_SIZE = ImVec2(64.f * SCALE.x, 64.f * SCALE.y);
 
-    ImGui::SetWindowFontScale(1.4f * RES_SCALE.x);
+    ImGui::SetWindowFontScale(1.2f * RES_SCALE.x);
     ImGui::SetCursorPos(ImVec2(50.f * SCALE.x, 108.f * SCALE.y));
     ImGui::TextColored(GUI_COLOR_TEXT, "%s", gui.lang.game_data["app_close"].c_str());
     if (gui.app_selector.user_apps_icon.contains(emuenv.io.app_path)) {
@@ -579,8 +579,12 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     draw_background(gui, emuenv);
 
     // Size of the icon depending view mode
-    const ImVec2 ICON_SIZE(emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
-
+    ImVec2 ICON_SIZE;
+    if(emuenv.cfg.screenmode_pos == 3){
+        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(100.f * VIEWPORT_SCALE.x, 100.f * VIEWPORT_SCALE.y) : ImVec2(120.0f * VIEWPORT_SCALE.x, 120.0f * VIEWPORT_SCALE.x));
+    }else{
+        ICON_SIZE = (emuenv.cfg.apps_list_grid ? ImVec2(128.f * VIEWPORT_SCALE.x, 128.f * VIEWPORT_SCALE.y) : ImVec2(emuenv.cfg.icon_size * VIEWPORT_SCALE.x, emuenv.cfg.icon_size * VIEWPORT_SCALE.x));
+    }
     // Size of column padding
     const float column_padding_size = 20.f * VIEWPORT_SCALE.x;
 
@@ -592,9 +596,9 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
     const auto full_compat_radius = (3.f * (emuenv.cfg.apps_list_grid ? VIEWPORT_SCALE.x : VIEWPORT_SCALE.x)) + compat_radius;
 
     auto &lang = gui.lang.home_screen;
-
+    
     ImGui::SetWindowFontScale(0.9f * VIEWPORT_RES_SCALE.x);
-
+    
     // Sort Apps list when is not sorted
     if (!gui.app_selector.is_app_list_sorted)
         sort_app_list(gui, emuenv, gui.users[emuenv.io.user_id].sort_apps_type);
@@ -744,10 +748,20 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         scroll_type = 0;
     }
 
-    const auto GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
+    float GRID_COLUMN_SIZE;
+    if(emuenv.cfg.screenmode_pos == 3){
+        GRID_COLUMN_SIZE = ICON_SIZE.y;
+    }else{
+        GRID_COLUMN_SIZE = ICON_SIZE.x + (80.f * VIEWPORT_SCALE.x);
+    }
     const ImVec2 list_selectable_size(0.f, ICON_SIZE.y + (10.f * VIEWPORT_SCALE.y));
     const ImVec2 SELECTABLE_APP_SIZE = emuenv.cfg.apps_list_grid ? ICON_SIZE : list_selectable_size;
 
+    // grid mode is broken, just disable it for portrait mode
+    if(emuenv.cfg.apps_list_grid == 3 && emuenv.cfg.apps_list_grid){
+        emuenv.cfg.apps_list_grid = !emuenv.cfg.apps_list_grid;
+    }
+    
     if (!emuenv.cfg.apps_list_grid) {
         ImGui::Columns(7, nullptr, true);
         ImGui::SetColumnWidth(0, column_icon_size);
@@ -764,7 +778,11 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetColumnWidth(3, GRID_COLUMN_SIZE);
     }
 
-    ImGui::SetWindowFontScale(1.1f);
+    if(emuenv.cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(1.6f);
+    }else{
+        ImGui::SetWindowFontScale(1.1f);
+    }
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT);
 
     std::vector<int32_t> visible_apps{};
@@ -790,8 +808,8 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
             const auto POS_ICON = ImGui::GetCursorPos();
             const auto GRID_INIT_POS = POS_ICON.x + (GRID_COLUMN_SIZE / 2.f) - (10.f * VIEWPORT_SCALE.x);
-
             const auto GRID_ICON_POS = GRID_INIT_POS - (ICON_SIZE.x / 2.f);
+            
             ImGui::PushID(app.path.c_str());
 
             if (emuenv.cfg.apps_list_grid)
@@ -856,6 +874,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
                         ImGui::SetCursorPosX(GRID_ICON_POS);
                     else
                         ImGui::SetCursorPos(ImVec2(POS_ICON.x + (5.f * VIEWPORT_SCALE.x), POS_ICON.y + (5.f * VIEWPORT_SCALE.y)));
+                    
                     const auto POS_MIN = ImGui::GetCursorScreenPos();
                     const ImVec2 POS_MAX(POS_MIN.x + ICON_SIZE.x, POS_MIN.y + ICON_SIZE.y);
                     ImGui::GetWindowDrawList()->AddImageRounded(apps_icon[app.path], POS_MIN, POS_MAX, ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, ICON_SIZE.x * VIEWPORT_SCALE.x, ImDrawFlags_RoundCornersAll);
@@ -866,6 +885,7 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
                 if (IS_CUSTOM_CONFIG) {
                     if (emuenv.cfg.apps_list_grid)
                         ImGui::SetCursorPosX(GRID_ICON_POS);
+                    
                     ImGui::SetCursorPosY(POS_ICON.y + ICON_SIZE.y - ImGui::GetFontSize() - (7.8f * emuenv.dpi_scale));
                     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_TITLE);
                     ImGui::Button("CC", ImVec2(40.f * VIEWPORT_SCALE.x, 0.f));
@@ -941,7 +961,11 @@ void draw_home_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImGui::PopStyleColor();
     ImGui::Columns(1);
-    ImGui::SetWindowFontScale(1.f);
+    if(emuenv.cfg.screenmode_pos == 3){
+        ImGui::SetWindowFontScale(1.6f);
+    }else{
+        ImGui::SetWindowFontScale(1.f);
+    }
     ImGui::ScrollWhenDragging();
     ImGui::EndChild();
 

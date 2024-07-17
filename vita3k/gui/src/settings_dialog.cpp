@@ -531,16 +531,24 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
     const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
+    // Always center this window when appearing
+    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+
     auto &lang = gui.lang.settings_dialog;
     auto &common = emuenv.common_dialog.lang.common;
     auto &firmware_font = gui.lang.install_dialog.firmware_install;
 
     ImGui::PushStyleColor(ImGuiCol_Text, GUI_COLOR_TEXT_MENUBAR);
-    ImGui::SetNextWindowPos(ImVec2(emuenv.viewport_pos.x + (display_size.x / 2.f), emuenv.viewport_pos.y + (display_size.y / 2.f)), ImGuiCond_Always, ImVec2(0.5f, 0.48f));
+
+    ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.48f));
     const auto is_custom_config = gui.configuration_menu.custom_settings_dialog;
     auto &settings_dialog = is_custom_config ? gui.configuration_menu.custom_settings_dialog : gui.configuration_menu.settings_dialog;
     ImGui::Begin("##settings", &settings_dialog, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
-    ImGui::SetWindowFontScale(1.0f * RES_SCALE.x);
+    if(emuenv.cfg.screenmode_pos == 3){
+       ImGui::SetWindowFontScale(1.2f * RES_SCALE.y);
+    }else{
+       ImGui::SetWindowFontScale(1.0f * RES_SCALE.x);
+    }
     auto settings_str = lang.main_window["title"].c_str();
     const auto title = is_custom_config ? fmt::format("{}: {} [{}]", settings_str, get_app_index(gui, emuenv.app_path)->title, emuenv.app_path) : settings_str;
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x / 2.f) - (ImGui::CalcTextSize(title.c_str()).x / 2.f));
@@ -816,13 +824,13 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
           if (ImGui::IsItemHovered())
               ImGui::SetTooltip("Not all games support manual screen size");
                     
-          if(setdph < 144){
-             setdph = 144;
+          if(setdph < 136){
+             setdph = 136;
           }else if(setdph > 4352){
              setdph = 4352;
           }
           
-          float tmp =  (float(setdph) / 544);
+          float tmp =  static_cast<float>(setdph / 544);
           config.resolution_multiplier = tmp;
           ImGui::Spacing();
         }
@@ -1115,8 +1123,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["sensor_settings"].c_str());
         ImGui::Spacing();
         if (ImGui::Checkbox(lang.emulator["sensor_enable"].c_str(), &emuenv.cfg.tiltsens)){
-            config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
-            SetTooltipEx(lang.emulator["sensors_description"].c_str());
+           SetTooltipEx(lang.emulator["sensors_description"].c_str());
         }
 
         if (!emuenv.cfg.tiltsens){
@@ -1138,6 +1145,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::RadioButton(lang.emulator["screenmode_Left"].c_str(), &emuenv.cfg.screenmode_pos, 1);
         ImGui::RadioButton(lang.emulator["screenmode_right"].c_str(), &emuenv.cfg.screenmode_pos, 2);
         ImGui::RadioButton(lang.emulator["screenmode_up"].c_str(), &emuenv.cfg.screenmode_pos, 3);
+        SetTooltipEx(lang.emulator["screenmode_up_description"].c_str());
         config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
         
         ImGui::Spacing();
@@ -1196,12 +1204,14 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Checkbox(lang.gui["stretch_the_display_area"].c_str(), &config.stretch_the_display_area);
         SetTooltipEx(lang.gui["stretch_the_display_area_description"].c_str());
         ImGui::Spacing();
-        ImGui::Checkbox(lang.gui["apps_list_grid"].c_str(), &emuenv.cfg.apps_list_grid);
-        SetTooltipEx(lang.gui["apps_list_grid_description"].c_str());
-        if (!emuenv.cfg.apps_list_grid) {
-            ImGui::Spacing();
-            ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
-            SetTooltipEx(lang.gui["select_icon_size"].c_str());
+        if(emuenv.cfg.screenmode_pos != 3){
+            ImGui::Checkbox(lang.gui["apps_list_grid"].c_str(), &emuenv.cfg.apps_list_grid);
+            SetTooltipEx(lang.gui["apps_list_grid_description"].c_str());
+            if (!emuenv.cfg.apps_list_grid) {
+                ImGui::Spacing();
+                ImGui::SliderInt(lang.gui["icon_size"].c_str(), &emuenv.cfg.icon_size, 64, 128);
+                SetTooltipEx(lang.gui["select_icon_size"].c_str());
+            }
         }
         ImGui::Spacing();
         ImGui::Separator();
@@ -1353,6 +1363,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::SameLine();
             SetTooltipEx(lang.debug["validation_layer_description"].c_str());
         }
+        ImGui::Spacing();
+        ImGui::Checkbox(lang.debug["debug_menu"].c_str(), &emuenv.cfg.debug_menu);
         ImGui::Spacing();
         if (ImGui::Button(emuenv.kernel.debugger.watch_code ? lang.debug["unwatch_code"].c_str() : lang.debug["watch_code"].c_str())) {
             emuenv.kernel.debugger.watch_code = !emuenv.kernel.debugger.watch_code;

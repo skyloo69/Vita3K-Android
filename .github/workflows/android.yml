@@ -55,8 +55,9 @@ jobs:
           cp -r lang android/assets
           cp -r vita3k/shaders-builtin android/assets
           export JAVA_HOME=$(echo $JAVA_HOME_17_X64)
-          ./gradlew --info --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease  assembleDebug
-          
+          ./gradlew --info --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease
+        #  ./gradlew --info --stacktrace --configuration-cache --build-cache --parallel --configure-on-demand assembleRelease assembleDebug
+      
       - if : failure()
         uses: actions/upload-artifact@v4
         with:
@@ -78,7 +79,7 @@ jobs:
           name: vita3k-${{ env.git_short_sha }}-release.apk
           path: android/build/outputs/apk/release/android-release.apk
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: vita3k-${{ env.git_short_sha }}-debug.apk
-          path: android/build/outputs/apk/debug/android-debug.apk
+    #  - uses: actions/upload-artifact@v4
+    #    with:
+    #      name: vita3k-${{ env.git_short_sha }}-debug.apk
+    #      path: android/build/outputs/apk/debug/android-debug.apk
