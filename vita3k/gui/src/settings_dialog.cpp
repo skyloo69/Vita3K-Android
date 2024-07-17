@@ -790,7 +790,12 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if (config.resolution_multiplier <= 0.5f)
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
-           ImGui::PushItemWidth(-100.f * SCALE.x);
+            if(emuenv.cfg.screenmode_pos == 3){
+                ImGui::PushItemWidth(-70.f * SCALE.x);
+            }else{
+                ImGui::PushItemWidth(-100.f * SCALE.x);
+            }
+           
            int slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
            if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
                config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
@@ -855,7 +860,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (config.anisotropic_filtering == 1)
             ImGui::EndDisabled();
         ImGui::SameLine(0, 5 * SCALE.x);
-        ImGui::PushItemWidth(-100.f * SCALE.x);
+        if(emuenv.cfg.screenmode_pos == 3){
+            ImGui::PushItemWidth(-70.f * SCALE.x);
+        }else{
+            ImGui::PushItemWidth(-100.f * SCALE.x);
+        }
         if (ImGui::SliderInt("##aniso_filter", &current_aniso_filter_log, 0, max_aniso_filter_log, fmt::format("{}x", config.anisotropic_filtering).c_str()))
             config.anisotropic_filtering = 1 << current_aniso_filter_log;
         ImGui::PopItemWidth();
