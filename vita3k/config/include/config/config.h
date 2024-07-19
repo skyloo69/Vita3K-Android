@@ -153,6 +153,7 @@ enum PerfomanceOverleyPosition {
     code(bool, "fps-hack", false, fps_hack)                                                             \
     code(bool, "acceleration-and-gyroscope", true, tiltsens)                                            \
     code(int, "acceleration-pos", 0, tiltpos)                                                           \
+    code(bool, "invert-gyro", false, invert_gyro)                                                            \
     code(int, "screenmode-pos", 0, screenmode_pos)                                                      \
     code(uint64_t, "current-ime-lang", 4, current_ime_lang)                                             \
     code(int, "psn-signed-in", false, psn_signed_in)                                                    \
