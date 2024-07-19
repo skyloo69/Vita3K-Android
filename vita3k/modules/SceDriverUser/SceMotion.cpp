@@ -85,8 +85,11 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
         if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
             std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
             sensorState->accelerometer = get_acceleration(emuenv.motion);
-            sensorState->gyro = get_gyroscope(emuenv.motion);
-    
+            if(emuenv.cfg.invert_gyro){
+               sensorState->gyro = get_gyroscope(emuenv.motion) * {-1,-1,-1};
+            }else{
+                sensorState->gyro = get_gyroscope(emuenv.motion);
+            }
             sensorState->timestamp = emuenv.motion.last_accel_timestamp;
             sensorState->counter = emuenv.motion.last_counter;
             sensorState->hostTimestamp = sensorState->timestamp;
@@ -123,8 +126,11 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             motionState->timestamp = emuenv.motion.last_accel_timestamp;
     
             motionState->acceleration = get_acceleration(emuenv.motion);
-            motionState->angularVelocity = get_gyroscope(emuenv.motion);
-    
+            if(emuenv.cfg.invert_gyro){
+               motionState->angularVelocity = get_gyroscope(emuenv.motion) * {-1,-1,-1};
+            }else{
+               motionState->angularVelocity = get_gyroscope(emuenv.motion);
+            }
             Util::Quaternion dev_quat = get_orientation(emuenv.motion);
     
             static_assert(sizeof(motionState->deviceQuat) == sizeof(dev_quat));
