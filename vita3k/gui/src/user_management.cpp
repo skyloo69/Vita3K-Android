@@ -466,7 +466,13 @@ void browse_users_management(GuiState &gui, EmuEnvState &emuenv, const uint32_t 
 
 void draw_user_management(GuiState &gui, EmuEnvState &emuenv) {
     const ImVec2 WINDOW_SIZE = ImGui::GetIO().DisplaySize;
-    const auto RES_SCALE = ImVec2(WINDOW_SIZE.x / emuenv.res_width_dpi_scale, WINDOW_SIZE.y / emuenv.res_height_dpi_scale);
+    ImVec2 RES_SCALE;
+    if(emuenv.cfg.screenmode_pos == 3){
+        RES_SCALE = ImVec2(WINDOW_SIZE.x, (WINDOW_SIZE.y / emuenv.res_height_dpi_scale) / 2);
+    }else{
+        RES_SCALE = ImVec2(WINDOW_SIZE.x / emuenv.res_width_dpi_scale, WINDOW_SIZE.y / emuenv.res_height_dpi_scale);
+    }
+    
     const auto SCALE = ImVec2(RES_SCALE.x * emuenv.dpi_scale, RES_SCALE.y * emuenv.dpi_scale);
 
     // Clear users list available
