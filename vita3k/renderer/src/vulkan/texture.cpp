@@ -473,7 +473,7 @@ void VKTextureCache::upload_texture_impl(SceGxmTextureBaseFormat base_format, ui
     } else {
         size_t bpp = gxm::bits_per_pixel(base_format);
         size_t bytes_per_pixel = (bpp + 7) >> 3;
-        upload_size = static_cast<unsigned long>(pixels_per_stride * height * bytes_per_pixel);
+        upload_size = static_cast<unsigned long>(pixels_per_stride) * height * bytes_per_pixel;
     }
 
     if (staging_buffer.used_so_far + upload_size > staging_buffer.buffer.size) {
