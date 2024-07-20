@@ -85,10 +85,11 @@ EXPORT(int, sceMotionGetSensorState, SceMotionSensorState *sensorState, int numR
         if (emuenv.ctrl.has_motion_support || emuenv.motion.has_device_motion_support && emuenv.cfg.tiltsens) {
             std::lock_guard<std::mutex> guard(emuenv.motion.mutex);
             sensorState->accelerometer = get_acceleration(emuenv.motion);
+            sensorState->gyro = get_gyroscope(emuenv.motion);
             if(emuenv.cfg.invert_gyro){
-               sensorState->gyro = get_gyroscope(emuenv.motion) * {-1,-1,-1};
-            }else{
-                sensorState->gyro = get_gyroscope(emuenv.motion);
+               sensorState->gyro.x = sensorState->gyro.x * -1;
+               sensorState->gyro.y = sensorState->gyro.y * -1;
+               sensorState->gyro.z = sensorState->gyro.z * -1;
             }
             sensorState->timestamp = emuenv.motion.last_accel_timestamp;
             sensorState->counter = emuenv.motion.last_counter;
@@ -126,10 +127,11 @@ EXPORT(int, sceMotionGetState, SceMotionState *motionState) {
             motionState->timestamp = emuenv.motion.last_accel_timestamp;
     
             motionState->acceleration = get_acceleration(emuenv.motion);
+            motionState->angularVelocity = get_gyroscope(emuenv.motion);
             if(emuenv.cfg.invert_gyro){
-               motionState->angularVelocity = get_gyroscope(emuenv.motion) * {-1,-1,-1};
-            }else{
-               motionState->angularVelocity = get_gyroscope(emuenv.motion);
+               motionState->angularVelocity.x = motionState->angularVelocity.x * -1;
+               motionState->angularVelocity.y = motionState->angularVelocity.y * -1;
+               motionState->angularVelocity.z = motionState->angularVelocity.z * -1;
             }
             Util::Quaternion dev_quat = get_orientation(emuenv.motion);
     
