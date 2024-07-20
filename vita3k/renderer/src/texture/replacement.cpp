@@ -400,7 +400,7 @@ void TextureCache::export_texture_impl(SceGxmTextureBaseFormat base_format, uint
     std::vector<uint8_t> expanded_data;
     if (base_format == SCE_GXM_TEXTURE_BASE_FORMAT_U8U8U8 || base_format == SCE_GXM_TEXTURE_BASE_FORMAT_S8S8S8) {
         // 24bpp textures are not supported nby dds files, convert them to rgba8
-        expanded_data.resize(static_cast<uint32_t>(width * height * 4));
+        expanded_data.resize(static_cast<size_t>(width * height * 4));
         const uint8_t *data = static_cast<const uint8_t *>(pixels);
         for (uint32_t i = 0; i < width * height; i++) {
             expanded_data[4 * i + 0] = data[3 * i + 0];
