@@ -555,7 +555,7 @@ std::optional<TextureLookupResult> VKSurfaceCache::retrieve_color_surface_as_tex
             // then the buffer to the image
             const uint32_t dst_pixel_stride = (stride_bytes / bytes_per_pixel_requested) * state.res_multiplier;
             copy_image_buffer
-                .setBufferOffset(static_cast<DeviceSize>(start_x * bytes_per_pixel_requested))
+                .setBufferOffset(static_cast<vk::DeviceSize>(start_x * bytes_per_pixel_requested))
                 .setBufferRowLength(dst_pixel_stride)
                 .setImageOffset({ 0, 0, 0 })
                 .setImageExtent({ width, height, 1 });
@@ -1173,7 +1173,7 @@ ColorSurfaceCacheInfo *VKSurfaceCache::perform_surface_sync() {
         vkutil::Buffer &copy_buffer = *last_written_surface->copy_buffer;
 
         if (!copy_buffer.buffer) {
-            copy_buffer.size = static_cast<DeviceSize>(last_written_surface->stride_bytes * last_written_surface->original_height);
+            copy_buffer.size = static_cast<vk::DeviceSize>(last_written_surface->stride_bytes * last_written_surface->original_height);
             copy_buffer.init_buffer(vk::BufferUsageFlagBits::eTransferDst, vkutil::vma_mapped_alloc);
         }
 
@@ -1389,7 +1389,7 @@ std::vector<uint32_t> VKSurfaceCache::dump_frame(Ptr<const void> address, uint32
 
     // we need a temporary buffer and command buffer for this
     // this is a raii buffer, it will be destroyed at the end of this function
-    vkutil::Buffer temp_buff(static_cast<DeviceSize>(width * height * 4));
+    vkutil::Buffer temp_buff(static_cast<vk::DeviceSize>(width * height * 4));
     temp_buff.init_buffer(vk::BufferUsageFlagBits::eTransferDst, vkutil::vma_mapped_alloc);
     vk::CommandBuffer cmd_buffer = vkutil::create_single_time_command(state.device, state.general_command_pool);
 
