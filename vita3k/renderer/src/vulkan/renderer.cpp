@@ -786,7 +786,8 @@ bool VKState::create(SDL_Window *window, std::unique_ptr<renderer::State> &state
         frame.destroy_queue.init(device);
     }
 
-    if (!screen_renderer.setup())
+    auto &config_vk_mapping = config.vk_mapping;
+    if (!screen_renderer.setup(config_vk_mapping))
         return false;
 
     support_fsr &= static_cast<bool>(screen_renderer.surface_capabilities.supportedUsageFlags & vk::ImageUsageFlagBits::eStorage);
