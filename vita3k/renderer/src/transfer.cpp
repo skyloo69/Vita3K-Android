@@ -232,7 +232,7 @@ COMMAND(handle_transfer_downscale) {
         case SCE_GXM_TRANSFER_FORMAT_U8U8U8U8_ABGR:
             pixel_fmt = AV_PIX_FMT_RGBA;
             break;
-        case SCE_GXM_TRANSFER_FORMAT_U4U4U4U4_ABGR;
+        case SCE_GXM_TRANSFER_FORMAT_U4U4U4U4_ABGR:
             pixel_fmt = AV_PIX_FMT_RGB444LE;
             break;
         default:
