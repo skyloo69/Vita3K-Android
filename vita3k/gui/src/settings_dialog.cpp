@@ -963,9 +963,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 "fifo"
             };
 
-            static int current_surface_format = std::find(surface_format_methods_indexes.begin(), surface_format_methods_indexes.end(), config.vk_mapping) - surface_format_methods_indexes.begin();
-            if (ImGui::Combo(lang.gpu["surface_format_method"].c_str(), &current_surface_format, surface_format_methods_strings.data(), surface_format_methods_strings.size())) {
-                config.vk_mapping = surface_format_methods_indexes[current_surface_format];
+            static int current_surface_format = std::find(vk_surface_format_methods_indexes.begin(), vk_surface_format_methods_indexes.end(), config.vk_mapping) - vk_surface_format_methods_indexes.begin();
+            if (ImGui::Combo(lang.gpu["surface_format_method"].c_str(), &current_surface_format, vk_surface_format_strings.data(), vk_surface_format_strings.size())) {
+                config.vk_mapping = vk_surface_format_methods_indexes[current_surface_format];
             }
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", lang.gpu[surface_format_method_description"].c_str());
