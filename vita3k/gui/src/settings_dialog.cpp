@@ -954,28 +954,26 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 ImGui::SetTooltip("%s", lang.gpu["mapping_method_description"].c_str());
             }
 
-            // only get the mapping methods that are available on this GPU
-            if (is_vulkan){
-               std::vector<const char *> vk_surface_format_strings = {
+            
+            std::vector<const char *> vk_surface_format_strings = {
                    "Immediate",
                    "Mailbox",
                    "Fifo relaxed",
                    "Fifo"
-               };
-               std::vector<std::string_view> vk_surface_format_methods_indexes = {
+            };
+            std::vector<std::string_view> vk_surface_format_methods_indexes = {
                    "Immediate",
                    "mailbox",
                    "fifo-relaxed",
                    "fifo"
-               };
+            };
 
-                static int current_surface_format = std::find(vk_surface_format_methods_indexes.begin(), vk_surface_format_methods_indexes.end(), config.vk_mapping) - vk_surface_format_methods_indexes.begin();
-                if (ImGui::Combo(lang.gpu["surface_format_method"].c_str(), &current_surface_format, vk_surface_format_strings.data(), vk_surface_format_strings.size())) {
-                   config.vk_mapping = vk_surface_format_methods_indexes[current_surface_format];
-                }
-                if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("%s", lang.gpu[surface_format_method_description].c_str());
-                }
+            static int current_surface_format = std::find(vk_surface_format_methods_indexes.begin(), vk_surface_format_methods_indexes.end(), config.vk_mapping) - vk_surface_format_methods_indexes.begin();
+            if (ImGui::Combo(lang.gpu["surface_format_method"].c_str(), &current_surface_format, vk_surface_format_strings.data(), vk_surface_format_strings.size())) {
+                config.vk_mapping = vk_surface_format_methods_indexes[current_surface_format];
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", lang.gpu[surface_format_method_description].c_str());
             }
             
             if (is_ingame)
