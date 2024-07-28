@@ -973,7 +973,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 config.vk_mapping = vk_surface_format_methods_indexes[current_surface_format];
             }
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("%s", lang.gpu[surface_format_method_description].c_str());
+                ImGui::SetTooltip("%s", lang.gpu["surface_format_method_description"].c_str());
             }
             
             if (is_ingame)
