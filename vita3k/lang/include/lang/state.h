@@ -568,6 +568,8 @@ struct LangState {
             { "shader_cache_description", "Check the box to enable shader cache to pre-compile it at game startup.\nUncheck to disable this feature." },
             { "mapping_method", "Memory mapping method" },
             { "mapping_method_description", "Memory mapping improved performances, reduces memory usage and fixes many graphical issues.\nHowever, it may be unstable on some GPUs" },
+            { "surface_format_method", "Change vulkan sync method" },
+            { "surface_format_method_description", "Need test, maybe fix gpu glitches" },
             { "spirv_shader", "Use Spir-V Shader (deprecated)" },
             { "spirv_shader_description", "Pass generated Spir-V shader directly to driver.\nNote that some beneficial extensions will be disabled,\nand not all GPUs are compatible with this." },
             { "clean_shaders", "Clean Shaders Cache and Log" },
