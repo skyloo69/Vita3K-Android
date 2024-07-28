@@ -586,7 +586,7 @@ IMGUI_API void ImGui_ImplSdlVulkan_RenderDrawData(ImGui_VulkanState &state) {
 IMGUI_API ImTextureID ImGui_ImplSdlVulkan_CreateTexture(ImGui_VulkanState &state, void *pixels, int width, int height, bool is_alpha) {
     auto *texture = new TextureState;
 
-    const size_t buffer_size = width * height * (is_alpha ? 1 : 4);
+    const size_t buffer_size = static_cast<size_t>(width * height * (is_alpha ? 1 : 4));
 
     vk::BufferCreateInfo buffer_info{
         .size = buffer_size,

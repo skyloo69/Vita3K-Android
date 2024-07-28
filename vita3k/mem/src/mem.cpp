@@ -494,7 +494,7 @@ void free(MemState &state, Address address) {
     }
 
     assert(!state.use_page_table || state.page_table[address / KiB(4)] == state.memory.get());
-    uint8_t *const memory = &state.memory[page_num * state.page_size];
+    uint8_t *const memory = &state.memory[static_cast<size_t>(page_num * state.page_size)];
 
 #ifdef WIN32
     const BOOL ret = VirtualFree(memory, static_cast<size_t>(page.size * state.page_size), MEM_DECOMMIT);

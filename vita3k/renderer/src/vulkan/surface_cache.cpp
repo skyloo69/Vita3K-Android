@@ -530,7 +530,7 @@ std::optional<TextureLookupResult> VKSurfaceCache::retrieve_color_surface_as_tex
         } else {
             LOG_INFO_ONCE("Game is doing typeless copies");
             // We must use a transition buffer
-            vk::DeviceSize buffer_size = stride_bytes * static_cast<size_t>(state.res_multiplier * align(height, 4)) + static_cast<size_t>(start_x * bytes_per_pixel_requested);
+            vk::DeviceSize buffer_size = stride_bytes * static_cast<size_t>(state.res_multiplier * align(height, 4)) + static_cast<unsigned long>(start_x * bytes_per_pixel_requested);
             if (!casted->transition_buffer.buffer || casted->transition_buffer.size < buffer_size) {
                 // create or re-create the buffer
                 state.frame().destroy_queue.add_buffer(casted->transition_buffer);
@@ -555,7 +555,7 @@ std::optional<TextureLookupResult> VKSurfaceCache::retrieve_color_surface_as_tex
             // then the buffer to the image
             const uint32_t dst_pixel_stride = (stride_bytes / bytes_per_pixel_requested) * state.res_multiplier;
             copy_image_buffer
-                .setBufferOffset(static_cast<size_t>(start_x * bytes_per_pixel_requested))
+                .setBufferOffset(static_cast<vk::DeviceSize>(start_x * bytes_per_pixel_requested))
                 .setBufferRowLength(dst_pixel_stride)
                 .setImageOffset({ 0, 0, 0 })
                 .setImageExtent({ width, height, 1 });
@@ -1173,7 +1173,7 @@ ColorSurfaceCacheInfo *VKSurfaceCache::perform_surface_sync() {
         vkutil::Buffer &copy_buffer = *last_written_surface->copy_buffer;
 
         if (!copy_buffer.buffer) {
-            copy_buffer.size = last_written_surface->stride_bytes * last_written_surface->original_height;
+            copy_buffer.size = static_cast<vk::DeviceSize>(last_written_surface->stride_bytes * last_written_surface->original_height);
             copy_buffer.init_buffer(vk::BufferUsageFlagBits::eTransferDst, vkutil::vma_mapped_alloc);
         }
 
@@ -1385,11 +1385,11 @@ std::vector<uint32_t> VKSurfaceCache::dump_frame(Ptr<const void> address, uint32
 
     const uint32_t real_height = std::min(height, info.height - line_delta);
 
-    std::vector<uint32_t> frame(width * height, 0);
+    std::vector<uint32_t> frame(static_cast<uint32_t>(width * height), 0);
 
     // we need a temporary buffer and command buffer for this
     // this is a raii buffer, it will be destroyed at the end of this function
-    vkutil::Buffer temp_buff(width * height * 4);
+    vkutil::Buffer temp_buff(static_cast<vk::DeviceSize>(width * height * 4));
     temp_buff.init_buffer(vk::BufferUsageFlagBits::eTransferDst, vkutil::vma_mapped_alloc);
     vk::CommandBuffer cmd_buffer = vkutil::create_single_time_command(state.device, state.general_command_pool);
 

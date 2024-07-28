@@ -786,7 +786,18 @@ bool VKState::create(SDL_Window *window, std::unique_ptr<renderer::State> &state
         frame.destroy_queue.init(device);
     }
 
-    if (!screen_renderer.setup())
+    auto &config_vk_mapping = config.vk_mapping;
+    uint8_t vk_idx;
+    if (config_vk_mapping == "mailbox"){
+        vk_idx = 1;
+    }else if (config_vk_mapping == "fifo-relaxed"){
+        vk_idx = 2;
+    }else if (config_vk_mapping == "fifo"){
+        vk_idx = 3;
+    }else {
+        vk_idx = 0; // Immediate
+    }
+    if (!screen_renderer.setup(vk_idx))
         return false;
 
     support_fsr &= static_cast<bool>(screen_renderer.surface_capabilities.supportedUsageFlags & vk::ImageUsageFlagBits::eStorage);

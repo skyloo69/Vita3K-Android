@@ -142,7 +142,7 @@ static void init_style(EmuEnvState &emuenv) {
     style->Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.32f, 0.32f, 0.32f, 1.00f);
     style->Colors[ImGuiCol_Tab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
     style->Colors[ImGuiCol_TabHovered] = ImVec4(0.32f, 0.30f, 0.23f, 1.00f);
-    style->Colors[ImGuiCol_TabActive] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
+    style->Colors[ImGuiCol_TabSelected] = ImVec4(0.06f, 0.05f, 0.07f, 1.00f);
     style->Colors[ImGuiCol_PlotLines] = ImVec4(1.f, 0.49f, 0.f, 1.f);
     style->Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
     style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
@@ -635,7 +635,7 @@ void get_user_apps_title(GuiState &gui, EmuEnvState &emuenv) {
 
 void get_sys_apps_title(GuiState &gui, EmuEnvState &emuenv) {
     gui.app_selector.sys_apps.clear();
-    constexpr std::array<const char *, 4> sys_apps_list = { "NPXS10003", "NPXS10008", "NPXS10015", "NPXS10026" };
+    constexpr std::array<const std::string_view, 4> sys_apps_list = { "NPXS10003", "NPXS10008", "NPXS10015", "NPXS10026" };
     for (const auto &app : sys_apps_list) {
         vfs::FileBuffer params;
         if (vfs::read_file(VitaIoDevice::vs0, params, emuenv.pref_path, fmt::format("app/{}/sce_sys/param.sfo", app))) {
@@ -654,18 +654,18 @@ void get_sys_apps_title(GuiState &gui, EmuEnvState &emuenv) {
             emuenv.app_info.app_version = "1.00";
             emuenv.app_info.app_category = "gda";
             emuenv.app_info.app_title_id = app;
-            if (strcmp(app, "NPXS10003") == 0) {
+            if (app == "NPXS10003") {
                 emuenv.app_info.app_short_title = lang["browser"].c_str();
                 emuenv.app_info.app_title = lang["internet_browser"].c_str();
-            } else if (strcmp(app, "NPXS10008") == 0) {
+            } else if (app == "NPXS10008") {
                 emuenv.app_info.app_short_title = lang["trophies"].c_str();
                 emuenv.app_info.app_title = lang["trophy_collection"].c_str();
-            } else if (strcmp(app, "NPXS10015") == 0)
+            } else if (app == "NPXS10015")
                 emuenv.app_info.app_short_title = emuenv.app_info.app_title = lang["settings"].c_str();
             else
                 emuenv.app_info.app_short_title = emuenv.app_info.app_title = lang["content_manager"];
         }
-        gui.app_selector.sys_apps.push_back({ emuenv.app_info.app_version, emuenv.app_info.app_category, {}, {}, {}, {}, emuenv.app_info.app_short_title, emuenv.app_info.app_title, emuenv.app_info.app_title_id, app });
+        gui.app_selector.sys_apps.push_back({ emuenv.app_info.app_version, emuenv.app_info.app_category, {}, {}, {}, {}, emuenv.app_info.app_short_title, emuenv.app_info.app_title, emuenv.app_info.app_title_id, app.data() });
     }
 
     std::sort(gui.app_selector.sys_apps.begin(), gui.app_selector.sys_apps.end(), [](const App &lhs, const App &rhs) {

@@ -136,6 +136,7 @@ public:
         bool disable_surface_sync = false;
         std::string screen_filter = "Bilinear";
         std::string memory_mapping = "double-buffer";
+        std::string vk_mapping = "mailbox";
         bool v_sync = true;
         int anisotropic_filtering = 1;
         bool async_pipeline_compilation = true;

@@ -83,6 +83,7 @@ enum PerfomanceOverleyPosition {
     code(bool, "export-textures", false, export_textures)                                               \
     code(bool, "export-as-png", true, export_as_png)                                                    \
     code(std::string, "memory-mapping", "double-buffer", memory_mapping)                                \
+    code(std::string, "vk-mapping", "mailbox", vk_mapping)                                \
     code(bool, "boot-apps-full-screen", false, boot_apps_full_screen)                                   \
     code(std::string, "audio-backend", "SDL", audio_backend)                                            \
     code(int, "audio-volume", 100, audio_volume)                                                        \
@@ -153,6 +154,7 @@ enum PerfomanceOverleyPosition {
     code(bool, "fps-hack", false, fps_hack)                                                             \
     code(bool, "acceleration-and-gyroscope", true, tiltsens)                                            \
     code(int, "acceleration-pos", 0, tiltpos)                                                           \
+    code(bool, "invert-gyro", false, invert_gyro)                                                            \
     code(int, "screenmode-pos", 0, screenmode_pos)                                                      \
     code(uint64_t, "current-ime-lang", 4, current_ime_lang)                                             \
     code(int, "psn-signed-in", false, psn_signed_in)                                                    \

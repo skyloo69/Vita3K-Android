@@ -247,7 +247,7 @@ static int decode_audio_frames(EmuEnvState &emuenv, const char *export_name, Sce
         ctrl->es_size_used += es_size_used;
         es_data += es_size_used;
 
-        uint32_t pcm_size_given = size.samples * decoder->get(DecoderQuery::CHANNELS) * sizeof(int16_t);
+        uint32_t pcm_size_given = static_cast<unsigned long>(size.samples * decoder->get(DecoderQuery::CHANNELS)) * sizeof(int16_t);
         assert(pcm_size_given <= ctrl->pcm_size_max);
         ctrl->pcm_size_given += pcm_size_given;
         pcm_data += pcm_size_given;
@@ -334,7 +334,7 @@ EXPORT(int, sceAudiodecPartlyDecode, SceAudiodecCtrl *ctrl, SceUInt32 samples_of
     ctrl->es_size_used = 0;
     ctrl->pcm_size_given = 0;
     std::vector<uint8_t> temp_storage;
-    temp_storage.reserve((samples_offset + samples_to_decode) * bytes_per_sample);
+    temp_storage.reserve(static_cast<size_t>((samples_offset + samples_to_decode) * bytes_per_sample));
 
     while (ctrl->pcm_size_given < (samples_offset + samples_to_decode) * bytes_per_sample) {
         DecoderSize size;
@@ -354,7 +354,7 @@ EXPORT(int, sceAudiodecPartlyDecode, SceAudiodecCtrl *ctrl, SceUInt32 samples_of
         decoder->receive(temp_storage.data() + old_size, &size);
     }
 
-    memcpy(pcm_data + samples_offset * bytes_per_sample, temp_storage.data() + samples_offset * bytes_per_sample, samples_to_decode * bytes_per_sample);
+    memcpy(pcm_data + samples_offset * bytes_per_sample, temp_storage.data() + samples_offset * bytes_per_sample, static_cast<size_t>(samples_to_decode * bytes_per_sample));
 
     return 0;
 }

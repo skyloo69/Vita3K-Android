@@ -180,6 +180,7 @@ static bool get_custom_config(EmuEnvState &emuenv, const std::string &app_path) 
                 config.disable_surface_sync = gpu_child.attribute("disable-surface-sync").as_bool();
                 config.screen_filter = gpu_child.attribute("screen-filter").as_string();
                 config.memory_mapping = gpu_child.attribute("memory-mapping").as_string();
+                config.vk_mapping = gpu_child.attribute("vk-mapping").as_string();
                 config.v_sync = gpu_child.attribute("v-sync").as_bool();
                 config.anisotropic_filtering = gpu_child.attribute("anisotropic-filtering").as_int();
                 config.async_pipeline_compilation = gpu_child.attribute("async-pipeline-compilation").as_bool();
@@ -253,6 +254,7 @@ void init_config(GuiState &gui, EmuEnvState &emuenv, const std::string &app_path
         config.disable_surface_sync = emuenv.cfg.disable_surface_sync;
         config.screen_filter = emuenv.cfg.screen_filter;
         config.memory_mapping = emuenv.cfg.memory_mapping;
+        config.vk_mapping = emuenv.cfg.vk_mapping;
         config.v_sync = emuenv.cfg.v_sync;
         config.anisotropic_filtering = emuenv.cfg.anisotropic_filtering;
         config.async_pipeline_compilation = emuenv.cfg.async_pipeline_compilation;
@@ -353,6 +355,7 @@ static void save_config(GuiState &gui, EmuEnvState &emuenv) {
         gpu_child.append_attribute("disable-surface-sync") = config.disable_surface_sync;
         gpu_child.append_attribute("screen-filter") = config.screen_filter.c_str();
         gpu_child.append_attribute("memory-mapping") = config.memory_mapping.c_str();
+        gpu_child.append_attribute("vk-mapping") = config.vk_mapping.c_str();
         gpu_child.append_attribute("v-sync") = config.v_sync;
         gpu_child.append_attribute("anisotropic-filtering") = config.anisotropic_filtering;
         gpu_child.append_attribute("async-pipeline-compilation") = config.async_pipeline_compilation;
@@ -393,6 +396,7 @@ static void save_config(GuiState &gui, EmuEnvState &emuenv) {
         emuenv.cfg.disable_surface_sync = config.disable_surface_sync;
         emuenv.cfg.screen_filter = config.screen_filter;
         emuenv.cfg.memory_mapping = config.memory_mapping;
+        emuenv.cfg.vk_mapping = config.vk_mapping;
         emuenv.cfg.v_sync = config.v_sync;
         emuenv.cfg.anisotropic_filtering = config.anisotropic_filtering;
         emuenv.cfg.async_pipeline_compilation = config.async_pipeline_compilation;
@@ -461,6 +465,7 @@ void set_config(EmuEnvState &emuenv, const std::string &app_path, bool custom) {
         emuenv.cfg.current_config.disable_surface_sync = emuenv.cfg.disable_surface_sync;
         emuenv.cfg.current_config.screen_filter = emuenv.cfg.screen_filter;
         emuenv.cfg.current_config.memory_mapping = emuenv.cfg.memory_mapping;
+        emuenv.cfg.current_config.vk_mapping = emuenv.cfg.vk_mapping;
         emuenv.cfg.current_config.v_sync = emuenv.cfg.v_sync;
         emuenv.cfg.current_config.anisotropic_filtering = emuenv.cfg.anisotropic_filtering;
         emuenv.cfg.current_config.async_pipeline_compilation = emuenv.cfg.async_pipeline_compilation;
@@ -790,7 +795,12 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
            if (config.resolution_multiplier <= 0.5f)
                ImGui::EndDisabled();
            ImGui::SameLine(0, 5.f * SCALE.x);
-           ImGui::PushItemWidth(-100.f * SCALE.x);
+            if(emuenv.cfg.screenmode_pos == 3){
+                ImGui::PushItemWidth(-70.f * SCALE.x);
+            }else{
+                ImGui::PushItemWidth(-100.f * SCALE.x);
+            }
+           
            int slider_position = static_cast<uint8_t>(config.resolution_multiplier * 4);
            if (ImGui::SliderInt("##res_scal", &slider_position, 2, 32, fmt::format("{}x", config.resolution_multiplier).c_str(), ImGuiSliderFlags_None)) {
                config.resolution_multiplier = static_cast<float>(slider_position) / 4.0f;
@@ -855,7 +865,11 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         if (config.anisotropic_filtering == 1)
             ImGui::EndDisabled();
         ImGui::SameLine(0, 5 * SCALE.x);
-        ImGui::PushItemWidth(-100.f * SCALE.x);
+        if(emuenv.cfg.screenmode_pos == 3){
+            ImGui::PushItemWidth(-70.f * SCALE.x);
+        }else{
+            ImGui::PushItemWidth(-100.f * SCALE.x);
+        }
         if (ImGui::SliderInt("##aniso_filter", &current_aniso_filter_log, 0, max_aniso_filter_log, fmt::format("{}x", config.anisotropic_filtering).c_str()))
             config.anisotropic_filtering = 1 << current_aniso_filter_log;
         ImGui::PopItemWidth();
@@ -922,7 +936,6 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 "native-buffer"
             };
 
-            // only get the mapping methods that are available on this GPU
             int list_pos = 0;
             for (int i = 0; i < 5; i++) {
                 if ((1 << i) & emuenv.renderer->supported_mapping_methods_mask) {
@@ -941,6 +954,28 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 ImGui::SetTooltip("%s", lang.gpu["mapping_method_description"].c_str());
             }
 
+            
+            std::vector<const char *> vk_surface_format_strings = {
+                   "Immediate",
+                   "Mailbox",
+                   "Fifo relaxed",
+                   "Fifo"
+            };
+            std::vector<std::string_view> vk_surface_format_methods_indexes = {
+                   "Immediate",
+                   "mailbox",
+                   "fifo-relaxed",
+                   "fifo"
+            };
+
+            static int current_surface_format = std::find(vk_surface_format_methods_indexes.begin(), vk_surface_format_methods_indexes.end(), config.vk_mapping) - vk_surface_format_methods_indexes.begin();
+            if (ImGui::Combo(lang.gpu["surface_format_method"].c_str(), &current_surface_format, vk_surface_format_strings.data(), vk_surface_format_strings.size())) {
+                config.vk_mapping = vk_surface_format_methods_indexes[current_surface_format];
+            }
+            if (ImGui::IsItemHovered()) {
+                ImGui::SetTooltip("%s", lang.gpu["surface_format_method_description"].c_str());
+            }
+            
             if (is_ingame)
                 ImGui::EndDisabled();
         }
@@ -1122,10 +1157,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::SetCursorPosX((ImGui::GetWindowWidth() / 2.f) - (ImGui::CalcTextSize(lang.emulator["sensor_settings"].c_str()).x / 2.f));
         ImGui::TextColored(GUI_COLOR_TEXT_TITLE, "%s", lang.emulator["sensor_settings"].c_str());
         ImGui::Spacing();
-        if (ImGui::Checkbox(lang.emulator["sensor_enable"].c_str(), &emuenv.cfg.tiltsens)){
-           SetTooltipEx(lang.emulator["sensors_description"].c_str());
-        }
-
+        ImGui::Checkbox(lang.emulator["sensor_enable"].c_str(), &emuenv.cfg.tiltsens);
+        SetTooltipEx(lang.emulator["sensors_description"].c_str());
+        
         if (!emuenv.cfg.tiltsens){
             ImGui::Spacing();
             ImGui::Text("%s", lang.emulator["sensor_emu_pos"].c_str());
@@ -1133,6 +1167,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             ImGui::RadioButton("90 degrees", &emuenv.cfg.tiltpos, 1);
             ImGui::RadioButton("-90 degrees", &emuenv.cfg.tiltpos, -1);
             config::serialize_config(emuenv.cfg, emuenv.cfg.config_path);
+        }else{
+            ImGui::Checkbox(lang.emulator["invert_gyro"].c_str(), &emuenv.cfg.invert_gyro);
+            SetTooltipEx(lang.emulator["invert_gyro_description"].c_str());
         }
 
         ImGui::Spacing();

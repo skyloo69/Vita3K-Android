@@ -123,8 +123,10 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     const auto RES_SCALE = ImVec2(display_size.x / emuenv.res_width_dpi_scale, display_size.y / emuenv.res_height_dpi_scale);
 
     // Always center this window when appearing
-    const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    if(emuenv.cfg.screenmode_pos == 3){
+        center.y = center.y / 2;
+    }
     ImGui::SetNextWindowPos(center, ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     ImGui::Begin("Overlay", &gui.controls_menu.controls_dialog, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::SetWindowFontScale(RES_SCALE.x);
