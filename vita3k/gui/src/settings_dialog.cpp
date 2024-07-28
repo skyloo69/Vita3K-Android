@@ -954,7 +954,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 ImGui::SetTooltip("%s", lang.gpu["mapping_method_description"].c_str());
             }
 
-            
+            ImGui::Spacing();
             std::vector<const char *> vk_surface_format_strings = {
                    "Immediate",
                    "Mailbox",
@@ -975,6 +975,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", lang.gpu["surface_format_method_description"].c_str());
             }
+            ImGui::Spacing();
             
             if (is_ingame)
                 ImGui::EndDisabled();
