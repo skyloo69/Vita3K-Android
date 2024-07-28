@@ -790,9 +790,9 @@ bool VKState::create(SDL_Window *window, std::unique_ptr<renderer::State> &state
     uint8_t vk_idx;
     if (config_vk_mapping == "mailbox"){
         vk_idx = 1;
-    }else if (config_vk_mapping = "fifo-relaxed"){
+    }else if (config_vk_mapping == "fifo-relaxed"){
         vk_idx = 2;
-    }else if (config_vk_mapping = "fifo"){
+    }else if (config_vk_mapping == "fifo"){
         vk_idx = 3;
     }else {
         vk_idx = 0; // Immediate
