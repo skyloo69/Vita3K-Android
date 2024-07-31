@@ -3,7 +3,8 @@ if you find issue go to main repo, not in here
 
 # Minimum system requirement
 - Android 9, 64 bit CPU for Snapdragon variant
-- Android 11, 64 bit CPU for Mediatek / Exynos / Rockchip (kirin not supported because it's using old gpu)
+- Android 11, 64 bit CPU for Mediatek / Exynos / Rockchip (kirin not supported, still unknow why)
+- **PowerVR GPU NOT SUPPORTED** because it's have limited Vulkan feature (not yet find workaround since i dont have PowerVR phones)
 - At least 4GB of RAM
 - 6GB Free storage
 
