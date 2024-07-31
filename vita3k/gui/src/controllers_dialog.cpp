@@ -365,6 +365,7 @@ void draw_controllers_dialog(GuiState &gui, EmuEnvState &emuenv) {
                     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
                         rebinds_is_open = false;
 
+                    ImGui::ScrollWhenDragging();
                     ImGui::End();
                 }
             }
