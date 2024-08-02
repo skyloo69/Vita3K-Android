@@ -51,13 +51,13 @@ void convert_yuv_to_rgb(const uint8_t *yuv, uint8_t *rgba, uint32_t width, uint3
         slice_position = 5; // 1.25
         break;
     case COLORSPACE_GRAYSCALE:
-        LOG_WARN_ONCE("Unsupported type: COLORSPACE_GRAYSCALE");
+        LOG_ERROR("Unsupported type: COLORSPACE_GRAYSCALE");
         format = AV_PIX_FMT_GRAY16;
         strides_divisor = 1;
         slice_position = 1;
         break;
     default:
-        LOG_ERROR_ONCE("Unsupported type: COLORSPACE_UNKNOWN");
+        LOG_ERROR("Unsupported type: COLORSPACE_UNKNOWN");
         break;
     }
 
@@ -111,13 +111,13 @@ void convert_rgb_to_yuv(const uint8_t *rgba, uint8_t *yuv, uint32_t width, uint3
         slice_position = 5; // 1.25
         break;
     case COLORSPACE_GRAYSCALE:
-        LOG_WARN_ONCE("Unsupported type: COLORSPACE_GRAYSCALE");
+        LOG_WARN("Unsupported type: COLORSPACE_GRAYSCALE");
         format = AV_PIX_FMT_GRAY16;
         strides_divisor = 1;
         slice_position = 1;
         break;
     default:
-        LOG_ERROR_ONCE("Unsupported type: COLORSPACE_UNKNOWN");
+        LOG_ERROR("Unsupported type: COLORSPACE_UNKNOWN");
         break;
     }
 
@@ -170,11 +170,11 @@ int convert_yuv_to_jpeg(const uint8_t *yuv, uint8_t *jpeg, uint32_t width, uint3
         format = AV_PIX_FMT_YUVJ420P;
         break;
     case COLORSPACE_GRAYSCALE:
-        LOG_WARN_ONCE("Unsupported type: COLORSPACE_GRAYSCALE");
+        LOG_ERROR("Unsupported type: COLORSPACE_GRAYSCALE");
         format = AV_PIX_FMT_GRAY16;
         break;
     default:
-        LOG_ERROR_ONCE("Unsupported type: COLORSPACE_UNKNOWN");
+        LOG_ERROR("Unsupported type: COLORSPACE_UNKNOWN");
         break;
     }
 
@@ -335,10 +335,10 @@ bool MjpegDecoderState::receive(uint8_t *data, DecoderSize *size) {
             break;
         }
         case COLORSPACE_GRAYSCALE:
-            LOG_WARN_ONCE("Unsupported type: COLORSPACE_GRAYSCALE");
+            LOG_ERROR("Unsupported type: COLORSPACE_GRAYSCALE");
             break;
         default:
-            LOG_ERROR_ONCE("Unsupported type: COLORSPACE_UNKNOWN");
+            LOG_ERROR("Unsupported type: COLORSPACE_UNKNOWN");
             break;
         }
     }
