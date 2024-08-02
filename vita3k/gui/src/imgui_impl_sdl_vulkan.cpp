@@ -798,7 +798,7 @@ IMGUI_API bool ImGui_ImplSdlVulkan_CreateDeviceObjects(ImGui_VulkanState &state)
         ImGuiIO &io = ImGui::GetIO();
 
         uint8_t *pixels;
-        uint32_t width, height;
+        int width, height;
         io.Fonts->GetTexDataAsAlpha8(&pixels, &width, &height);
 
         io.Fonts->TexID = ImGui_ImplSdlVulkan_CreateTexture(state, pixels, width, height, true);
