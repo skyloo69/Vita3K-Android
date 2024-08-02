@@ -762,7 +762,7 @@ IMGUI_API bool ImGui_ImplSdlVulkan_CreateDeviceObjects(ImGui_VulkanState &state)
         // Constants: we are using 'vec2 offset' and 'vec2 scale' instead of a full 3d projection matrix
         vk::PushConstantRange push_constants{
             .stageFlags = vk::ShaderStageFlagBits::eVertex,
-            .offset = 0.0f,
+            .offset = 0,
             .size = sizeof(float) * 4
         };
         vk::PipelineLayoutCreateInfo layout_info{};
