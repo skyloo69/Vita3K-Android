@@ -585,7 +585,7 @@ struct LangState {
             { "enable_ngs_support", "Enable NGS support" },
             { "ngs_description", "Uncheck the box to disable support for advanced audio library NGS." },
             { "use_opensl_audio", "Use OpenSLES for audio output" },
-            { "opensl_audio_description", "Uncheck the box to use AAPT audio." }
+            { "opensl_audio_description", "Uncheck the box to use AAudio." }
         };
         std::map<std::string, std::string> system = {
             { "title", "System" },
