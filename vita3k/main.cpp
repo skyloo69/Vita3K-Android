@@ -278,8 +278,10 @@ int main(int argc, char *argv[]) {
         SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI_COMBINE_JOY_CONS, "0");
 
 #ifdef ANDROID
+        auto audio_mode = emuenv.cfg.audio_drv;
+        
         // The AAudio driver (used by default) is really really bad
-        SDL_SetHint(SDL_HINT_AUDIODRIVER, emuenv.cfg.audio_drv);
+        SDL_SetHint(SDL_HINT_AUDIODRIVER, audio_mode.c_str());
 #endif
 
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR) < 0) {
