@@ -1041,8 +1041,8 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         std::vector<std::string> audiodrv_list_str;
         const uint8_t numbersdrv = SDL_GetNumAudioDrivers();
-        for (uint8_t list=0; list < (numbersdrv); list++){
-             audiodrv_list_str.push_back(SDL_GetAudioDriver(numbersdrv);
+        for (uint8_t list=0; list < numbersdrv; list++){
+             audiodrv_list_str.push_back(SDL_GetAudioDriver(numbersdrv));
         }
         // must convert to a vector of char*
         std::vector<const char *> audiodrv_list;
