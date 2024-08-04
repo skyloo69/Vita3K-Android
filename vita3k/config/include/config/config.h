@@ -83,9 +83,10 @@ enum PerfomanceOverleyPosition {
     code(bool, "export-textures", false, export_textures)                                               \
     code(bool, "export-as-png", true, export_as_png)                                                    \
     code(std::string, "memory-mapping", "double-buffer", memory_mapping)                                \
-    code(std::string, "vk-mapping", "mailbox", vk_mapping)                                \
+    code(std::string, "vk-mapping", "mailbox", vk_mapping)                                              \
     code(bool, "boot-apps-full-screen", false, boot_apps_full_screen)                                   \
     code(std::string, "audio-backend", "SDL", audio_backend)                                            \
+    code(bool, "use-opensles", true, use_opensles)                                                          \
     code(int, "audio-volume", 100, audio_volume)                                                        \
     code(bool, "ngs-enable", true, ngs_enable)                                                          \
     code(int, "sys-button", static_cast<int>(SCE_SYSTEM_PARAM_ENTER_BUTTON_CROSS), sys_button)          \
