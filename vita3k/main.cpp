@@ -281,8 +281,6 @@ int main(int argc, char *argv[]) {
         // The AAudio driver (used by default) is really really bad
         if(emuenv.cfg.use_opensles)
            SDL_SetHint(SDL_HINT_AUDIODRIVER, "openslES");
-           
-        LOG_INFO("audio driver is: {}", SDL_GetCurrentAudioDriver());
 #endif
 
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR) < 0) {
@@ -301,7 +299,8 @@ int main(int argc, char *argv[]) {
     LOG_INFO("Total of CPU Cores: {}", SDL_GetCPUCount());
 #endif
     LOG_INFO("Available RAM memory: {} MiB", SDL_GetSystemRAM());
-
+    LOG_INFO("Audio driver: {}", SDL_GetCurrentAudioDriver());
+    
     app::AppRunType run_type = app::AppRunType::Unknown;
     if (cfg.run_app_path) {
         run_type = app::AppRunType::Extracted;
