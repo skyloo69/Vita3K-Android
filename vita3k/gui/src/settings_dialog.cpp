@@ -1038,9 +1038,17 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Checkbox(lang.audio["enable_ngs_support"].c_str(), &config.ngs_enable);
         SetTooltipEx(lang.audio["ngs_description"].c_str());
         ImGui::Spacing();
-        ImGui::Checkbox(lang.audio["use_opensl_audio"].c_str(), &emuenv.cfg.use_opensles);
-        SetTooltipEx(lang.audio["opensl_audio_description"].c_str());
-        ImGui::Spacing();
+
+        const std::vector<std::string> audiodrv_list_str = SDL_GetAudioDriver(SDL_GetNumAudioDrivers() - 1);
+        // must convert to a vector of char*
+        std::vector<const char *> audiodrv_list;
+        for (const auto &audiodrv : audiodrv_list_str)
+            audiodrv_list.push_back(audiodrv.c_str());
+
+        static int current_audio_driver = std::find(audiodrv_list_str.begin(), audiodrv_list_str.end(), emuenv.cfg.audio_drv) - audiodrv_list_str.begin();
+        ImGui::Combo(lang.audio["audio_driver"].c_str(), &current_audio_driver, audiodrv_list.data(), static_cast<int>(audiodrv_list.size()));
+        SetTooltipEx(lang.audio["select_audio_driver"].c_str());
+
         ImGui::Separator();
         ImGui::Spacing();
         ImGui::EndTabItem();
