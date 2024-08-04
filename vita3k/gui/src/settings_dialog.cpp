@@ -1040,8 +1040,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Spacing();
 
         std::vector<std::string> audiodrv_list_str;
-        for (uint8_t list=0; list < (SDL_GetNumAudioDrivers() - 1); list++){
-             audiodrv_list_str.emplace_back(SDL_GetAudioDriver(SDL_GetNumAudioDrivers() - 1));
+        const uint8_t numbersdrv = SDL_GetNumAudioDrivers();
+        for (uint8_t list=0; list < (numbersdrv); list++){
+             audiodrv_list_str.push_back(SDL_GetAudioDriver(numbersdrv);
         }
         // must convert to a vector of char*
         std::vector<const char *> audiodrv_list;
