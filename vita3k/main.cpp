@@ -279,7 +279,8 @@ int main(int argc, char *argv[]) {
 
 #ifdef ANDROID
         // The AAudio driver (used by default) is really really bad
-        SDL_SetHint(SDL_HINT_AUDIODRIVER, "openslES");
+        if(cfg.use_opensl_audio)
+           SDL_SetHint(SDL_HINT_AUDIODRIVER, "openslES");
 #endif
 
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER | SDL_INIT_SENSOR) < 0) {
