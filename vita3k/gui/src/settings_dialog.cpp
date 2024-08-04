@@ -1038,6 +1038,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Checkbox(lang.audio["enable_ngs_support"].c_str(), &config.ngs_enable);
         SetTooltipEx(lang.audio["ngs_description"].c_str());
         ImGui::Spacing();
+        ImGui::Checkbox(lang.audio["use_opensl_audio"].c_str(), &config.use_opensles);
+        SetTooltipEx(lang.audio["opensl_audio_description"].c_str());
+        ImGui::Spacing();
         ImGui::Separator();
         ImGui::Spacing();
         ImGui::EndTabItem();
