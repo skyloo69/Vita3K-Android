@@ -89,7 +89,7 @@ enum PerfomanceOverleyPosition {
     code(bool, "use-opensles", true, use_opensles)                                                      \
     code(int, "audio-volume", 100, audio_volume)                                                        \
     code(bool, "ngs-enable", true, ngs_enable)                                                          \
-    code(std::string, "audio-drv", "opensles", audio_drv)                                               \
+    code(std::string, "audio-drv", "openslES", audio_drv)                                               \
     code(int, "sys-button", static_cast<int>(SCE_SYSTEM_PARAM_ENTER_BUTTON_CROSS), sys_button)          \
     code(int, "sys-lang", static_cast<int>(SCE_SYSTEM_PARAM_LANG_ENGLISH_US), sys_lang)                 \
     code(int, "sys-date-format", (int)SCE_SYSTEM_PARAM_DATE_FORMAT_MMDDYYYY, sys_date_format)           \
