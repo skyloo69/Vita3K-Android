@@ -301,6 +301,12 @@ int main(int argc, char *argv[]) {
 #endif
     LOG_INFO("Available RAM memory: {} MiB", SDL_GetSystemRAM());
     LOG_INFO("Audio driver: {}", SDL_GetCurrentAudioDriver());
+
+    const uint8_t numbersdrv = SDL_GetNumAudioDrivers();
+    LOG_INFO("Supported audio driver:");
+    for (uint8_t list=0; list < numbersdrv; list++){
+        LOG_INFO("index {} : {}", list, SDL_GetAudioDriver(numbersdrv));
+    }
     
     app::AppRunType run_type = app::AppRunType::Unknown;
     if (cfg.run_app_path) {
