@@ -1083,9 +1083,9 @@ void draw_live_area_screen(GuiState &gui, EmuEnvState &emuenv) {
 
     ImVec2 BUTTON_SIZE;
     if(emuenv.cfg.screenmode_pos == 3){
-	BUTTON_SIZE = ImVec2(120.f * SCALE.y, 80.f * SCALE.x);
+	BUTTON_SIZE = ImVec2(80.f * SCALE.x, 120.f * SCALE.y);
     }else{
-	BUTTON_SIZE = ImVec2(72.f * SCALE.x, 30.f * SCALE.y);
+	BUTTON_SIZE = ImVec2(75.f * SCALE.x, 50.f * SCALE.y);
     }
 
     if (gui.live_area_contents[app_path].contains("gate")) {
