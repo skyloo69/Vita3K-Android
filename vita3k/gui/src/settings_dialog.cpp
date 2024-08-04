@@ -1039,7 +1039,9 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         SetTooltipEx(lang.audio["ngs_description"].c_str());
         ImGui::Spacing();
 
-        const std::vector<std::string> audiodrv_list_str = (SDL_GetAudioDriver(SDL_GetNumAudioDrivers() - 1)).c_str();
+        const std::vector<std::string> audiodrv_list_str {
+            SDL_GetAudioDriver(SDL_GetNumAudioDrivers() - 1);
+        }
         // must convert to a vector of char*
         std::vector<const char *> audiodrv_list;
         for (const auto &audiodrv : audiodrv_list_str)
