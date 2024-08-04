@@ -279,7 +279,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef ANDROID
         // The AAudio driver (used by default) is really really bad
-        if(cfg.use_opensl_audio)
+        if(emuenv.use_opensl_audio)
            SDL_SetHint(SDL_HINT_AUDIODRIVER, "openslES");
 #endif
 
