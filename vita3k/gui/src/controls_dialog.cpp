@@ -189,6 +189,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
         set_controller_overlay_state(0);
         gui.controls_menu.controls_dialog = false;
     }
+    ImGui::ScrollWhenDragging();
     ImGui::End();
 }
 
@@ -399,6 +400,7 @@ void draw_controls_dialog(GuiState &gui, EmuEnvState &emuenv) {
     if (ImGui::Button(common["close"].c_str(), BUTTON_SIZE))
         gui.controls_menu.controls_dialog = false;
 
+    ImGui::ScrollWhenDragging();
     ImGui::End();
 }
 

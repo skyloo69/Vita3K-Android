@@ -954,7 +954,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
                 ImGui::SetTooltip("%s", lang.gpu["mapping_method_description"].c_str());
             }
 
-            
+            ImGui::Spacing();
             std::vector<const char *> vk_surface_format_strings = {
                    "Immediate",
                    "Mailbox",
@@ -975,6 +975,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
             if (ImGui::IsItemHovered()) {
                 ImGui::SetTooltip("%s", lang.gpu["surface_format_method_description"].c_str());
             }
+            ImGui::Spacing();
             
             if (is_ingame)
                 ImGui::EndDisabled();
@@ -1037,6 +1038,24 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
         ImGui::Checkbox(lang.audio["enable_ngs_support"].c_str(), &config.ngs_enable);
         SetTooltipEx(lang.audio["ngs_description"].c_str());
         ImGui::Spacing();
+
+        std::vector<std::string> audiodrv_list_str;
+        const int numbersdrv = SDL_GetNumAudioDrivers()-1;
+        for (int list=0; list < numbersdrv; list++){
+             audiodrv_list_str.push_back(SDL_GetAudioDriver(list));
+        }
+        // must convert to a vector of char*
+        std::vector<const char *> audiodrv_list;
+        for (const auto &audiodrv : audiodrv_list_str)
+            audiodrv_list.push_back(audiodrv.c_str());
+
+        static int current_audio_driver = std::find(audiodrv_list_str.begin(), audiodrv_list_str.end(), emuenv.cfg.audio_drv) - audiodrv_list_str.begin();
+        if(ImGui::Combo(lang.audio["audio_driver"].c_str(), &current_audio_driver, audiodrv_list.data(), static_cast<int>(audiodrv_list.size()))) {
+          emuenv.cfg.audio_drv = audiodrv_list_str[current_audio_driver];
+        }
+        if (ImGui::IsItemHovered()) {
+            SetTooltipEx(lang.audio["select_audio_driver"].c_str());
+        }
         ImGui::Separator();
         ImGui::Spacing();
         ImGui::EndTabItem();
