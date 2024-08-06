@@ -1051,7 +1051,7 @@ void draw_settings_dialog(GuiState &gui, EmuEnvState &emuenv) {
 
         static int current_audio_driver = std::find(audiodrv_list_str.begin(), audiodrv_list_str.end(), emuenv.cfg.audio_drv) - audiodrv_list_str.begin();
         if(ImGui::Combo(lang.audio["audio_driver"].c_str(), &current_audio_driver, audiodrv_list.data(), static_cast<int>(audiodrv_list.size()))) {
-          &emuenv.cfg.audio_drv = audiodrv_list_str[current_audio_driver];
+          emuenv.cfg.audio_drv = audiodrv_list_str[current_audio_driver];
         }
         if (ImGui::IsItemHovered()) {
             SetTooltipEx(lang.audio["select_audio_driver"].c_str());
